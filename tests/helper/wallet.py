@@ -22,8 +22,10 @@ import random
 import sys
 
 from secp256k1 import PrivateKey, PublicKey
-from time import time
 from typing import Optional
+
+from .tbears_command import get_deploy_payload
+from .tbears.utils import get_now_time_stamp
 
 ICX_FACTOR = 10 ** 18
 ICX_FEE = 0.01
@@ -92,6 +94,20 @@ class Wallet:
 
         return icx_origin if is_raw_data else params
 
+    def deploy_score_v3(self, score_name: str, is_raw_data=False) -> dict:
+        params = get_deploy_payload(score_name, self)
+        hash_for_sign = self.__create_hash(params)
+        params["signature"] = self.__create_signature(hash_for_sign)
+
+        icx_origin = dict()
+        icx_origin["jsonrpc"] = "2.0"
+        icx_origin["method"] = "icx_sendTransaction"
+        icx_origin["id"] = random.randrange(0, 100000)
+        icx_origin["params"] = params
+        self.__last_raw_icx_origin = icx_origin
+
+        return icx_origin if is_raw_data else params
+
     @staticmethod
     def __create_address(public_key: PublicKey) -> str:
         serialized_pub = public_key.serialize(compressed=False)
@@ -140,8 +156,3 @@ class Wallet:
                 yield from self.__gen_ordered_items(parameter[key])
             else:
                 raise TypeError(f"{key} must be dict or str")
-
-
-# micro seconds
-def get_now_time_stamp() -> int:
-    return int(time() * 10 ** 6)

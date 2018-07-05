@@ -1,7 +1,7 @@
 import binascii
 import unittest
-import time
 import jsonrpcclient
+from time import sleep
 from secp256k1 import PrivateKey
 
 from tests.helper import validator_v3
@@ -13,7 +13,9 @@ class TestV3(unittest.TestCase):
     first_block = None
 
     god_private_key = PrivateKey(binascii.unhexlify('98dc1847168d72e515c9e2a6639ae8af312a1dde5d19f3fb38ded71141a1e6be'))
+    score_owner_private_key = PrivateKey(binascii.unhexlify('a0a1c51d2deeba854ca25aab72e465d701e0f47fb97e2110dc5157d752ab154a'))
     god_wallet = Wallet(god_private_key)
+    score_owner = Wallet(score_owner_private_key)
 
     any_wallets = [Wallet(), Wallet()]
     any_icx = [123, 1.23]
@@ -33,7 +35,7 @@ class TestV3(unittest.TestCase):
         cls.tx_hashes.append(response)
         cls.tx_origin.append(params)
 
-        time.sleep(1)  # wait for consensus
+        sleep(1)  # wait for consensus
 
         cls.any_wallets[0].to_address = cls.any_wallets[1].address
         cls.any_wallets[0].value = cls.any_icx[1]
@@ -43,7 +45,7 @@ class TestV3(unittest.TestCase):
         cls.tx_hashes.append(response)
         cls.tx_origin.append(params)
 
-        time.sleep(1)  # wait for consensus
+        sleep(1)  # wait for consensus
 
     @classmethod
     def tearDownClass(cls):
@@ -89,3 +91,8 @@ class TestV3(unittest.TestCase):
 
         response = jsonrpcclient.request(self.host, 'icx_getTransactionByHash', {'txHash': self.tx_hashes[1]})
         validator_v3.validate_origin(self, response, self.tx_origin[1], self.tx_hashes[1])
+
+    def test_deploy_score(self):
+        params = self.score_owner.deploy_score_v3('sample_token')
+        response = jsonrpcclient.request(self.host, 'icx_sendTransaction', params)
+        print(response)
