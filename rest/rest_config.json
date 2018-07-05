@@ -1,0 +1,11 @@
+{
+  "LOOPCHAIN_DEFAULT_CHANNEL": "loopchain_default",
+  "PORT_REST": 9000,
+  "AMQP_KEY": "7100",
+
+  "log": {
+    "level": "debug",
+    "filePath": "./tbears.log",
+    "outputType": "console|file"
+  }
+}
