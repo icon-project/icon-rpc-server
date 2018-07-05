@@ -4,8 +4,9 @@
   "AMQP_KEY": "7100",
 
   "log": {
-    "level": "debug",
-    "filePath": "./tbears.log",
-    "outputType": "console|file"
-  }
+		"colorLog": true,
+		"level": "DEBUG",
+		"filePath": "./log/rest_server.log",
+		"outputType": "console|file"
+	}
 }
