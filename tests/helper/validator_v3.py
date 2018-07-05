@@ -99,5 +99,5 @@ def validate_origin(self, result, origin, tx_hash):
     result.pop('txIndex')
     result.pop('blockHeight')
     result.pop('blockHash')
-    # TODO
-    # self.assertDictEqual(result, origin)
+    result.pop('txHash')
+    self.assertDictEqual(result, origin)
