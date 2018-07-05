@@ -124,8 +124,9 @@ def start_process(params: dict):
 
 
 def stop_process(params: dict):
-    # TODO
-    Logger.info(f'stop_process_icon_service!', REST_SERVICE_STANDALONE)
+    command = f"pkill gunicorn"
+    subprocess.run(command, stdout=subprocess.PIPE, shell=True)
+    Logger.info(f'stop_process_rest_app!', REST_SERVICE_STANDALONE)
 
 
 def is_serve_rest_server(params: dict) -> bool:
@@ -133,9 +134,10 @@ def is_serve_rest_server(params: dict) -> bool:
 
 
 def _check_serve(params: dict) -> bool:
-    Logger.info(f'check_serve_icon_service!', REST_SERVICE_STANDALONE)
-    proc_title = conf.REST_SERVER_PROCTITLE_FORMAT.format(**params)
-    return find_procs_by_params(proc_title)
+    Logger.info(f'check_serve_rest_app!', REST_SERVICE_STANDALONE)
+    # proc_title = conf.REST_SERVER_PROCTITLE_FORMAT.format(**params)
+    # return find_procs_by_params(proc_title)
+    return find_procs_by_params("gunicorn")
 
 
 def find_procs_by_params(name) -> bool:

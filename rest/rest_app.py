@@ -70,7 +70,7 @@ def main():
     ServerComponents().set_resource()
 
     api_port = port
-    Logger.debug("Run gunicorn webserver for HA. Port = %s", str(api_port))
+    Logger.debug(f"Run gunicorn webserver for HA. Port = {api_port}")
 
     # Configure SSL.
     ssl_context = ServerComponents().ssl_context
@@ -96,6 +96,7 @@ def main():
     # Launch gunicorn web server.
     ServerComponents().ready(amqp_target, amqp_key)
     StandaloneApplication(ServerComponents().app, options).run()
+    Logger.error("Rest App Done!")
 
 
 # Run as gunicorn web server.
