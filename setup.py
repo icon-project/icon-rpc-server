@@ -5,6 +5,7 @@ from rest import __version__
 
 requires = [
     "setproctitle",
+    "binascii",
     "requests==2.19.1",
     "jsonrpcserver==3.5.3",
     "sanic==0.7.0",
@@ -13,7 +14,8 @@ requires = [
     "grpcio-tools == 1.3.5",
     "protobuf == 3.5.1",
     "aiohttp == 3.0.9",
-    "jsonrpcclient == 2.5.2"
+    "jsonrpcclient == 2.5.2",
+    "secp256k1==0.13.2"
 ]
 
 setup_options = {
