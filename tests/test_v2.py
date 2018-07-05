@@ -18,7 +18,8 @@ import time
 import jsonrpcclient
 from secp256k1 import PrivateKey
 
-from tests.wallet import Wallet, ICX_FACTOR
+from tests.helper import validator_v2
+from tests.helper.wallet import Wallet, ICX_FACTOR
 
 
 class TestV2(unittest.TestCase):
@@ -35,7 +36,6 @@ class TestV2(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-
         response = jsonrpcclient.request(cls.host, 'icx_getLastBlock')
         cls.first_block = response
 
@@ -73,42 +73,23 @@ class TestV2(unittest.TestCase):
 
     def test_get_last_block(self):
         response = jsonrpcclient.request(self.host, 'icx_getLastBlock')
-        self.validate_block(response['block'])
+        validator_v2.validate_block(self, response['block'])
 
         self.assertEqual(response['block']['height'], self.first_block['block']['height'] + len(self.any_icx))
 
     def test_get_block_by_hash(self):
         response = jsonrpcclient.request(self.host, 'icx_getBlockByHash', {'hash': self.first_block['block']['block_hash']})
-        self.validate_block(response['block'])
+        validator_v2.validate_block(self, response['block'])
 
         self.assertDictEqual(response, self.first_block)
 
     def test_get_block_by_height(self):
         response = jsonrpcclient.request(self.host, 'icx_getBlockByHeight', {'height': '2'})
-        self.validate_block(response['block'])
+        validator_v2.validate_block(self, response['block'])
 
     def test_get_transaction_by_address(self):
         pass
 
     def test_get_total_supply(self):
         response = jsonrpcclient.request(self.host, 'icx_getTotalSupply')
-        self.assertEqual(response, '0x2961ffa20dd47f5c4700000')
-
-    def validate_block(self, block):
-        self.assertIn('version', block)
-
-        int(block['prev_block_hash'], 16)
-        self.assertEqual(len(block['prev_block_hash']), 64)
-
-        int(block['merkle_tree_root_hash'], 16)
-        self.assertEqual(len(block['merkle_tree_root_hash']), 64)
-
-        int(block['block_hash'], 16)
-        self.assertEqual(len(block['block_hash']), 64)
-
-        # int(block['height'])
-
-        self.assertIn('peer_id', block)
-        self.assertIn('signature', block)
-
-        # int(block['time_stamp'])
+        self.assertEqual(response, '0x296f3bc3cac14e365700000')
