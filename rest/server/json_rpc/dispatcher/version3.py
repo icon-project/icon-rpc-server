@@ -19,7 +19,7 @@ import logging
 from earlgrey import MessageQueueException
 from jsonrpcserver import config, status
 from jsonrpcserver.aio import AsyncMethods
-from sanic import response
+from sanic import response as sanic_response
 
 import rest.configure.configure as conf
 from ....protos import message_code
@@ -41,7 +41,7 @@ class Version3Dispatcher:
         req = request.json
 
         dispatch_response = await methods.dispatch(req)
-        return response.json(dispatch_response, status=dispatch_response.http_status, dumps=json.dumps)
+        return sanic_response.json(dispatch_response, status=dispatch_response.http_status, dumps=json.dumps)
 
     @staticmethod
     @methods.add
@@ -79,7 +79,8 @@ class Version3Dispatcher:
         if by_citizen:
             kwargs = kwargs["message"]
 
-        request = make_request("icx_sendTransaction", kwargs)
+        method = 'icx_sendTransaction'
+        request = make_request(method, kwargs)
         icon_stub = StubCollection().icon_score_stubs[conf.LOOPCHAIN_DEFAULT_CHANNEL]
         response = await icon_stub.async_task().validate_transaction(request)
         response_to_json_query(response)

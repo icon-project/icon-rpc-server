@@ -50,7 +50,7 @@ class Version2Dispatcher:
     @methods.add
     async def icx_sendTransaction(**kwargs):
         if RestProperty().node_type == conf.NodeType.CitizenNode:
-            return await redirect_request_to_rs(kwargs, RestProperty().rs_target, 'v2')
+            return await redirect_request_to_rs(kwargs, RestProperty().rs_target, conf.ApiVersion.v2.name)
 
         by_citizen = kwargs.get("node_type", False)
         if by_citizen:
@@ -84,7 +84,7 @@ class Version2Dispatcher:
     @methods.add
     async def icx_getTransactionResult(**kwargs):
         if RestProperty().node_type == conf.NodeType.CitizenNode:
-            return await redirect_request_to_rs(kwargs, RestProperty().rs_target, 'v2')
+            return await redirect_request_to_rs(kwargs, RestProperty().rs_target, conf.ApiVersion.v2.name)
 
         by_citizen = kwargs.get("node_type", False)
         if by_citizen:

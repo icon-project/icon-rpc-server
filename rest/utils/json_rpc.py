@@ -23,7 +23,7 @@ from ..utils.message_queue import StubCollection
 from ..protos import message_code
 
 
-async def redirect_request_to_rs(message, rs_target, version='v3'):
+async def redirect_request_to_rs(message, rs_target, version=conf.ApiVersion.v3.name):
     rs_url = f"{'https' if conf.SUBSCRIBE_USE_HTTPS else 'http'}://{rs_target}/api/{version}"
     async with aiohttp.ClientSession() as session:
         result = await aiohttpClient(session, rs_url).request(
