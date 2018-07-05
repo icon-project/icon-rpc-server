@@ -5,7 +5,6 @@ from rest import __version__
 
 requires = [
     "setproctitle",
-    "binascii",
     "requests==2.19.1",
     "jsonrpcserver==3.5.3",
     "sanic==0.7.0",
