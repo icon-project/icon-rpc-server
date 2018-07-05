@@ -23,13 +23,14 @@ import sys
 
 from secp256k1 import PrivateKey, PublicKey
 from time import time
+from typing import Optional
 
 ICX_FACTOR = 10 ** 18
 ICX_FEE = 0.01
 
 
 class Wallet:
-    def __init__(self, private_key=None):
+    def __init__(self, private_key: Optional['PrivateKey']=None):
         self.__private_key = private_key or PrivateKey()
         self.__address = self.__create_address(self.__private_key.pubkey)
         self.__last_raw_icx_origin = None
@@ -40,16 +41,16 @@ class Wallet:
         self.is_logging = True
 
     @property
-    def address(self):
+    def address(self) -> str:
         return self.__address
 
-    def get_last_icx_origin(self, is_raw_data=False):
+    def get_last_icx_origin(self, is_raw_data=False) -> Optional[dict]:
         if self.__last_raw_icx_origin is None:
             return None
 
         return self.__last_raw_icx_origin if is_raw_data else self.__last_raw_icx_origin["params"]
 
-    def create_icx_origin(self, is_raw_data=False):
+    def create_icx_origin(self, is_raw_data=False) -> dict:
         params = dict()
         params["from"] = self.address
         params["to"] = self.to_address
@@ -70,7 +71,7 @@ class Wallet:
 
         return icx_origin if is_raw_data else params
 
-    def create_icx_origin_v3(self, is_raw_data=False):
+    def create_icx_origin_v3(self, is_raw_data=False) -> dict:
         params = dict()
         params["version"] = "0x3"
         params["from"] = self.address
@@ -91,12 +92,13 @@ class Wallet:
 
         return icx_origin if is_raw_data else params
 
-    def __create_address(self, public_key: PublicKey) -> str:
+    @staticmethod
+    def __create_address(public_key: PublicKey) -> str:
         serialized_pub = public_key.serialize(compressed=False)
         hashed_pub = hashlib.sha3_256(serialized_pub[1:]).hexdigest()
         return f"hx{hashed_pub[-40:]}"
 
-    def __create_hash(self, icx_origin):
+    def __create_hash(self, icx_origin) -> str:
         # gen origin
         gen = self.__gen_ordered_items(icx_origin)
         origin = ".".join(gen)
@@ -107,7 +109,7 @@ class Wallet:
         # gen hash
         return hashlib.sha3_256(origin.encode()).hexdigest()
 
-    def __create_signature(self, tx_hash):
+    def __create_signature(self, tx_hash) -> str:
         signature = self.__private_key.ecdsa_sign_recoverable(msg=binascii.unhexlify(tx_hash),
                                                               raw=True,
                                                               digest=hashlib.sha3_256)
@@ -125,7 +127,7 @@ class Wallet:
         signature = base64.b64encode(sig_message).decode()
         return signature
 
-    def __gen_ordered_items(self, parameter):
+    def __gen_ordered_items(self, parameter) -> str:
         ordered_keys = list(parameter)
         ordered_keys.sort()
         for key in ordered_keys:
@@ -140,5 +142,6 @@ class Wallet:
                 raise TypeError(f"{key} must be dict or str")
 
 
-def get_now_time_stamp():
+# micro seconds
+def get_now_time_stamp() -> int:
     return int(time() * 10 ** 6)
