@@ -18,5 +18,6 @@
   "USE_EXTERNAL_REST": true,
   "PORT_PEER": 7100,
   "AMQP_KEY": "7100",
-  "DEFAULT_STORAGE_PATH": "./.storage/"
+  "DEFAULT_STORAGE_PATH": "./.storage/",
+  "ALLOW_MAKE_EMPTY_BLOCK": false
 }

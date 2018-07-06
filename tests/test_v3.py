@@ -87,11 +87,11 @@ class TestV3(unittest.TestCase):
 
     def test_get_genesis_block_by_height(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': '0x1'})
-        validator_v3.validate_block(self, response, block_height='0x1')
+        validator_v3.validate_block(self, response, block_height=1)
 
     def test_get_block_by_height(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': '0x2'})
-        validator_v3.validate_block(self, response, block_height='0x2')
+        validator_v3.validate_block(self, response, block_height=2)
 
     def test_get_block_by_hash(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHash', {'hash': self.first_block['block_hash']})
