@@ -1,9 +1,11 @@
 import binascii
 import unittest
 import jsonrpcclient
+import jsonrpcclient.exceptions
 from time import sleep
 from secp256k1 import PrivateKey
 
+from rest.server.json_rpc import JsonError
 from tests.helper import validator_v3, validator_v2
 from tests.helper.wallet import Wallet, ICX_FACTOR
 
@@ -52,12 +54,18 @@ class TestV3(unittest.TestCase):
     def tearDownClass(cls):
         pass
 
-    def test_get_balance(self):
+    def test_get_balance_success(self):
         response = jsonrpcclient.request(self.host_v3, 'icx_getBalance', {"address": self.any_wallets[0].address})
         self.assertEqual(response, hex(int((123 - 1.23) * ICX_FACTOR)))
 
         response = jsonrpcclient.request(self.host_v3, 'icx_getBalance', {"address": self.any_wallets[1].address})
         self.assertEqual(response, hex(int(1.23 * ICX_FACTOR)))
+
+    def test_get_balance_fail_invalid_address(self):
+        try:
+            response = jsonrpcclient.request(self.host_v3, 'icx_getBalance', {"address": "INVALID_ADDRESS"})
+        except jsonrpcclient.exceptions.ReceivedErrorResponse as e:
+            self.assertEqual(e.code, JsonError.INVALID_PARAMS)
 
     def test_get_total_supply(self):
         response = jsonrpcclient.request(self.host_v3, 'icx_getTotalSupply')

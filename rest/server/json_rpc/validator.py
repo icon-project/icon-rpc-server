@@ -18,7 +18,7 @@ from jsonrpcserver import status
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
-from rest.server.json_rpc.exception import GenericJsonRpcServerError, INVALID_PARAMS, METHOD_NOT_FOUND
+from rest.server.json_rpc.exception import GenericJsonRpcServerError, JsonError
 
 icx_sendTransaction_v2: dict = {
     "$schema": "http://json-schema.org/schema#",
@@ -380,7 +380,7 @@ def validate_jsonschema(request: object, schemas: dict = SCHEMA_V3):
     # get schema for 'method'
     schema = schemas.get(request['method'], None)
     if schema is None:
-        raise GenericJsonRpcServerError(code=METHOD_NOT_FOUND,
+        raise GenericJsonRpcServerError(code=JsonError.METHOD_NOT_FOUND,
                                         message=f"JSON schema validation error: Method not found",
                                         http_status=status.HTTP_BAD_REQUEST )
 
@@ -388,6 +388,6 @@ def validate_jsonschema(request: object, schemas: dict = SCHEMA_V3):
     try:
         validate(instance=request, schema=schema)
     except ValidationError as e:
-        raise GenericJsonRpcServerError(code=INVALID_PARAMS,
+        raise GenericJsonRpcServerError(code=JsonError.INVALID_PARAMS,
                                         message=f"JSON schema validation error: {e}",
                                         http_status=status.HTTP_BAD_REQUEST )

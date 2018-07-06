@@ -66,6 +66,7 @@ class TestV2(unittest.TestCase):
 
     def test_get_balance(self):
         response = jsonrpcclient.request(self.host, 'icx_getBalance', {"address": self.any_wallets[0].address})
+        print(response)
         self.assertEqual(response, hex(int((123 - 1.23) * ICX_FACTOR)))
 
         response = jsonrpcclient.request(self.host, 'icx_getBalance', {"address": self.any_wallets[1].address})
