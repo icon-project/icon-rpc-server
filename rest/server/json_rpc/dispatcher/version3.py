@@ -28,6 +28,7 @@ from ...json_rpc import exception
 from ....utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
 from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params
 from ....utils.message_queue import StubCollection
+from rest.server.json_rpc.validator import validate_jsonschema_v3
 
 config.log_requests = False
 config.log_responses = False
@@ -39,6 +40,8 @@ class Version3Dispatcher:
     @staticmethod
     async def dispatch(request):
         req = request.json
+
+        validate_jsonschema_v3(request=req)
 
         dispatch_response = await methods.dispatch(req)
         return sanic_response.json(dispatch_response, status=dispatch_response.http_status, dumps=json.dumps)
