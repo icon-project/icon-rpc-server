@@ -117,12 +117,27 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
             "id": 1234,
             "method": "icx_getLastBlock"
         }
+        self.getTotalSupply = {
+            "jsonrpc": "2.0",
+            "id": 1234,
+            "method": "icx_getTotalSupply",
+        }
+        self.icx_getTransactionByAddress = {
+            "jsonrpc" : "2.0",
+            "method": "icx_getTransactionByAddress",
+            "id": 1234,
+            "params": {
+                "address": "hxaa688d74eb5f98b577883ca203535d2aa4f0838c",
+                "index": 0
+            }
+        }
 
     def check_address(self, full_data: dict, data: dict, keys: list):
         for key in keys:
+            org_addr = data.get(key)
             data[key] = create_address(data=b'addr', is_eoa=False)
             self.check_invalid(full_data=full_data)
-            data[key] = create_address(data=b'addr')
+            data[key] = org_addr
 
     def test_sendTransaction(self):
         full_data = self.sendTransaction
@@ -200,6 +215,31 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
         # check required key validation
         required_keys = ['jsonrpc', 'id']
         self.check_more(full_data=full_data, data=full_data, required_keys=required_keys)
+
+    def test_getTotalSupply(self):
+        full_data = self.getTotalSupply
+
+        # check default function
+        self.check_valid(full_data=full_data)
+
+        # check required key validation
+        required_keys = ['jsonrpc', 'id', 'method']
+        self.check_more(full_data=full_data, data=full_data, required_keys=required_keys)
+
+    def test_getTransactionByAddress(self):
+        full_data = self.icx_getTransactionByAddress
+
+        # check default function
+        self.check_valid(full_data=full_data)
+
+        # check with invalid address
+        params = full_data['params']
+        addr_keys = ['address']
+        self.check_address(full_data=full_data, data=params, keys=addr_keys)
+
+        # check required key validation
+        required_keys = ['address', 'index']
+        self.check_more(full_data=full_data, data=params, required_keys=required_keys)
 
     def test_batch_request(self):
         batch_request = [self.getBlockByHash, self.sendTransaction, self.getBalance]
@@ -387,7 +427,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
         self.check_valid(full_data=full_data)
 
         # check required key validation
-        required_keys = ['jsonrpc', 'id']
+        required_keys = ['jsonrpc', 'id', 'method']
         self.check_more(full_data=full_data, data=full_data, required_keys=required_keys)
 
     def test_getTransactionResult(self):

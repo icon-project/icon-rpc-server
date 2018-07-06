@@ -19,6 +19,7 @@ import logging
 from earlgrey import MessageQueueException
 from jsonrpcserver import config, status
 from jsonrpcserver.aio import AsyncMethods
+from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
 import rest.configure.configure as conf
@@ -41,10 +42,14 @@ class Version3Dispatcher:
     async def dispatch(request):
         req = request.json
 
-        validate_jsonschema_v3(request=req)
+        try:
+            validate_jsonschema_v3(request=req)
+        except exception.GenericJsonRpcServerError as e:
+            response = ExceptionResponse(e, request_id=req.get('id', 0))
+        else:
+            response = await methods.dispatch(req)
 
-        dispatch_response = await methods.dispatch(req)
-        return sanic_response.json(dispatch_response, status=dispatch_response.http_status, dumps=json.dumps)
+        return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
 
     @staticmethod
     @methods.add

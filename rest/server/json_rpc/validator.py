@@ -152,13 +152,52 @@ icx_getLastBlock_v2: dict = {
     "required": ["jsonrpc", "method", "id"]
 }
 
+icx_getTransactionByAddress_v2: dict = {
+    "$schema": "http://json-schema.org/schema#",
+    "title": "icx_getTransactionByAddress",
+    "id": "googledoc.icx_getTransactionByAddress",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": "number"},
+        "params": {
+            "type": "object",
+            "properties": {
+                "address": {"type": "string", "maxLength": 42, "pattern": "^hx"},
+                "index": {"type": "number"},
+            },
+            "additionalProperties": False,
+            "required": ["address", "index"]
+        }
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id"]
+}
+
+icx_getTotalSupply_v2: dict = {
+    "$schema": "http://json-schema.org/schema#",
+    "title": "icx_getTotalSupply",
+    "id": "googledoc.icx_getTotalSupplu",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": "number"},
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id"]
+}
+
 SCHEMA_V2: dict = {
     "icx_sendTransaction": icx_sendTransaction_v2,
     "icx_getTransactionResult": icx_getTransactionResult_v2,
     "icx_getBalance": icx_getBalance_v2,
-    "icx_getBlockByHeight": icx_getBlockByHeight_v2,
+    "icx_getTotalSupply": icx_getTotalSupply_v2,
+    "icx_getLastBlock": icx_getLastBlock_v2,
     "icx_getBlockByHash": icx_getBlockByHash_v2,
-    "icx_getLastBlock": icx_getLastBlock_v2
+    "icx_getBlockByHeight": icx_getBlockByHeight_v2,
+    "icx_getTransactionByAddress": icx_getTransactionByAddress_v2
 }
 
 
@@ -233,7 +272,7 @@ icx_getScoreApi_v3: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "address": {"type": "string", "maxLength": 42, "pattern": "^hx|^cx"},
+                "address": {"type": "string", "maxLength": 42, "pattern": "^cx"},
             },
             "additionalProperties": False,
             "required": ["address"]
@@ -241,20 +280,6 @@ icx_getScoreApi_v3: dict = {
     },
     "additionalProperties": False,
     "required": ["jsonrpc", "method", "id", "params"]
-}
-
-icx_getTotalSupply_v3: dict = {
-    "$schema": "http://json-schema.org/schema#",
-    "title": "icx_getTotalSupply",
-    "id": "https://repo.theloop.co.kr/theloop/LoopChain/wikis/doc/loopchain-json-rpc-v3#icx_gettotalsupply",
-    "type": "object",
-    "properties": {
-        "jsonrpc": {"type": "string", "enum": ["2.0"]},
-        "method": {"type": "string"},
-        "id": {"type": "number"},
-    },
-    "additionalProperties": False,
-    "required": ["jsonrpc", "method", "id"]
 }
 
 icx_getTransactionResult_v3: dict = {
@@ -349,7 +374,7 @@ SCHEMA_V3: dict = {
     "icx_call": icx_call_v3,
     "icx_getBalance": icx_getBalance_v3,
     "icx_getScoreApi": icx_getScoreApi_v3,
-    "icx_getTotalSupply": icx_getTotalSupply_v3,
+    "icx_getTotalSupply": icx_getTotalSupply_v2,
     "icx_getTransactionResult": icx_getTransactionResult_v3,
     "icx_getTransactionByHash": icx_getTransactionByHash_v3,
     "icx_sendTransaction": icx_sendTransaction_v3
@@ -378,11 +403,14 @@ def validate_jsonschema(request: object, schemas: dict = SCHEMA_V3):
         return
 
     # get schema for 'method'
-    schema = schemas.get(request['method'], None)
+    schema: dict = None
+    method = request.get('method', None)
+    if method and isinstance(method, str):
+        schema = schemas.get(method, None)
     if schema is None:
         raise GenericJsonRpcServerError(code=JsonError.METHOD_NOT_FOUND,
                                         message=f"JSON schema validation error: Method not found",
-                                        http_status=status.HTTP_BAD_REQUEST )
+                                        http_status=status.HTTP_BAD_REQUEST)
 
     # check request
     try:
@@ -390,4 +418,4 @@ def validate_jsonschema(request: object, schemas: dict = SCHEMA_V3):
     except ValidationError as e:
         raise GenericJsonRpcServerError(code=JsonError.INVALID_PARAMS,
                                         message=f"JSON schema validation error: {e}",
-                                        http_status=status.HTTP_BAD_REQUEST )
+                                        http_status=status.HTTP_BAD_REQUEST)
