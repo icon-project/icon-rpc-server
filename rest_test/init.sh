@@ -4,8 +4,8 @@
 
 #virtualenv -p python3 venv
 
-deactivate
-source ./venv/bin/activate
+# deactivate
+# source ../venv/bin/activate
 
 echo "uninstall package start!"
 pip uninstall -y tbears

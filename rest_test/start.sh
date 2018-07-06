@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source venv/bin/activate
+# source ../venv/bin/activate
 
 loop rs -d -o ./conf/loop_rs_conf.json &
 sleep 3
