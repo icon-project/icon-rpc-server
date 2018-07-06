@@ -29,6 +29,12 @@ def response_to_json_query(response):
             message=response['message'],
             http_status=status.HTTP_BAD_REQUEST
         )
+    else:
+        response = {
+            'response': response,
+            "response_code": 0
+        }
+
     return response
 
 

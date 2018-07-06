@@ -108,12 +108,9 @@ class Version2Dispatcher:
         tx_hash = kwargs["tx_hash"]
         if is_hex(tx_hash):
             response_code, result = await channel_stub.async_task().get_invoke_result(tx_hash)
-            verify_result['response_code'] = str(response_code)
-
             if response_code == message_code.Response.success:
                 # loopchain success
                 if result:
-                    print(444)
                     try:
                         # apply tx_result_convert
                         result_dict = json.loads(result)
@@ -141,7 +138,7 @@ class Version2Dispatcher:
             message = "response_code is fail"
 
         # parsing response
-        verify_result['response_code'] = error_code
+        verify_result['response_code'] = str(error_code)
         if error_code == message_code.Response.success:
             verify_result['response'] = {'code': error_code}
         if message:
@@ -228,48 +225,3 @@ class Version2Dispatcher:
 
 def is_hex(s):
     return re.fullmatch(r"^(0x)?[0-9a-f]{64}$", s or "") is not None
-
-
-
-"""
-### jsonrpc 기반 프로토콜
-```
-/api/v2 post
-{
-    "jsonrpc" : "2.0",
-    "method": "send_transaction",
-    "param": {
-        "address" : "icxaa688d74eb5f98b577883ca203535d2aa4f0838c",
-        "channl_name": "icon_public",
-        "score_id": "icon_foundation/icx",
-        "invoke_method": "send",
-        "invoke_params": [{
-            "a": "b",
-            "b": "c"
-        }],
-        "signature": "FaqqMJexkFm1uUtCa85Ag9UwScWqxI0p7l648L7ZmAJfOEOTaoMB2AYRxz+Ekg22X8gRhwPRwSCB5OcXLrYO+Q==1"
-    },
-    "id": 1
-}
-```
-
-### restapi 기반 프로토콜
-```
-/api/v1/transactions
-{
-    "address": "icxaa688d74eb5f98b577883ca203535d2aa4f0838c",
-    "channel_name": "icon_public",
-    "score_id": "icon_foundation/icx",
-    "score": {
-        "jsonrpc": "2.0",
-        "method": "send",
-        "params": {
-            "a": "b",
-            "b": "c"
-        },
-        "id": 1
-    },
-    "signature": "FaqqMJexkFm1uUtCa85Ag9UwScWqxI0p7l648L7ZmAJfOEOTaoMB2AYRxz+Ekg22X8gRhwPRwSCB5OcXLrYO+Q==1"
-}
-```
-"""

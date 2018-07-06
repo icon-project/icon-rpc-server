@@ -50,6 +50,7 @@ class TestV2(unittest.TestCase):
 
         response = jsonrpcclient.request(cls.HOST_V2, 'icx_sendTransaction', params)
         cls.tx_hashes.append(response['tx_hash'])
+        cls.tx_origin.append(params)
 
         time.sleep(1)  # wait for consensus
 
@@ -59,6 +60,7 @@ class TestV2(unittest.TestCase):
 
         response = jsonrpcclient.request(cls.HOST_V2, 'icx_sendTransaction', params)
         cls.tx_hashes.append(response['tx_hash'])
+        cls.tx_origin.append(params)
 
         time.sleep(1)  # wait for consensus
 
@@ -78,7 +80,7 @@ class TestV2(unittest.TestCase):
         self.assertEqual(response['response'], hex(int((self.any_icx[0] - self.any_icx[1]) * ICX_FACTOR)))
 
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBalance', {"address": self.any_wallets[1].address})
-        self.assertEqual(response, hex(int(self.any_icx[1] * ICX_FACTOR)))
+        self.assertEqual(response['response'], hex(int(self.any_icx[1] * ICX_FACTOR)))
 
     def test_get_total_supply(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getTotalSupply')
@@ -118,7 +120,7 @@ class TestV2(unittest.TestCase):
 
     def test_get_total_supply_v3(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTotalSupply')
-        self.assertEqual(response, '0x2961ffa20dd47f5c4700000')
+        self.assertEqual(response, self.ICX_TOTAL_SUPPLY)
 
     def test_get_last_block_v3(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getLastBlock')
