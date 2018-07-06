@@ -175,7 +175,7 @@ class TestV3(unittest.TestCase):
         block = response['block']
         validator_v2.validate_block(self, block)
 
-        self.assertNotEqual(block['block_hash'], self.first_block['block_hash'])
+        self.assertEqual(block['block_hash'], self.first_block['block_hash'])
         self.assertDictEqual(convert_params(block, ParamType.get_block_response), self.first_block)
 
     def test_get_transaction_result_v2(self):

@@ -25,13 +25,13 @@ def validate_block(self, block, block_hash=None, block_height=None):
     int(block['merkle_tree_root_hash'], 16)
     self.assertEqual(64, len(block['merkle_tree_root_hash']))
 
-    self.assertIsInstance(block['time_stamp'], int)
-    self.assertIsInstance(block['height'], int)
-
     int(block['block_hash'], 16)
     self.assertEqual(64, len(block['block_hash']))
     if block_hash:
         self.assertEqual(block['block_hash'], block_hash)
+
+    self.assertIsInstance(block['time_stamp'], int)
+    self.assertIsInstance(block['height'], int)
 
     if block_height:
         self.assertEqual(block['height'], block_height)

@@ -244,11 +244,6 @@ templates[ParamType.get_block_by_height_request] = {
 }
 
 templates[ParamType.get_block_response] = {
-    "prev_block_hash": ValueType.hex_0x_hash_number,
-    "merkle_tree_root_hash": ValueType.hex_0x_hash_number,
-    "time_stamp": ValueType.hex_0x_number,
-    "block_hash": ValueType.hex_0x_hash_number,
-    "height": ValueType.hex_0x_number,
     "confirmed_transaction_list": [
         {
             "txHash": ValueType.hex_0x_hash_number
@@ -262,6 +257,7 @@ templates[ParamType.get_tx_request] = {
 
 templates[ParamType.get_tx_result_response] = {
     "txHash": ValueType.hex_0x_hash_number,
+    "blockHash": ValueType.hex_0x_hash_number,
 }
 
 templates[ParamType.get_tx_by_hash_response] = {
