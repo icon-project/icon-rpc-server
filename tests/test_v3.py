@@ -83,7 +83,7 @@ class TestV3(unittest.TestCase):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getLastBlock')
         validator_v3.validate_block(self, response)
 
-        self.assertEqual(int(response['height'], 16), int(self.first_block['height'], 16) + len(self.any_icx))
+        self.assertEqual(int(response['height'], 16), self.first_block['height'] + len(self.any_icx))
 
     def test_get_genesis_block_by_height(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': '0x1'})
@@ -94,7 +94,8 @@ class TestV3(unittest.TestCase):
         validator_v3.validate_block(self, response, block_height=2)
 
     def test_get_block_by_hash(self):
-        response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHash', {'hash': self.first_block['block_hash']})
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHash',
+                                         {'hash': f"0x{self.first_block['block_hash']}"})
         validator_v3.validate_block(self, response, block_hash=self.first_block['block_hash'])
 
         self.assertDictEqual(response, self.first_block)
@@ -147,21 +148,21 @@ class TestV3(unittest.TestCase):
 
     def test_get_balance_v2(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBalance', {"address": self.any_wallets[0].address})
-        self.assertEqual(response, hex(int((self.any_icx[0] - self.any_icx[1]) * ICX_FACTOR)))
+        self.assertEqual(response['response'], hex(int((self.any_icx[0] - self.any_icx[1]) * ICX_FACTOR)))
 
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBalance', {"address": self.any_wallets[1].address})
-        self.assertEqual(response, hex(int(self.any_icx[1] * ICX_FACTOR)))
+        self.assertEqual(response['response'], hex(int(self.any_icx[1] * ICX_FACTOR)))
 
     def test_get_total_supply_v2(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getTotalSupply')
-        self.assertEqual(response, self.ICX_TOTAL_SUPPLY)
+        self.assertEqual(response['response'], self.ICX_TOTAL_SUPPLY)
 
     def test_get_last_block_v2(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getLastBlock')
         block = response['block']
         validator_v2.validate_block(self, block)
 
-        self.assertEqual(block['height'], int(self.first_block['height'], 16) + len(self.any_icx))
+        self.assertEqual(block['height'], self.first_block['height'] + len(self.any_icx))
 
     def test_get_block_by_height_v2(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHeight', {'height': '2'})
@@ -169,7 +170,7 @@ class TestV3(unittest.TestCase):
         validator_v2.validate_block(self, block)
 
     def test_get_block_by_hash_v2(self):
-        block_hash = self.first_block['block_hash'].replace('0x', '')
+        block_hash = self.first_block['block_hash']
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHash', {'hash': block_hash})
         block = response['block']
         validator_v2.validate_block(self, block)

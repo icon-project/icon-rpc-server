@@ -134,7 +134,7 @@ class TestV2(unittest.TestCase):
     def test_get_block_by_hash_v3(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHash',
                                          {'hash': f"0x{self.first_block['block_hash']}"})
-        validator_v3.validate_block(self, response, block_hash=f"0x{self.first_block['block_hash']}")
+        validator_v3.validate_block(self, response, block_hash=self.first_block['block_hash'])
 
         self.assertDictEqual(response, convert_params(self.first_block, ParamType.get_block_response))
 

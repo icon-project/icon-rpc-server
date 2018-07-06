@@ -20,13 +20,13 @@ def validate_block(self, block, block_hash=None, block_height=None):
 
     if block['height'] != 0:
         int(block['prev_block_hash'], 16)
-        self.assertEqual(len(block['prev_block_hash']), 64)
+        self.assertEqual(64, len(block['prev_block_hash']))
 
     int(block['merkle_tree_root_hash'], 16)
-    self.assertEqual(len(block['merkle_tree_root_hash']), 64)
+    self.assertEqual(64, len(block['merkle_tree_root_hash']))
 
     int(block['block_hash'], 16)
-    self.assertEqual(len(block['block_hash']), 64)
+    self.assertEqual(64, len(block['block_hash']))
     if block_hash:
         self.assertEqual(block['block_hash'], block_hash)
 
@@ -47,12 +47,12 @@ def validate_block(self, block, block_hash=None, block_height=None):
 def validate_receipt(self, receipt, tx_hash):
     int(receipt['txHash'], 16)
     self.assertEqual(receipt['txHash'], tx_hash)
-    self.assertEqual(len(receipt['txHash']), 66)
+    self.assertEqual(66, len(receipt['txHash']))
 
     int(receipt['txIndex'], 16)
     int(receipt['blockHeight'], 16)
     int(receipt['blockHash'], 16)
-    self.assertEqual(len(receipt['blockHash']), 66)
+    self.assertEqual(66, len(receipt['blockHash']))
 
     int(receipt['cumulativeStepUsed'], 16)
     int(receipt['stepUsed'], 16)
