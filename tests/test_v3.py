@@ -1,11 +1,11 @@
 import binascii
 import unittest
 import jsonrpcclient
-import jsonrpcclient.exceptions
+from jsonrpcclient.exceptions import ReceivedErrorResponse
 from time import sleep
 from secp256k1 import PrivateKey
 
-from rest.server.json_rpc import GenericJsonRpcServerError, JsonError, convert_params, ParamType
+from rest.server.json_rpc import JsonError, convert_params, ParamType
 from tests.helper import validator_v3, validator_v2
 from tests.helper.wallet import Wallet, ICX_FACTOR
 
@@ -72,9 +72,8 @@ class TestV3(unittest.TestCase):
     def test_get_balance_fail_invalid_address(self):
         try:
             response = jsonrpcclient.request(self.HOST_V3, 'icx_getBalance', {"address": "INVALID_ADDRESS"})
-        except:
-            pass
-            # self.assertEqual(e.code, JsonError.INVALID_PARAMS)
+        except ReceivedErrorResponse as e:
+            self.assertEqual(e.code, JsonError.INVALID_PARAMS)
 
     def test_get_total_supply(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTotalSupply')
