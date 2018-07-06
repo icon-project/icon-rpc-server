@@ -42,22 +42,25 @@ def validate_block(self, block, block_hash=None, block_height=None):
     self.assertIn('confirmed_transaction_list', block)
 
 
-def validate_origin(self, result, origin, tx_hash):
-    response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHeight', {'height': result['block']['block_height']})
-    validate_block(self, response)
+def validate_origin(self, tx_result, origin, tx_hash):
+    block_height = int(tx_result['blockHeight'], 16)
+    response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHeight', {'height': str(block_height)})
+    validate_block(self, response['block'])
 
-    txs = response['confirmed_transaction_list']
-    tx_index = int(result['txIndex'], 16)
-    self.assertEqual(txs[tx_index]['tx_hash'], tx_hash)
+    txs = response['block']['confirmed_transaction_list']
+    tx_index = int(tx_result['txIndex'], 16)
+    self.assertEqual(txs[tx_index]['tx_hash'], tx_hash.replace('0x', ''))
 
-    response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHash', {'hash': result['block']['block_hash']})
-    validate_block(self, response)
+    response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHash',
+                                     {'hash': tx_result['blockHash'].replace('0x', '')})
+    validate_block(self, response['block'])
 
-    txs = response['confirmed_transaction_list']
-    tx_index = int(result['txIndex'], 16)
-    self.assertEqual(txs[tx_index]['tx_hash'], tx_hash)
+    txs = response['block']['confirmed_transaction_list']
+    tx_index = int(tx_result['txIndex'], 16)
+    self.assertEqual(txs[tx_index]['tx_hash'], tx_hash.replace('0x', ''))
 
-    result.pop('txIndex')
-    result.pop('blockHeight')
-    result.pop('blockHash')
-    self.assertDictEqual(result, origin)
+    tx_result.pop('txIndex')
+    tx_result.pop('blockHeight')
+    tx_result.pop('blockHash')
+    tx_result.pop('method')
+    self.assertDictEqual(tx_result, origin)

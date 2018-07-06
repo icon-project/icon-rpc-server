@@ -105,7 +105,6 @@ class TestV2(unittest.TestCase):
     def test_get_transaction_by_address(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getTransactionByAddress',
                                          {'address': self.god_wallet.address, 'index': 0})
-        print(f"icx_getTransactionByAddress response : {response}")
         tx_hashes = response['response']
         for tx_hash in tx_hashes:
             tx_result_response = jsonrpcclient.request(self.HOST_V2, 'icx_getTransactionResult', {'tx_hash': tx_hash})
@@ -148,7 +147,7 @@ class TestV2(unittest.TestCase):
 
     def test_get_transaction_by_hash_v3(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionByHash', {'txHash': f'0x{self.tx_hashes[0]}'})
-        validator_v3.validate_origin(self, response, self.tx_origin[0], f'0x{self.tx_hashes[0]}')
+        validator_v2.validate_origin(self, response, self.tx_origin[0], self.tx_hashes[0])
 
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionByHash', {'txHash': f'0x{self.tx_hashes[1]}'})
-        validator_v3.validate_origin(self, response, self.tx_origin[1], f'0x{self.tx_hashes[1]}')
+        validator_v2.validate_origin(self, response, self.tx_origin[1], self.tx_hashes[1])
