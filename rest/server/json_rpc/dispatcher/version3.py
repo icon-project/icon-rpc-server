@@ -116,7 +116,7 @@ class Version3Dispatcher:
         if response_code == message_code.Response.fail_invalid_key_error or \
             response_code == message_code.Response.fail:
             raise exception.GenericJsonRpcServerError(
-                code=exception.INVALID_PARAMS,
+                code=exception.JsonError.INVALID_PARAMS,
                 message='Invalid params txHash',
                 http_status=status.HTTP_BAD_REQUEST
             )
@@ -142,7 +142,7 @@ class Version3Dispatcher:
         tx_info = await channel_stub.async_task().get_tx_info(request["txHash"])
         if tx_info == message_code.Response.fail_invalid_key_error:
             raise exception.GenericJsonRpcServerError(
-                code=exception.INVALID_PARAMS,
+                code=exception.JsonError.INVALID_PARAMS,
                 message='Invalid params txHash',
                 http_status=status.HTTP_BAD_REQUEST
             )
@@ -197,7 +197,7 @@ class Version3Dispatcher:
         block_hash, result = await get_block_by_params(block_hash=request['hash'])
         if result['response_code'] == message_code.Response.fail_wrong_block_hash:
             raise exception.GenericJsonRpcServerError(
-                code=exception.INVALID_PARAMS,
+                code=exception.JsonError.INVALID_PARAMS,
                 message='Invalid params hash',
                 http_status=status.HTTP_BAD_REQUEST
             )
@@ -215,7 +215,7 @@ class Version3Dispatcher:
             block_hash, result = await get_block_by_params(block_height=request['height'])
         except MessageQueueException as e:
             raise exception.GenericJsonRpcServerError(
-                code=exception.INVALID_PARAMS,
+                code=exception.JsonError.INVALID_PARAMS,
                 message='Invalid params height',
                 http_status=status.HTTP_BAD_REQUEST
             )
