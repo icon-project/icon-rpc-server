@@ -18,8 +18,9 @@ import jsonrpcclient
 def validate_block(self, block, block_hash=None, block_height=None):
     self.assertIn('version', block)
 
-    int(block['prev_block_hash'], 16)
-    self.assertEqual(len(block['prev_block_hash']), 66)
+    if int(block['height'], 16) != 0:
+        int(block['prev_block_hash'], 16)
+        self.assertEqual(len(block['prev_block_hash']), 66)
 
     int(block['merkle_tree_root_hash'], 16)
     self.assertEqual(len(block['merkle_tree_root_hash']), 66)

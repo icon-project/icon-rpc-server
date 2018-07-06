@@ -103,47 +103,50 @@ class Version2Dispatcher:
         channel_stub = StubCollection().channel_stubs[channel_name]
         verify_result = {}
 
+        message = None
+
         tx_hash = kwargs["tx_hash"]
         if is_hex(tx_hash):
             response_code, result = await channel_stub.async_task().get_invoke_result(tx_hash)
             verify_result['response_code'] = str(response_code)
 
-            error_code = None
-            message = None
-            EXCEPTION_CODE = 90
-
             if response_code == message_code.Response.success:
                 # loopchain success
                 if result:
+                    print(444)
                     try:
                         # apply tx_result_convert
                         result_dict = json.loads(result)
-                        status = bool(result_dict.get('failure'))
-                        if not status:
+                        fail_status = bool(result_dict.get('failure'))
+                        if fail_status:
                             error_code_hex_str = result_dict['failure']['code']
                             error_code = int(error_code_hex_str, 16)
                             message = result_dict['failure']['message']
                         else:
                             error_code = message_code.Response.success
-                    except json.JSONDecodeError as e:
+                    except Exception as e:
                         error_message = f"your result is not json, result({result}), {e}"
                         Logger.warning(error_message)
-                        error_code = EXCEPTION_CODE
+                        error_code = message_code.Response.fail_validate_params
                         message = error_message
                 else:
-                    error_code = EXCEPTION_CODE
+                    error_code = message_code.Response.fail_validate_params
                     message = 'tx_reult is empty'
             else:
-                # fail
-                verify_result['response_code'] = str(message_code.Response.fail_validate_params)
-                verify_result['message'] = "Invalid transaction hash."
+                error_code = message_code.Response.fail_validate_params
+                message = "Invalid transaction hash."
+        else:
+            # fail
+            error_code = message_code.Response.fail_validate_params
+            message = "response_code is fail"
 
-            # parsing response
-            verify_result['response_code'] = error_code
-            if error_code == message_code.Response.success:
-                verify_result['response'] = {'code': error_code}
-            if message:
-                verify_result['message'] = message
+        # parsing response
+        verify_result['response_code'] = error_code
+        if error_code == message_code.Response.success:
+            verify_result['response'] = {'code': error_code}
+        if message:
+            verify_result['message'] = message
+
         return verify_result
 
     @staticmethod
