@@ -5,7 +5,7 @@ import jsonrpcclient.exceptions
 from time import sleep
 from secp256k1 import PrivateKey
 
-from rest.server.json_rpc import JsonError
+from rest.server.json_rpc import JsonError, convert_params, ParamType
 from tests.helper import validator_v3, validator_v2
 from tests.helper.wallet import Wallet, ICX_FACTOR
 
