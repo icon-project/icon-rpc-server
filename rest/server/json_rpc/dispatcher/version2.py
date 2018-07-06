@@ -107,18 +107,43 @@ class Version2Dispatcher:
         if is_hex(tx_hash):
             response_code, result = await channel_stub.async_task().get_invoke_result(tx_hash)
             verify_result['response_code'] = str(response_code)
-            if len(result) is not 0:
-                try:
-                    result_dict = json.loads(result)
-                    verify_result['response'] = result_dict
-                except json.JSONDecodeError as e:
-                    Logger.warning(f"your result is not json, result({result}), {e}")
-            if response_code == message_code.Response.success:
-                verify_result['response'] = json.loads(result)
-        else:
-            verify_result['response_code'] = str(message_code.Response.fail_validate_params)
-            verify_result['message'] = "Invalid transaction hash."
 
+            error_code = None
+            message = None
+            EXCEPTION_CODE = 90
+
+            if response_code == message_code.Response.success:
+                # loopchain success
+                if result:
+                    try:
+                        # apply tx_result_convert
+                        result_dict = json.loads(result)
+                        status = bool(result_dict.get('failure'))
+                        if not status:
+                            error_code_hex_str = result_dict['failure']['code']
+                            error_code = int(error_code_hex_str, 16)
+                            message = result_dict['failure']['message']
+                        else:
+                            error_code = message_code.Response.success
+                    except json.JSONDecodeError as e:
+                        error_message = f"your result is not json, result({result}), {e}"
+                        Logger.warning(error_message)
+                        error_code = EXCEPTION_CODE
+                        message = error_message
+                else:
+                    error_code = EXCEPTION_CODE
+                    message = 'tx_reult is empty'
+            else:
+                # fail
+                verify_result['response_code'] = str(message_code.Response.fail_validate_params)
+                verify_result['message'] = "Invalid transaction hash."
+
+            # parsing response
+            verify_result['response_code'] = error_code
+            if error_code == message_code.Response.success:
+                verify_result['response'] = {'code': error_code}
+            if message:
+                verify_result['message'] = message
         return verify_result
 
     @staticmethod

@@ -68,9 +68,9 @@ class TestV2(unittest.TestCase):
     def test_get_transaction_result(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getTransactionResult', {'tx_hash': self.tx_hashes[0]})
         self.assertEqual(response['response']['code'], 0)
-
-        response = jsonrpcclient.request(self.HOST_V2, 'icx_getTransactionResult', {'tx_hash': self.tx_hashes[1]})
-        self.assertEqual(response['response']['code'], 0)
+        #
+        # response = jsonrpcclient.request(self.HOST_V2, 'icx_getTransactionResult', {'tx_hash': self.tx_hashes[1]})
+        # self.assertEqual(response['response']['code'], 0)
 
     def test_get_balance(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBalance', {"address": self.any_wallets[0].address})
