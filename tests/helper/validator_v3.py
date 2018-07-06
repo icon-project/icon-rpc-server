@@ -62,13 +62,13 @@ def validate_receipt(self, receipt, tx_hash):
     else:
         raise RuntimeError('Unknown status in receipt')
 
-    response = jsonrpcclient.request(self.host_v3, 'icx_getBlockByHeight', {'height': receipt['blockHeight']})
+    response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': receipt['blockHeight']})
     validate_block(self, response)
 
     txs = response['confirmed_transaction_list']
     self.assertEqual(txs[int(receipt['txIndex'])]['txHash'], tx_hash)
 
-    response = jsonrpcclient.request(self.host_v3, 'icx_getBlockByHash', {'hash': receipt['blockHash']})
+    response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHash', {'hash': receipt['blockHash']})
     validate_block(self, response)
 
     txs = response['confirmed_transaction_list']
@@ -76,14 +76,14 @@ def validate_receipt(self, receipt, tx_hash):
 
 
 def validate_origin(self, result, origin, tx_hash):
-    response = jsonrpcclient.request(self.host_v3, 'icx_getBlockByHeight', {'height': result['blockHeight']})
+    response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': result['blockHeight']})
     validate_block(self, response)
 
     txs = response['confirmed_transaction_list']
     tx_index = int(result['txIndex'], 16)
     self.assertEqual(txs[tx_index]['txHash'], tx_hash)
 
-    response = jsonrpcclient.request(self.host_v3, 'icx_getBlockByHash', {'hash': result['blockHash']})
+    response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHash', {'hash': result['blockHash']})
     validate_block(self, response)
 
     txs = response['confirmed_transaction_list']

@@ -43,19 +43,19 @@ def validate_block(self, block, block_hash=None, block_height=None):
 
 
 def validate_origin(self, result, origin, tx_hash):
-    response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': result['block']['block_height']})
+    response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHeight', {'height': result['block']['block_height']})
     validate_block(self, response)
 
     txs = response['confirmed_transaction_list']
     tx_index = int(result['txIndex'], 16)
-    self.assertEqual(txs[tx_index]['txHash'], tx_hash)
+    self.assertEqual(txs[tx_index]['tx_hash'], tx_hash)
 
-    response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHash', {'hash': result['block']['block_hash']})
+    response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHash', {'hash': result['block']['block_hash']})
     validate_block(self, response)
 
     txs = response['confirmed_transaction_list']
     tx_index = int(result['txIndex'], 16)
-    self.assertEqual(txs[tx_index]['txHash'], tx_hash)
+    self.assertEqual(txs[tx_index]['tx_hash'], tx_hash)
 
     result.pop('txIndex')
     result.pop('blockHeight')
