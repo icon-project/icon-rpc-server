@@ -74,10 +74,10 @@ class TestV2(unittest.TestCase):
 
     def test_get_balance(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBalance', {"address": self.any_wallets[0].address})
-        self.assertEqual(response, hex(int((123 - 1.23) * ICX_FACTOR)))
+        self.assertEqual(response, hex(int((self.any_icx[0] - self.any_icx[1]) * ICX_FACTOR)))
 
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBalance', {"address": self.any_wallets[1].address})
-        self.assertEqual(response, hex(int(1.23 * ICX_FACTOR)))
+        self.assertEqual(response, hex(int(self.any_icx[1] * ICX_FACTOR)))
 
     def test_get_total_supply(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getTotalSupply')

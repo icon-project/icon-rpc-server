@@ -52,16 +52,22 @@ class TestV3(unittest.TestCase):
 
         sleep(1)  # wait for consensus
 
+        params = cls.score_owner.deploy_score_v3('sample_token')
+        response = jsonrpcclient.request(cls.HOST_V3, 'icx_sendTransaction', params)
+        cls.tx_hashes.append(response)
+        cls.tx_origin.append(params)
+        sleep(1)  # wait for consensus
+
     @classmethod
     def tearDownClass(cls):
         pass
 
     def test_get_balance_success(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBalance', {"address": self.any_wallets[0].address})
-        self.assertEqual(response, hex(int((123 - 1.23) * ICX_FACTOR)))
+        self.assertEqual(response, hex(int((self.any_icx[0] - self.any_icx[1]) * ICX_FACTOR)))
 
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBalance', {"address": self.any_wallets[1].address})
-        self.assertEqual(response, hex(int(1.23 * ICX_FACTOR)))
+        self.assertEqual(response, hex(int(self.any_icx[1] * ICX_FACTOR)))
 
     def test_get_balance_fail_invalid_address(self):
         try:
@@ -104,17 +110,44 @@ class TestV3(unittest.TestCase):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionByHash', {'txHash': self.tx_hashes[1]})
         validator_v3.validate_origin(self, response, self.tx_origin[1], self.tx_hashes[1])
 
-    def test_deploy_score(self):
-        params = self.score_owner.deploy_score_v3('sample_token')
-        response = jsonrpcclient.request(self.HOST_V3, 'icx_sendTransaction', params)
-        print(response)
+    def test_sample_token_score_get_token_supply(self):
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[2]})
+        validator_v3.validate_receipt(self, response, self.tx_hashes[2])
+        score_addr = response['scoreAddress']
+        payload = {
+            "from": self.score_owner.address,
+            "to": score_addr,
+            "dataType": "call",
+            "data": {
+                "method": "total_supply",
+                "params": {}
+            }
+        }
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_call', payload)
+        self.assertEqual(response, '0x3635c9adc5dea00000')
+
+    def test_sample_token_score_get_balance(self):
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[2]})
+        validator_v3.validate_receipt(self, response, self.tx_hashes[2])
+        score_addr = response['scoreAddress']
+        payload = {
+            "from": self.score_owner.address,
+            "to": score_addr,
+            "dataType": "call",
+            "data": {
+                "method": "total_supply",
+                "params": {}
+            }
+        }
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_call', payload)
+        self.assertEqual(response, '0x3635c9adc5dea00000')
 
     def test_get_balance_v2(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBalance', {"address": self.any_wallets[0].address})
-        self.assertEqual(response, hex(int((123 - 1.23) * ICX_FACTOR)))
+        self.assertEqual(response, hex(int((self.any_icx[0] - self.any_icx[1]) * ICX_FACTOR)))
 
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBalance', {"address": self.any_wallets[1].address})
-        self.assertEqual(response, hex(int(1.23 * ICX_FACTOR)))
+        self.assertEqual(response, hex(int(self.any_icx[1] * ICX_FACTOR)))
 
     def test_get_total_supply_v2(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getTotalSupply')
