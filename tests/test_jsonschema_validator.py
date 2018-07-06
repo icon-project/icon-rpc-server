@@ -18,7 +18,7 @@ import unittest
 
 from rest.server.json_rpc.exception import GenericJsonRpcServerError
 from rest.server.json_rpc.validator import validate_jsonschema_v2, validate_jsonschema_v3
-from rest.tests import create_address, create_tx_hash
+from tests import create_address, create_tx_hash
 
 
 class TestJsonschemaValidator(unittest.TestCase):

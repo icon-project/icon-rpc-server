@@ -11,3 +11,30 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import hashlib
+import shutil
+import time
+
+
+def create_address(data: bytes, is_eoa: bool = True):
+    hash_value = hashlib.sha3_256(data).hexdigest()
+    return f'{"hx" if is_eoa else "cx"}{hash_value[-20:]}'
+
+
+def create_tx_hash(data: bytes=None):
+    if data is None:
+        data = int(time.time()).to_bytes(8, 'big')
+
+    return bytes.fromhex(hashlib.sha3_256(data).hexdigest())
+
+
+def create_block_hash(data: bytes=None):
+    return create_tx_hash(data)
+
+
+def rmtree(path: str) -> None:
+    try:
+        shutil.rmtree(path)
+    except:
+        pass

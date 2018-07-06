@@ -4,6 +4,7 @@ from setuptools import setup, find_packages
 from rest import __version__
 
 requires = [
+    "jsonschema",
     "setproctitle",
     "requests==2.19.1",
     "jsonrpcserver==3.5.3",
