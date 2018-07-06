@@ -11,3 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+
+def validate_block(self, block):
+    self.assertIn('version', block)
+
+    int(block['prev_block_hash'], 16)
+    self.assertEqual(len(block['prev_block_hash']), 64)
+
+    int(block['merkle_tree_root_hash'], 16)
+    self.assertEqual(len(block['merkle_tree_root_hash']), 64)
+
+    int(block['block_hash'], 16)
+    self.assertEqual(len(block['block_hash']), 64)
+
+    # int(block['height'])
+
+    self.assertIn('peer_id', block)
+    self.assertIn('signature', block)
+
+    # int(block['time_stamp'])

@@ -12,7 +12,6 @@
 
 from typing import Any
 from jsonrpcserver import status
-from ...server.json_rpc import GenericJsonRpcServerError
 
 from .converter import convert_params, ParamType
 
@@ -22,6 +21,7 @@ def check_error_response(result: Any):
 
 
 def response_to_json_query(response):
+    from ...server.json_rpc import GenericJsonRpcServerError
     if check_error_response(response):
         response = response['error']
         raise GenericJsonRpcServerError(
