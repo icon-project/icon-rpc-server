@@ -86,6 +86,10 @@ class TestV3(unittest.TestCase):
 
         self.assertEqual(int(response['height'], 16), int(self.first_block['height'], 16) + len(self.any_icx))
 
+    def test_get_genesis_block_by_height(self):
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': '0x1'})
+        validator_v3.validate_block(self, response, block_height='0x1')
+
     def test_get_block_by_height(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': '0x2'})
         validator_v3.validate_block(self, response, block_height='0x2')
