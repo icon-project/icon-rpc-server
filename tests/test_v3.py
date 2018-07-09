@@ -64,8 +64,14 @@ class TestV3(unittest.TestCase):
         pass
 
     def test_get_balance_success(self):
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[1]})
+        var1 = self.any_icx[0] * ICX_FACTOR
+        var2 = self.any_icx[1] * ICX_FACTOR
+        fee = int(response['stepPrice'], 16) * int(response['stepUsed'], 16)
+        excepted_balance = var1 - var2 - fee
+
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBalance', {"address": self.any_wallets[0].address})
-        self.assertEqual(response, hex(int((self.any_icx[0] - self.any_icx[1]) * ICX_FACTOR)))
+        self.assertEqual(response, hex(int(excepted_balance)))
 
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBalance', {"address": self.any_wallets[1].address})
         self.assertEqual(response, hex(int(self.any_icx[1] * ICX_FACTOR)))
@@ -102,7 +108,7 @@ class TestV3(unittest.TestCase):
         self.assertDictEqual(response, self.first_block)
 
     def test_get_transaction_result(self):
-        response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[0]})
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[0][2:]})
         validator_v3.validate_receipt(self, response, self.tx_hashes[0])
 
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[1]})
@@ -156,8 +162,14 @@ class TestV3(unittest.TestCase):
         self.assertEqual(response, '0x3635c9adc5dea00000')
 
     def test_get_balance_v2(self):
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[1]})
+        var1 = self.any_icx[0] * ICX_FACTOR
+        var2 = self.any_icx[1] * ICX_FACTOR
+        fee = int(response['stepPrice'], 16) * int(response['stepUsed'], 16)
+        excepted_balance = var1 - var2 - fee
+
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBalance', {"address": self.any_wallets[0].address})
-        self.assertEqual(response['response'], hex(int((self.any_icx[0] - self.any_icx[1]) * ICX_FACTOR)))
+        self.assertEqual(response['response'], hex(int(excepted_balance)))
 
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBalance', {"address": self.any_wallets[1].address})
         self.assertEqual(response['response'], hex(int(self.any_icx[1] * ICX_FACTOR)))

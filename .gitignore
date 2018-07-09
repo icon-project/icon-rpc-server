@@ -116,6 +116,7 @@ var/
 pip-log.txt
 pip-delete-this-directory.txt
 pip-selfcheck.json
+*.logs
 
 # Unit test / coverage reports
 htmlcov/
