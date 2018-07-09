@@ -90,15 +90,20 @@ class TestV3(unittest.TestCase):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getLastBlock')
         validator_v3.validate_block(self, response)
 
-        self.assertEqual(response['height'], self.first_block['height'] + 3)
+        self.assertEqual(response['height'], self.first_block['height'] + len(self.tx_origin))
 
-    def test_get_genesis_block_by_height(self):
-        response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': '0x1'})
+    def test_get_block_by_height_success(self):
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': hex(1)})
         validator_v3.validate_block(self, response, block_height=1)
 
-    def test_get_block_by_height(self):
-        response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': '0x2'})
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': hex(2)})
         validator_v3.validate_block(self, response, block_height=2)
+
+    def test_get_block_by_height_fail_invalid_height(self):
+        try:
+            response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': str(2)})
+        except ReceivedErrorResponse as e:
+            self.assertEqual(e.code, JsonError.INVALID_PARAMS)
 
     def test_get_block_by_hash(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHash',
@@ -108,7 +113,7 @@ class TestV3(unittest.TestCase):
         self.assertDictEqual(response, self.first_block)
 
     def test_get_transaction_result(self):
-        response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[0][2:]})
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[0]})
         validator_v3.validate_receipt(self, response, self.tx_hashes[0])
 
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[1]})
@@ -183,10 +188,10 @@ class TestV3(unittest.TestCase):
         block = response['block']
         validator_v2.validate_block(self, block)
 
-        self.assertEqual(block['height'], self.first_block['height'] + 3)
+        self.assertEqual(block['height'], self.first_block['height'] + len(self.tx_origin))
 
     def test_get_block_by_height_v2(self):
-        response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHeight', {'height': '2'})
+        response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHeight', {'height': str(2)})
         block = response['block']
         validator_v2.validate_block(self, block)
 

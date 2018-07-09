@@ -107,14 +107,16 @@ class TestV2(unittest.TestCase):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getLastBlock')
         validator_v2.validate_block(self, response['block'])
 
-        self.assertEqual(response['block']['height'], self.first_block['height'] + len(self.any_icx))
+        self.assertEqual(response['block']['height'], self.first_block['height'] + len(self.tx_origin))
 
     def test_get_block_by_height_success(self):
-        response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHeight', {'height': '2'})
+        response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHeight', {'height': str(1)})
+        validator_v2.validate_block(self, response['block'])
+        response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHeight', {'height': str(2)})
         validator_v2.validate_block(self, response['block'])
 
     def test_get_block_by_height_fail_invalid_height(self):
-        response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHeight', {'height': '0x2'})
+        response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHeight', {'height': hex(2)})
         self.assertEqual(response['response_code'], Response.fail_validate_params)
 
     def test_get_block_by_hash_success(self):
@@ -168,14 +170,17 @@ class TestV2(unittest.TestCase):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getLastBlock')
         validator_v3.validate_block(self, response)
 
-        self.assertEqual(response['height'], self.first_block['height'] + len(self.any_icx))
+        self.assertEqual(response['height'], self.first_block['height'] + len(self.tx_origin))
 
     def test_get_block_by_height_v3_success(self):
-        response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': '0x2'})
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': hex(2)})
         validator_v3.validate_block(self, response, block_height=2)
 
     def test_get_block_by_height_v3_fail_invalid_height(self):
-        response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': '2'})
+        try:
+            response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': str(2)})
+        except ReceivedErrorResponse as e:
+            self.assertEqual(e.code, JsonError.INVALID_PARAMS)
 
     def test_get_block_by_hash_v3_success(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHash',
