@@ -16,11 +16,13 @@ import binascii
 import unittest
 import time
 import jsonrpcclient
+from jsonrpcclient.exceptions import ReceivedErrorResponse
 from secp256k1 import PrivateKey
 
-from tests.helper import validator_v2, validator_v3
+from rest.protos.message_code import Response
 from rest.server.json_rpc import JsonError, convert_params, ParamType
-from tests.helper.wallet import Wallet, ICX_FACTOR
+from tests.helper import validator_v2, validator_v3
+from tests.helper.wallet import Wallet, ICX_FACTOR, ICX_FEE
 
 
 class TestV2(unittest.TestCase):
@@ -68,19 +70,34 @@ class TestV2(unittest.TestCase):
     def tearDownClass(cls):
         pass
 
-    def test_get_transaction_result(self):
+    def test_get_transaction_result_success(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getTransactionResult', {'tx_hash': self.tx_hashes[0]})
         self.assertEqual(response['response']['code'], 0)
 
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getTransactionResult', {'tx_hash': self.tx_hashes[1]})
         self.assertEqual(response['response']['code'], 0)
 
-    def test_get_balance(self):
-        response = jsonrpcclient.request(self.HOST_V2, 'icx_getBalance', {"address": self.any_wallets[0].address})
-        self.assertEqual(response['response'], hex(int((self.any_icx[0] - self.any_icx[1]) * ICX_FACTOR)))
+    def test_get_transaction_result_fail_invalid_tx_hash(self):
+        response = jsonrpcclient.request(self.HOST_V2, 'icx_getTransactionResult', {'tx_hash': "INVALID_TXHASH"})
+        self.assertEqual(response['response_code'], str(Response.fail_validate_params))
 
+    def test_get_balance_success(self):
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[1]})
+        var1 = self.any_icx[0] * ICX_FACTOR
+        var2 = self.any_icx[1] * ICX_FACTOR
+        fee = int(response['stepPrice'], 16) * int(response['stepUsed'], 16)
+        excepted_balance = var1 - var2 - fee
+
+        response = jsonrpcclient.request(self.HOST_V2, 'icx_getBalance', {"address": self.any_wallets[0].address})
+        self.assertEqual(response['response'], hex(int(excepted_balance)))
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBalance', {"address": self.any_wallets[1].address})
         self.assertEqual(response['response'], hex(int(self.any_icx[1] * ICX_FACTOR)))
+
+    def test_get_balance_fail_invalid_address(self):
+        try:
+            response = jsonrpcclient.request(self.HOST_V2, 'icx_getBalance', {"address": "INVALID_ADDRESS"})
+        except ReceivedErrorResponse as e:
+            self.assertEqual(e.code, JsonError.INVALID_PARAMS)
 
     def test_get_total_supply(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getTotalSupply')
@@ -92,17 +109,25 @@ class TestV2(unittest.TestCase):
 
         self.assertEqual(response['block']['height'], self.first_block['height'] + len(self.any_icx))
 
-    def test_get_block_by_height(self):
+    def test_get_block_by_height_success(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHeight', {'height': '2'})
         validator_v2.validate_block(self, response['block'])
 
-    def test_get_block_by_hash(self):
+    def test_get_block_by_height_fail_invalid_height(self):
+        response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHeight', {'height': '0x2'})
+        self.assertEqual(response['response_code'], Response.fail_validate_params)
+
+    def test_get_block_by_hash_success(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHash', {'hash': self.first_block['block_hash']})
         validator_v2.validate_block(self, response['block'])
 
         self.assertDictEqual(response['block'], self.first_block)
 
-    def test_get_transaction_by_address(self):
+    def test_get_block_by_hash_fail_invalid_hash(self):
+        response = jsonrpcclient.request(self.HOST_V2, 'icx_getBlockByHash', {'hash': "INVALID_BLOCK_HASH"})
+        self.assertEqual(response['response_code'], Response.fail_wrong_block_hash)
+
+    def test_get_transaction_by_address_success(self):
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getTransactionByAddress',
                                          {'address': self.god_wallet.address, 'index': 0})
         tx_hashes = response['response']
@@ -110,12 +135,30 @@ class TestV2(unittest.TestCase):
             tx_result_response = jsonrpcclient.request(self.HOST_V2, 'icx_getTransactionResult', {'tx_hash': tx_hash})
             self.assertEqual(tx_result_response['response']['code'], 0)
 
-    def test_get_balance_v3(self):
-        response = jsonrpcclient.request(self.HOST_V3, 'icx_getBalance', {"address": self.any_wallets[0].address})
-        self.assertEqual(response, hex(int((123 - 1.23) * ICX_FACTOR)))
+    def test_get_transaction_by_address_fail_invalid_address(self):
+        try:
+            response = jsonrpcclient.request(self.HOST_V2, 'icx_getTransactionByAddress',
+                                             {'address': "INVALID_ADDRESS", 'index': 0})
+        except ReceivedErrorResponse as e:
+            self.assertEqual(e.code, JsonError.INVALID_PARAMS)
 
+    def test_get_balance_v3_success(self):
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[1]})
+        var1 = self.any_icx[0] * ICX_FACTOR
+        var2 = self.any_icx[1] * ICX_FACTOR
+        fee = int(response['stepPrice'], 16) * int(response['stepUsed'], 16)
+        excepted_balance = var1 - var2 - fee
+
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getBalance', {"address": self.any_wallets[0].address})
+        self.assertEqual(response, hex(int(excepted_balance)))
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBalance', {"address": self.any_wallets[1].address})
-        self.assertEqual(response, hex(int(1.23 * ICX_FACTOR)))
+        self.assertEqual(response, hex(int(self.any_icx[1] * ICX_FACTOR)))
+
+    def test_get_balance_v3_fail_invalid_address(self):
+        try:
+            response = jsonrpcclient.request(self.HOST_V3, 'icx_getBalance', {"address": "INVALID_ADDRESS"})
+        except ReceivedErrorResponse as e:
+            self.assertEqual(e.code, JsonError.INVALID_PARAMS)
 
     def test_get_total_supply_v3(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTotalSupply')
@@ -127,27 +170,48 @@ class TestV2(unittest.TestCase):
 
         self.assertEqual(response['height'], self.first_block['height'] + len(self.any_icx))
 
-    def test_get_block_by_height_v3(self):
+    def test_get_block_by_height_v3_success(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': '0x2'})
         validator_v3.validate_block(self, response, block_height=2)
 
-    def test_get_block_by_hash_v3(self):
+    def test_get_block_by_height_v3_fail_invalid_height(self):
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHeight', {'height': '2'})
+
+    def test_get_block_by_hash_v3_success(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHash',
                                          {'hash': f"0x{self.first_block['block_hash']}"})
         validator_v3.validate_block(self, response, block_hash=self.first_block['block_hash'])
 
         self.assertDictEqual(response, convert_params(self.first_block, ParamType.get_block_response))
 
-    def test_get_transaction_result_v3(self):
+    def test_get_block_by_hash_v3_fail_invalid_hash(self):
+        try:
+            response = jsonrpcclient.request(self.HOST_V3, 'icx_getBlockByHash', {'hash': "INVALID_HASH"})
+        except ReceivedErrorResponse as e:
+            self.assertEqual(e.code, JsonError.INVALID_PARAMS)
+
+    def test_get_transaction_result_v3_success(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': f'0x{self.tx_hashes[0]}'})
         self.assertEqual(response['status'], '0x1')
 
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': f'0x{self.tx_hashes[1]}'})
         self.assertEqual(response['status'], '0x1')
 
-    def test_get_transaction_by_hash_v3(self):
+    def test_get_transaction_result_v3_fail_invalid_hash(self):
+        try:
+            response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': "INVALID_TX_HASH"})
+        except ReceivedErrorResponse as e:
+            self.assertEqual(e.code, JsonError.INVALID_PARAMS)
+
+    def test_get_transaction_by_hash_v3_success(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionByHash', {'txHash': f'0x{self.tx_hashes[0]}'})
         validator_v2.validate_origin(self, response, self.tx_origin[0], self.tx_hashes[0])
 
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionByHash', {'txHash': f'0x{self.tx_hashes[1]}'})
         validator_v2.validate_origin(self, response, self.tx_origin[1], self.tx_hashes[1])
+
+    def test_get_transaction_by_hash_v3_fail_invalid_hash(self):
+        try:
+            response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionByHash', {'txHash': "INVALID_TX_HASH"})
+        except ReceivedErrorResponse as e:
+            self.assertEqual(e.code, JsonError.INVALID_PARAMS)

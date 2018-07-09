@@ -185,7 +185,16 @@ class Version2Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getBlockByHeight(**kwargs):
-        block_hash, response = await get_block_by_params(block_height=int(kwargs["height"]))
+        try:
+            block_height = int(kwargs["height"])
+        except Exception as e:
+            verify_result = {
+                'response_code': message_code.Response.fail_validate_params,
+                'message': f"Invalid block height. error: {e}"
+            }
+            return verify_result
+
+        block_hash, response = await get_block_by_params(block_height=block_height)
         return response
 
     @staticmethod

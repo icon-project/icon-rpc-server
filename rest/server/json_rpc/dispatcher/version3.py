@@ -153,6 +153,7 @@ class Version3Dispatcher:
             )
 
         result = tx_info["transaction"]
+        result['txHash'] = request['txHash']
         result["txIndex"] = tx_info["tx_index"]
         result["blockHeight"] = tx_info["block_height"]
         result["blockHash"] = tx_info["block_hash"]

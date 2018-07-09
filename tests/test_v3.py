@@ -18,7 +18,8 @@ class TestV3(unittest.TestCase):
     first_block = None
 
     god_private_key = PrivateKey(binascii.unhexlify('98dc1847168d72e515c9e2a6639ae8af312a1dde5d19f3fb38ded71141a1e6be'))
-    score_owner_private_key = PrivateKey(binascii.unhexlify('a0a1c51d2deeba854ca25aab72e465d701e0f47fb97e2110dc5157d752ab154a'))
+    score_owner_private_key = PrivateKey(
+        binascii.unhexlify('a0a1c51d2deeba854ca25aab72e465d701e0f47fb97e2110dc5157d752ab154a'))
     god_wallet = Wallet(god_private_key)
     score_owner = Wallet(score_owner_private_key)
 
@@ -63,8 +64,14 @@ class TestV3(unittest.TestCase):
         pass
 
     def test_get_balance_success(self):
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[1]})
+        var1 = self.any_icx[0] * ICX_FACTOR
+        var2 = self.any_icx[1] * ICX_FACTOR
+        fee = int(response['stepPrice'], 16) * int(response['stepUsed'], 16)
+        excepted_balance = var1 - var2 - fee
+
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBalance', {"address": self.any_wallets[0].address})
-        self.assertEqual(response, hex(int((self.any_icx[0] - self.any_icx[1]) * ICX_FACTOR)))
+        self.assertEqual(response, hex(int(excepted_balance)))
 
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getBalance', {"address": self.any_wallets[1].address})
         self.assertEqual(response, hex(int(self.any_icx[1] * ICX_FACTOR)))
@@ -101,7 +108,7 @@ class TestV3(unittest.TestCase):
         self.assertDictEqual(response, self.first_block)
 
     def test_get_transaction_result(self):
-        response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[0]})
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[0][2:]})
         validator_v3.validate_receipt(self, response, self.tx_hashes[0])
 
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[1]})
@@ -113,6 +120,14 @@ class TestV3(unittest.TestCase):
 
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionByHash', {'txHash': self.tx_hashes[1]})
         validator_v3.validate_origin(self, response, self.tx_origin[1], self.tx_hashes[1])
+
+    def test_check_score_address_sample_token_deploy(self):
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[2]})
+        if response['status'] == hex(1) and \
+                validator_v3.validate_score_address(response['scoreAddress']):
+            pass
+        else:
+            raise Exception("Can't Score Deploy")
 
     def test_sample_token_score_get_token_supply(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[2]})
@@ -147,8 +162,14 @@ class TestV3(unittest.TestCase):
         self.assertEqual(response, '0x3635c9adc5dea00000')
 
     def test_get_balance_v2(self):
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[1]})
+        var1 = self.any_icx[0] * ICX_FACTOR
+        var2 = self.any_icx[1] * ICX_FACTOR
+        fee = int(response['stepPrice'], 16) * int(response['stepUsed'], 16)
+        excepted_balance = var1 - var2 - fee
+
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBalance', {"address": self.any_wallets[0].address})
-        self.assertEqual(response['response'], hex(int((self.any_icx[0] - self.any_icx[1]) * ICX_FACTOR)))
+        self.assertEqual(response['response'], hex(int(excepted_balance)))
 
         response = jsonrpcclient.request(self.HOST_V2, 'icx_getBalance', {"address": self.any_wallets[1].address})
         self.assertEqual(response['response'], hex(int(self.any_icx[1] * ICX_FACTOR)))

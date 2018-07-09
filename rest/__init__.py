@@ -16,8 +16,8 @@
 
 from .rest_cli import main
 
-# Version of tbears.
-__version__ = "0.9.2"
+# Version of rest.
+__version__ = "0.9.3"
 
 if __name__ == "__main__":
     main()
