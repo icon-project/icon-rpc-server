@@ -316,7 +316,7 @@ icx_getTransactionByHash_v3: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "txHash": {"type": "string"}
+                "txHash": {"type": "string", "minLength": 66, "maxLength": 66, "pattern": "^0x[0-9a-f]{64}"}
             },
             "additionalProperties": False,
             "required": ["txHash"]
