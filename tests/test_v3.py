@@ -18,7 +18,8 @@ class TestV3(unittest.TestCase):
     first_block = None
 
     god_private_key = PrivateKey(binascii.unhexlify('98dc1847168d72e515c9e2a6639ae8af312a1dde5d19f3fb38ded71141a1e6be'))
-    score_owner_private_key = PrivateKey(binascii.unhexlify('a0a1c51d2deeba854ca25aab72e465d701e0f47fb97e2110dc5157d752ab154a'))
+    score_owner_private_key = PrivateKey(
+        binascii.unhexlify('a0a1c51d2deeba854ca25aab72e465d701e0f47fb97e2110dc5157d752ab154a'))
     god_wallet = Wallet(god_private_key)
     score_owner = Wallet(score_owner_private_key)
 
@@ -113,6 +114,14 @@ class TestV3(unittest.TestCase):
 
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionByHash', {'txHash': self.tx_hashes[1]})
         validator_v3.validate_origin(self, response, self.tx_origin[1], self.tx_hashes[1])
+
+    def test_check_score_address_sample_token_deploy(self):
+        response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[2]})
+        if response['status'] == hex(1) and \
+                validator_v3.validate_score_address(response['scoreAddress']):
+            pass
+        else:
+            raise Exception("Can't Score Deploy")
 
     def test_sample_token_score_get_token_supply(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[2]})
