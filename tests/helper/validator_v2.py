@@ -63,4 +63,6 @@ def validate_origin(self, tx_result, origin, tx_hash):
     tx_result.pop('blockHeight')
     tx_result.pop('blockHash')
     tx_result.pop('method')
+    tx_hash = tx_result.pop('txHash')
+    tx_result['tx_hash'] = tx_hash[2:]
     self.assertDictEqual(tx_result, origin)
