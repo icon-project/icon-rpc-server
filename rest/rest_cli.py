@@ -67,7 +67,6 @@ def main():
 
     if args.config:
         conf.Configure().load_configure_json(args.config)
-
     config_path = conf.CONFIG_PATH
     port = args.port or conf.PORT_REST
     amqp_target = args.amqp_target or conf.AMQP_TARGET
