@@ -24,7 +24,7 @@ import sys
 from secp256k1 import PrivateKey, PublicKey
 from typing import Optional
 
-from .tbears_command import get_deploy_payload
+from .tbears_command import make_deploy_payload, make_send_token_payload
 from .tbears.utils import get_now_time_stamp
 
 ICX_FACTOR = 10 ** 18
@@ -95,7 +95,21 @@ class Wallet:
         return icx_origin if is_raw_data else params
 
     def deploy_score_v3(self, score_name: str, is_raw_data=False) -> dict:
-        params = get_deploy_payload(score_name, self)
+        params = make_deploy_payload(score_name, self)
+        hash_for_sign = self.__create_hash(params)
+        params["signature"] = self.__create_signature(hash_for_sign)
+
+        icx_origin = dict()
+        icx_origin["jsonrpc"] = "2.0"
+        icx_origin["method"] = "icx_sendTransaction"
+        icx_origin["id"] = random.randrange(0, 100000)
+        icx_origin["params"] = params
+        self.__last_raw_icx_origin = icx_origin
+
+        return icx_origin if is_raw_data else params
+
+    def invoke_score_v3(self, score_addr: str, data_addr: str, data_value: str, is_raw_data=False) -> dict:
+        params = make_send_token_payload(self, score_addr, data_addr, data_value)
         hash_for_sign = self.__create_hash(params)
         params["signature"] = self.__create_signature(hash_for_sign)
 

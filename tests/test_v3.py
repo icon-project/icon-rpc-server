@@ -57,6 +57,16 @@ class TestV3(unittest.TestCase):
         response = jsonrpcclient.request(cls.HOST_V3, 'icx_sendTransaction', params)
         cls.tx_hashes.append(response)
         cls.tx_origin.append(params)
+
+        sleep(1)  # wait for consensus
+
+        response = jsonrpcclient.request(cls.HOST_V3, 'icx_getTransactionResult', {'txHash': cls.tx_hashes[2]})
+        score_addr = response['scoreAddress']
+
+        params = cls.score_owner.invoke_score_v3(score_addr, cls.any_wallets[1].address, hex(1))
+        response = jsonrpcclient.request(cls.HOST_V3, 'icx_sendTransaction', params)
+        cls.tx_hashes.append(response)
+        cls.tx_origin.append(params)
         sleep(1)  # wait for consensus
 
     @classmethod
@@ -148,23 +158,30 @@ class TestV3(unittest.TestCase):
             }
         }
         response = jsonrpcclient.request(self.HOST_V3, 'icx_call', payload)
-        self.assertEqual(response, '0x3635c9adc5dea00000')
+        self.assertEqual(response, "0x3635c9adc5dea00000")
 
     def test_sample_token_score_get_balance(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[2]})
         validator_v3.validate_receipt(self, response, self.tx_hashes[2])
         score_addr = response['scoreAddress']
+
         payload = {
-            "from": self.score_owner.address,
+            "from": self.any_wallets[0].address,
             "to": score_addr,
             "dataType": "call",
             "data": {
-                "method": "total_supply",
-                "params": {}
+                "method": "balance_of",
+                "params": {
+                    'addr_from': self.score_owner.address
+                }
             }
         }
         response = jsonrpcclient.request(self.HOST_V3, 'icx_call', payload)
-        self.assertEqual(response, '0x3635c9adc5dea00000')
+        self.assertEqual(response, "0x3635c9adc5dea00000")
+
+    # def test_fail_tx_result(self):
+    #     response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[4]})
+    #     pass
 
     def test_get_balance_v2(self):
         response = jsonrpcclient.request(self.HOST_V3, 'icx_getTransactionResult', {'txHash': self.tx_hashes[1]})

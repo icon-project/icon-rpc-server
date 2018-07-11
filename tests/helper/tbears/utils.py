@@ -42,6 +42,35 @@ def get_deploy_req_template():
     return payload
 
 
+def get_send_token_req_template():
+    payload = {
+        "version": "0x3",
+        "from": "",
+        "to": "",
+        "stepLimit": "0x12345",
+        "timestamp": f'{hex(get_now_time_stamp())}',
+        "nonce": "0x1",
+        "dataType": "call",
+        "data": {
+            "method": "transfer1",
+            "params": {
+                "addr_to": "",
+                "value": ""
+            }
+        }
+    }
+    return payload
+
+
+def get_send_token_payload(wallet: 'Wallet', score_addr: str, data_addr: str, data_value: str) -> dict:
+    payload = get_send_token_req_template()
+    payload['from'] = f'{wallet.address}'
+    payload['to'] = score_addr
+    payload['data']['params']['addr_to'] = data_addr
+    payload['data']['params']['value'] = data_value
+    return payload
+
+
 def get_deploy_payload(path: str, wallet: 'Wallet', step_limit: str=None, score_address: str=None,
                        params: dict=None) -> dict:
     payload = get_deploy_req_template()

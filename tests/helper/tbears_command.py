@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from typing import TYPE_CHECKING
-from tests.helper.tbears.utils import get_deploy_payload
+from tests.helper.tbears.utils import get_deploy_payload, get_send_token_payload
 
 if TYPE_CHECKING:
     from tests.helper.wallet import Wallet
@@ -21,3 +21,7 @@ if TYPE_CHECKING:
 
 def make_deploy_payload(score_name: str, wallet: 'Wallet') -> dict:
     return get_deploy_payload(score_name, wallet)
+
+
+def make_send_token_payload(wallet: 'Wallet', score_addr: str, data_addr: str, data_value: str) -> dict:
+    return get_send_token_payload(wallet, score_addr, data_addr, data_value)
