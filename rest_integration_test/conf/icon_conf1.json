@@ -5,9 +5,19 @@
 		"filePath": "./log/icon_service1.log",
 		"outputType": "console|file"
 	},
-	"icon_score_root_path": ".score1",
-	"icon_score_state_db_root_path": ".db1",
-	"channel": "loopchain_default",
-	"amqp_key": "7100",
-	"amqp_target": "127.0.0.1"
+	"icon_cli": {
+		"icon_score_root_path": ".score1",
+		"icon_score_state_db_root_path": ".db1",
+		"channel": "loopchain_default",
+		"amqp_key": "7100",
+		"amqp_target": "127.0.0.1"
+	},
+	"config": {
+		"ICON_SERVICE_BIG_STOP_LIMIT": 5000000,
+		"LOGGER_DEV": true,
+		"THREAD_DEV": true,
+		"ADMIN_ADDRESS_STR": "hx1234",
+		"ENABLE_THREAD_FLAG": 0,
+		"ICON_SERVICE_FLAG": 0
+	}
 }
