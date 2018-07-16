@@ -12,7 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from earlgrey import message_queue_task, MessageQueueStub
+from earlgrey import MessageQueueStub, message_queue_task
+from typing import TYPE_CHECKING
+from . import exit_process
+
+if TYPE_CHECKING:
+    from earlgrey import RobustConnection
 
 
 class IconScoreInnerTask:
@@ -52,3 +57,6 @@ class IconScoreInnerTask:
 
 class IconScoreInnerStub(MessageQueueStub[IconScoreInnerTask]):
     TaskType = IconScoreInnerTask
+
+    def _callback_connection_lost_callback(self, connection: 'RobustConnection'):
+        exit_process()

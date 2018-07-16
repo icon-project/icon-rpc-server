@@ -29,7 +29,7 @@ from ...rest_server import RestProperty
 from ...json_rpc import exception
 from ....utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
 from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params
-from ....utils.message_queue import StubCollection
+from ....utils.message_queue.stub_collection import StubCollection
 from iconservice.logger.logger import Logger
 
 config.log_requests = False

@@ -26,7 +26,7 @@ from .rest_property import RestProperty
 from .json_rpc.dispatcher.node import NodeDispatcher
 from .json_rpc.dispatcher.version2 import Version2Dispatcher
 from .json_rpc.dispatcher.version3 import Version3Dispatcher
-from ..utils.message_queue import StubCollection
+from ..utils.message_queue.stub_collection import StubCollection
 
 from iconservice.logger.logger import Logger
 

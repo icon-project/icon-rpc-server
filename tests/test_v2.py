@@ -22,7 +22,7 @@ from secp256k1 import PrivateKey
 from rest.protos.message_code import Response
 from rest.server.json_rpc import JsonError, convert_params, ParamType
 from tests.helper import validator_v2, validator_v3
-from tests.helper.wallet import Wallet, ICX_FACTOR, ICX_FEE
+from tests.helper.wallet import Wallet, ICX_FACTOR
 
 
 class TestV2(unittest.TestCase):

@@ -15,7 +15,7 @@ pip uninstall -y loopchain
 pip uninstall -y rest
 
 echo "install package start"
-pip install ./lib/earlgrey-0.0.0-py3-none-any.whl
+pip install ./lib/earlgrey-0.0.2-py3-none-any.whl
 pip install ./lib/iconservice-0.9.3-py3-none-any.whl
 pip install ./lib/tbears-0.9.3-py3-none-any.whl
 pip install ./lib/loopchain-1.21.0-py3-none-any.whl
