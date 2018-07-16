@@ -12,12 +12,14 @@
 		"amqp_key": "7100",
 		"amqp_target": "127.0.0.1"
 	},
-	"config": {
-		"ICON_SERVICE_BIG_STOP_LIMIT": 5000000,
-		"LOGGER_DEV": true,
-		"THREAD_DEV": true,
-		"ADMIN_ADDRESS_STR": "hx1234",
-		"ENABLE_THREAD_FLAG": 0,
-		"ICON_SERVICE_FLAG": 0
-	}
+	"iconScoreRootPath": ".score1",
+	"iconScoreStateDbRootPath": ".db1",
+	"channel": "loopchain_default",
+	"amqpKey": "7100",
+	"amqpTarget": "127.0.0.1",
+	"iconServiceBigStopLimit": 5000000,
+	"loggerDev": true,
+	"adminAddress": "hxebf3a409845cd09dcb5af31ed5be5e34e2af9433",
+	"enableThreadFlag": 0,
+	"iconServiceFlag": 0
 }
