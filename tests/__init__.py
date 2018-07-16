@@ -27,14 +27,3 @@ def create_tx_hash(data: bytes=None):
         data = int(time.time()).to_bytes(8, 'big')
 
     return bytes.fromhex(hashlib.sha3_256(data).hexdigest())
-
-
-def create_block_hash(data: bytes=None):
-    return create_tx_hash(data)
-
-
-def rmtree(path: str) -> None:
-    try:
-        shutil.rmtree(path)
-    except:
-        pass
