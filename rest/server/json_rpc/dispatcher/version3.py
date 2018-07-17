@@ -67,7 +67,6 @@ class Version3Dispatcher:
         request = make_request(method, kwargs)
         response = await score_stub.async_task().query(request)
 
-        response_to_json_query(response)
         return response
 
     @staticmethod
@@ -80,7 +79,6 @@ class Version3Dispatcher:
         request = make_request(method, kwargs)
         response = await score_stub.async_task().query(request)
 
-        response_to_json_query(response)
         return response
 
     @staticmethod
@@ -177,7 +175,6 @@ class Version3Dispatcher:
         request = make_request(method, kwargs)
         response = await score_stub.async_task().query(request)
 
-        response_to_json_query(response)
         return response
 
     @staticmethod
@@ -190,7 +187,6 @@ class Version3Dispatcher:
         request = make_request(method, kwargs)
         response = await score_stub.async_task().query(request)
 
-        response_to_json_query(response)
         return response
 
     @staticmethod
