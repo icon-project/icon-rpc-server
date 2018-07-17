@@ -17,7 +17,7 @@
 from .rest_cli import main
 
 # Version of rest.
-__version__ = "0.9.3"
+__version__ = "0.9.4"
 
 if __name__ == "__main__":
     main()
