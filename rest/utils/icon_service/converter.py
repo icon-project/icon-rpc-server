@@ -145,7 +145,7 @@ def _convert_value_hex_0x_number(value):
     if isinstance(value, int):
         return hex(value)
     if isinstance(value, str):
-        if value.startswith('0x'):
+        if value.startswith('0x') or value.startswith('-0x'):
             return value
 
         return hex(int(value))
@@ -155,12 +155,15 @@ def _convert_value_hex_0x_hash_number(value):
     if isinstance(value, int):
         return hex(value)
     if isinstance(value, str):
-        if value.startswith('0x'):
+        if value.startswith('0x') or value.startswith('-0x'):
             return value
 
-        hex(int(value, 16))  # if no raise
-        return '0x' + value
-
+        num = int(value, 16)
+        hex(int(value, 16))
+        if num > 0:
+            return '0x' + value
+        else:
+            return '-0x' + value
 
 templates = dict()
 templates[ParamType.send_tx] = {

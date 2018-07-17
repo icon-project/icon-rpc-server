@@ -14,7 +14,6 @@
 """json rpc dispatcher version 3"""
 
 import json
-import logging
 
 from earlgrey import MessageQueueException
 from jsonrpcserver import config, status
@@ -23,24 +22,29 @@ from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
 import rest.configure.configure as conf
-from rest.server.json_rpc.validator import validate_jsonschema_v3
+from iconservice.logger.logger import Logger
+
+from ....server.json_rpc.validator import validate_jsonschema_v3
 from ....protos import message_code
 from ...rest_server import RestProperty
 from ...json_rpc import exception
 from ....utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
 from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params
-from ....utils.message_queue import StubCollection
+from ....utils.message_queue.stub_collection import StubCollection
 
 config.log_requests = False
 config.log_responses = False
 
 methods = AsyncMethods()
 
+REST_SERVER_V3 = 'REST_SERVER_V3'
+
 
 class Version3Dispatcher:
     @staticmethod
     async def dispatch(request):
         req = request.json
+        Logger.debug(f'rest_server_v3 request with {req}', REST_SERVER_V3)
 
         try:
             validate_jsonschema_v3(request=req)
@@ -49,6 +53,7 @@ class Version3Dispatcher:
         else:
             response = await methods.dispatch(req)
 
+        Logger.debug(f'rest_server_v3 with response {response}', REST_SERVER_V3)
         return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
 
     @staticmethod
@@ -61,7 +66,6 @@ class Version3Dispatcher:
         request = make_request(method, kwargs)
         response = await score_stub.async_task().query(request)
 
-        response_to_json_query(response)
         return response
 
     @staticmethod
@@ -74,7 +78,6 @@ class Version3Dispatcher:
         request = make_request(method, kwargs)
         response = await score_stub.async_task().query(request)
 
-        response_to_json_query(response)
         return response
 
     @staticmethod
@@ -96,6 +99,12 @@ class Version3Dispatcher:
         channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
         channel_stub = StubCollection().channel_stubs[channel_name]
         tx_hash = await channel_stub.async_task().create_icx_tx(kwargs)
+        if tx_hash is None:
+            raise exception.GenericJsonRpcServerError(
+                code=exception.JsonError.INVALID_REQUEST,
+                message='txHash is None',
+                http_status=status.HTTP_BAD_REQUEST
+            )
 
         return convert_params(tx_hash, ParamType.send_tx_response)
 
@@ -119,7 +128,7 @@ class Version3Dispatcher:
         response_code, result = await channel_stub.async_task().get_invoke_result(tx_hash)
 
         if response_code == message_code.Response.fail_invalid_key_error or \
-            response_code == message_code.Response.fail:
+                response_code == message_code.Response.fail:
             raise exception.GenericJsonRpcServerError(
                 code=exception.JsonError.INVALID_PARAMS,
                 message='Invalid params txHash',
@@ -131,7 +140,7 @@ class Version3Dispatcher:
                 result_dict = json.loads(result)
                 verify_result = result_dict
             except json.JSONDecodeError as e:
-                logging.warning(f"your result is not json, result({result}), {e}")
+                Logger.warning(f"your result is not json, result({result}), {e}")
 
         response = convert_params(verify_result, ParamType.get_tx_result_response)
         return response
@@ -171,7 +180,6 @@ class Version3Dispatcher:
         request = make_request(method, kwargs)
         response = await score_stub.async_task().query(request)
 
-        response_to_json_query(response)
         return response
 
     @staticmethod
@@ -184,7 +192,6 @@ class Version3Dispatcher:
         request = make_request(method, kwargs)
         response = await score_stub.async_task().query(request)
 
-        response_to_json_query(response)
         return response
 
     @staticmethod
@@ -225,7 +232,7 @@ class Version3Dispatcher:
                 message='Invalid params height',
                 http_status=status.HTTP_BAD_REQUEST
             )
-        
+
         response = convert_params(result['block'], ParamType.get_block_response)
 
         return response

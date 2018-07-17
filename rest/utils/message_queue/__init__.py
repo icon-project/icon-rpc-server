@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
+import signal
 
 
-from .peer_inner_stub import *
-from .channel_inner_stub import *
-from .icon_score_inner_stub import *
-from .stub_collection import *
+def exit_process():
+    os.killpg(0, signal.SIGKILL)

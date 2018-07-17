@@ -27,7 +27,7 @@ from ...rest_property import RestProperty
 from ...json_rpc import exception
 from ....utils.icon_service import make_request, response_to_json_query, ParamType
 from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params
-from ....utils.message_queue import StubCollection
+from ....utils.message_queue.stub_collection import StubCollection
 from rest.server.json_rpc.validator import validate_jsonschema_v2
 
 from iconservice.logger.logger import Logger

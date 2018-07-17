@@ -18,7 +18,7 @@ from jsonrpcserver.aio import AsyncMethods
 from sanic import response
 
 from ....protos import message_code
-from ....utils.message_queue import StubCollection
+from ....utils.message_queue.stub_collection import StubCollection
 
 methods = AsyncMethods()
 

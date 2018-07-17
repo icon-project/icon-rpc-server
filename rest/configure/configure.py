@@ -18,13 +18,9 @@ import os
 import re
 import json
 
-from default_conf.rest_config import *
+from ..default_conf.rest_config import *
 from ..components.singleton import SingletonMetaClass
-import default_conf
-
-DIR_PATH = os.path.abspath(os.path.dirname(__file__))
-PROJECT_ROOT_PATH = os.path.abspath(os.path.join(DIR_PATH, '..', '..'))
-config_path = os.path.join(PROJECT_ROOT_PATH, 'rest', 'rest_config.json')
+import rest.default_conf.rest_config
 
 
 class DataType(IntEnum):
@@ -44,7 +40,7 @@ class Configure(metaclass=SingletonMetaClass):
         # print("Set Configure... only once in scope from system environment.")
         # configure_info_list = {configure_attr: configure_type}
         self.__configure_info_list = {}
-        self.__load_configure(default_conf)
+        self.__load_configure(rest.default_conf)
 
     def load_configure_json(self, configure_file_path: str) -> None:
         """method for reading and applying json configuration.
@@ -112,7 +108,8 @@ class Configure(metaclass=SingletonMetaClass):
             # checking for environment variable of system
         return configure_type, configure_value
 
-    def __check_value_condition(self, configure_key, configure_value):
+    @staticmethod
+    def __check_value_condition(configure_key, configure_value):
         # turn configure value to int or float after some condition check.
         # cast type string to original type if it exists in the globals().
         if isinstance(configure_value, str) and len(configure_value) > 0 and \
@@ -129,4 +126,4 @@ class Configure(metaclass=SingletonMetaClass):
         return configure_value
 
 
-Configure().load_configure_json(config_path)
+Configure()

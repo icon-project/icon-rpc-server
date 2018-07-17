@@ -14,7 +14,7 @@ requires = [
     "grpcio-tools == 1.3.5",
     "protobuf == 3.5.1",
     "aiohttp == 3.0.9",
-    "jsonrpcclient == 2.5.2",
+    "jsonrpcclient == 2.6.0",
     "secp256k1==0.13.2"
 ]
 
@@ -26,7 +26,7 @@ setup_options = {
     'author_email': 'foo@icon.foundation',
     'packages': find_packages(exclude=['tests*', 'docs']),
     'package_data': {'rest': ['rest_config.json']},
-    'py_modules': ['rest'],
+    'py_modules': ['rest', ''],
     'license': "Apache License 2.0",
     'install_requires': requires,
     'test_suite': 'tests',

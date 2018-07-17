@@ -40,7 +40,7 @@ class ApiVersion(IntEnum):
 
 
 #rest
-CONFIG_PATH = './rest_config.json'
+CONFIG_PATH = './conf/rest_config.json'
 REST_SERVER_PROCTITLE_FORMAT = "rest_server.{port}.{config}.{amqp_target}.{amqp_key}"
 
 
