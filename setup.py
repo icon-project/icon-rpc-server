@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from setuptools import setup, find_packages
-from rest import __version__
+from iconrpcserver import __version__
 
 requires = [
     "jsonschema",
