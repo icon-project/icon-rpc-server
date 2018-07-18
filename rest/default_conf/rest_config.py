@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from enum import IntEnum
+import os
 
 
 class SSLAuthType(IntEnum):
@@ -56,7 +57,8 @@ PEER_QUEUE_NAME_FORMAT = "Peer.{amqp_key}"
 CHANNEL_QUEUE_NAME_FORMAT = "Channel.{channel_name}.{amqp_key}"
 ICON_SCORE_QUEUE_NAME_FORMAT = "IconScore.{channel_name}.{amqp_key}"
 
-GUNICORN_WORKER_COUNT = 2
+# See also: <http://docs.gunicorn.org/en/19.3/design.html#how-many-workers>
+GUNICORN_WORKER_COUNT = os.cpu_count() * 2 + 1
 
 DISABLE_V1_API = True
 
