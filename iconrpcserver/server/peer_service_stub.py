@@ -15,7 +15,7 @@
 
 import json
 
-import rest.configure.configure as conf
+import iconrpcserver.configure.configure as conf
 from ..components import SingletonMetaClass
 from ..protos import loopchain_pb2, loopchain_pb2_grpc
 from ..utils.stub_manager import StubManager

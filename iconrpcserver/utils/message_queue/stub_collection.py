@@ -14,7 +14,7 @@
 
 from typing import Dict
 
-import rest.configure.configure as conf
+import iconrpcserver.configure.configure as conf
 from ...components.singleton import SingletonMetaClass
 from .peer_inner_stub import PeerInnerStub
 from .channel_inner_stub import ChannelInnerStub

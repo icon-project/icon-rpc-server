@@ -19,9 +19,9 @@ requires = [
 ]
 
 setup_options = {
-    'name': 'rest',
+    'name': 'iconrpcserver',
     'version': __version__,
-    'description': '`Rest server` for LoopChain',
+    'description': '`iconrpcserver server` for icon',
     'author': 'ICON foundation',
     'author_email': 'foo@icon.foundation',
     'packages': find_packages(exclude=['tests*', 'docs']),

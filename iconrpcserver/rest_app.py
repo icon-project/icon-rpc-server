@@ -5,7 +5,7 @@ import gunicorn
 from gunicorn.six import iteritems
 import gunicorn.app.base
 
-import rest.configure.configure as conf
+import iconrpcserver.configure.configure as conf
 from iconcommons.logger import Logger
 
 from .server.peer_service_stub import PeerServiceStub
