@@ -28,7 +28,7 @@ from .json_rpc.dispatcher.version2 import Version2Dispatcher
 from .json_rpc.dispatcher.version3 import Version3Dispatcher
 from ..utils.message_queue.stub_collection import StubCollection
 
-from icon_common.logger import Logger
+from iconcommons.logger import Logger
 
 
 class ServerComponents(metaclass=SingletonMetaClass):

@@ -30,7 +30,7 @@ from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params
 from ....utils.message_queue.stub_collection import StubCollection
 from rest.server.json_rpc.validator import validate_jsonschema_v2
 
-from icon_common.logger import Logger
+from iconcommons.logger import Logger
 
 config.log_requests = False
 config.log_responses = False

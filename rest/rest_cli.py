@@ -21,7 +21,7 @@ from enum import IntEnum
 
 import rest
 import rest.configure.configure as conf
-from icon_common.logger import Logger
+from iconcommons.logger import Logger
 
 REST_SERVICE_STANDALONE = "RestServerStandAlone"
 

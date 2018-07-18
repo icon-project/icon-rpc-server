@@ -19,7 +19,7 @@ from ...components.singleton import SingletonMetaClass
 from .peer_inner_stub import PeerInnerStub
 from .channel_inner_stub import ChannelInnerStub
 from .icon_score_inner_stub import IconScoreInnerStub
-from icon_common.logger import Logger
+from iconcommons.logger import Logger
 
 
 class StubCollection(metaclass=SingletonMetaClass):
