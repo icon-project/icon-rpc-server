@@ -21,7 +21,7 @@ from jsonrpcserver.aio import AsyncMethods
 from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
-import rest.configure.configure as conf
+import iconrpcserver.configure.configure as conf
 from iconcommons.logger import Logger
 
 from ....server.json_rpc.validator import validate_jsonschema_v3

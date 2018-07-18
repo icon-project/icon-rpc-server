@@ -17,7 +17,7 @@ This object has own channel information and support re-generation of gRPC stub."
 import logging
 import grpc
 
-import rest.configure.configure as conf
+import iconrpcserver.configure.configure as conf
 
 
 class StubManager:

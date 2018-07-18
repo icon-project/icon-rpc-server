@@ -21,14 +21,14 @@ from jsonrpcserver.aio import AsyncMethods
 from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
-import rest.configure.configure as conf
+import iconrpcserver.configure.configure as conf
 from ....protos import message_code
 from ...rest_property import RestProperty
 from ...json_rpc import exception
 from ....utils.icon_service import make_request, response_to_json_query, ParamType
 from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params
 from ....utils.message_queue.stub_collection import StubCollection
-from rest.server.json_rpc.validator import validate_jsonschema_v2
+from iconrpcserver.server.json_rpc.validator import validate_jsonschema_v2
 
 from iconcommons.logger import Logger
 

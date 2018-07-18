@@ -19,8 +19,8 @@ import sys
 import subprocess
 from enum import IntEnum
 
-import rest
-import rest.configure.configure as conf
+import iconrpcserver
+import iconrpcserver.configure.configure as conf
 from iconcommons.logger import Logger
 
 REST_SERVICE_STANDALONE = "RestServerStandAlone"
@@ -34,9 +34,9 @@ class ExitCode(IntEnum):
 def main():
     parser = argparse.ArgumentParser(prog='rest_cli.py', usage=f"""
     ==========================
-    JsonRpcRest server version : {rest.__version__}
+    iconrpcserver server version : {iconrpcserver.__version__}
     ==========================
-    JsonRpcRest commands:
+    iconrpcserver commands:
         start : icon_service start
         stop : icon_service stop
         -p[--port] : rest_proxy port
@@ -106,7 +106,7 @@ def stop(params: dict) -> int:
 
 def start_process(params: dict):
     Logger.debug('start_server() start')
-    python_module_string = 'rest.rest_app'
+    python_module_string = 'iconrpcserver.rest_app'
 
     converted_params = {'-p': params['port'],
                         '-o': params['config'],

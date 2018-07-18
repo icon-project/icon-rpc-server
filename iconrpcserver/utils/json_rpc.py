@@ -18,7 +18,7 @@ import aiohttp
 
 from jsonrpcclient.aiohttp_client import aiohttpClient
 
-import rest.configure.configure as conf
+import iconrpcserver.configure.configure as conf
 from ..utils.message_queue.stub_collection import StubCollection
 from ..protos import message_code
 

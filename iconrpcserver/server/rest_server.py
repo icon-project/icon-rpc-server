@@ -19,7 +19,7 @@ import ssl
 from sanic import Sanic, response
 from sanic.views import HTTPMethodView
 
-import rest.configure.configure as conf
+import iconrpcserver.configure.configure as conf
 from ..components import SingletonMetaClass
 from .peer_service_stub import PeerServiceStub
 from .rest_property import RestProperty
