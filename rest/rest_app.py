@@ -6,7 +6,7 @@ from gunicorn.six import iteritems
 import gunicorn.app.base
 
 import rest.configure.configure as conf
-from icon_common.logger import Logger
+from iconcommons.logger import Logger
 
 from .server.peer_service_stub import PeerServiceStub
 from .server.rest_server import ServerComponents

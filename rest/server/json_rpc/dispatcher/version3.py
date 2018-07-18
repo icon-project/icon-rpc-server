@@ -22,7 +22,7 @@ from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
 import rest.configure.configure as conf
-from icon_common.logger.logger import Logger
+from iconcommons.logger import Logger
 
 from ....server.json_rpc.validator import validate_jsonschema_v3
 from ....protos import message_code
