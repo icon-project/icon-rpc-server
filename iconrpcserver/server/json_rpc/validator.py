@@ -18,7 +18,7 @@ from jsonrpcserver import status
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
-from rest.server.json_rpc.exception import GenericJsonRpcServerError, JsonError
+from iconrpcserver.server.json_rpc.exception import GenericJsonRpcServerError, JsonError
 
 icx_sendTransaction_v2: dict = {
     "$schema": "http://json-schema.org/schema#",

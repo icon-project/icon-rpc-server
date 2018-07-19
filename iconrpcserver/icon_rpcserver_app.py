@@ -1,12 +1,13 @@
 import argparse
-import setproctitle
 
 import gunicorn
 from gunicorn.six import iteritems
 import gunicorn.app.base
 
-import rest.configure.configure as conf
-from iconservice.logger import Logger
+from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
+from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
+from iconcommons.icon_config import IconConfig
+from iconcommons.logger import Logger
 
 from .server.peer_service_stub import PeerServiceStub
 from .server.rest_server import ServerComponents
@@ -42,35 +43,45 @@ def main():
 
     # Parse arguments.
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--port", type=str, dest="port",
+    parser.add_argument("-p", type=str, dest=ConfigKey.PORT_REST, default=None,
                         help="rest_proxy port")
-    parser.add_argument("-o", "--configure_file_path", type=str, dest="config",
+    parser.add_argument("-c", type=str, dest=ConfigKey.CONFIG, default=None,
                         help="json configure file path")
-    parser.add_argument("--amqp_target", type=str, dest="amqp_target",
+    parser.add_argument("-at", type=str, dest=ConfigKey.AMQP_TARGET, default=None,
                         help="amqp target info [IP]:[PORT]")
-    parser.add_argument("--amqp_key", type=str, dest="amqp_key",
+    parser.add_argument("-ak", type=str, dest=ConfigKey.AMQP_KEY, default=None,
                         help="key sharing peer group using queue name. use it if one more peers connect one MQ")
 
     args = parser.parse_args()
     args_params = dict(vars(args))
-    setproctitle.setproctitle(conf.REST_SERVER_PROCTITLE_FORMAT.format(**args_params))
 
-    if args.config:
-        conf.Configure().load_configure_json(args.config)
-    config_path = conf.CONFIG_PATH
-    Logger(config_path)
+    conf = IconConfig(args.config, default_rpcserver_config)
+    conf.load(args_params)
+    Logger.load_config(conf)
+    _run(conf)
 
+
+def run_in_foreground(conf: 'IconConfig'):
+    _run(conf)
+
+
+def _run(conf: 'IconConfig'):
     # Setup port and host values.
-    port = args.port or conf.PORT_REST
-    port = int(port)
     host = '0.0.0.0'
 
     # Connect gRPC stub.
-    PeerServiceStub().set_stub_port(port - conf.PORT_DIFF_REST_SERVICE_CONTAINER, conf.IP_LOCAL)
+    PeerServiceStub().conf = conf
+    PeerServiceStub().rest_grpc_timeout = \
+        conf[ConfigKey.GRPC_TIMEOUT] + conf[ConfigKey.REST_ADDITIONAL_TIMEOUT]
+    PeerServiceStub().rest_score_query_timeout = \
+        conf[ConfigKey.SCORE_QUERY_TIMEOUT] + conf[ConfigKey.REST_ADDITIONAL_TIMEOUT]
+    PeerServiceStub().set_stub_port(int(conf[ConfigKey.PORT_REST]) -
+                                    int(conf[ConfigKey.PORT_DIFF_REST_SERVICE_CONTAINER]),
+                                    conf[ConfigKey.IP_LOCAL])
+    ServerComponents.conf = conf
     ServerComponents().set_resource()
 
-    api_port = port
-    Logger.debug(f"Run gunicorn webserver for HA. Port = {api_port}")
+    Logger.debug(f"Run gunicorn webserver for HA. Port = {conf[ConfigKey.PORT_REST]}")
 
     # Configure SSL.
     ssl_context = ServerComponents().ssl_context
@@ -82,19 +93,17 @@ def main():
         keyfile = ssl_context[1]
 
     options = {
-        'bind': f"{host}:{api_port}",
-        'workers': conf.GUNICORN_WORKER_COUNT,
+        'bind': f"{host}:{conf[ConfigKey.PORT_REST]}",
+        'workers': conf[ConfigKey.GUNICORN_WORKER_COUNT],
         'worker_class': "sanic.worker.GunicornWorker",
         'certfile': certfile,
-        'SERVER_SOFTWARE': "loopchain",
+        'SERVER_SOFTWARE': gunicorn.SERVER_SOFTWARE,
         'keyfile': keyfile
     }
 
-    amqp_target = args.amqp_target or conf.AMQP_TARGET
-    amqp_key = args.amqp_key or conf.AMQP_KEY
-
     # Launch gunicorn web server.
-    ServerComponents().ready(amqp_target, amqp_key)
+    ServerComponents.conf = conf
+    ServerComponents().ready()
     StandaloneApplication(ServerComponents().app, options).run()
     Logger.error("Rest App Done!")
 

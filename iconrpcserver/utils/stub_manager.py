@@ -14,14 +14,14 @@
 """stub wrapper for gRPC stub.
 This object has own channel information and support re-generation of gRPC stub."""
 
-import logging
 import grpc
 
-import rest.configure.configure as conf
+from ..utils.message_queue.stub_collection import StubCollection
+from ..default_conf.icon_rpcserver_constant import ConfigKey
+from iconcommons.logger import Logger
 
 
 class StubManager:
-
     def __init__(self, target, stub_type):
         self.__target = target
         self.__stub_type = stub_type
@@ -36,15 +36,16 @@ class StubManager:
 
     def call(self, method_name, message, timeout=None):
         if timeout is None:
-            timeout = conf.GRPC_TIMEOUT
+
+            timeout = StubCollection().conf[ConfigKey.GRPC_TIMEOUT]
 
         e = None
-        for _ in range(conf.GRPC_RETRY):
+        for _ in range(StubCollection().conf[ConfigKey.GRPC_RETRY]):
             try:
                 stub_method = getattr(self.__stub, method_name)
                 return stub_method(message, timeout)
             except Exception as e:
                 self.__make_stub()
-                logging.warning(f"gRPC call fail method_name({method_name}), message({message}): {e}")
+                Logger.warning(f"gRPC call fail method_name({method_name}), message({message}): {e}")
 
         raise e

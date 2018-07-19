@@ -18,22 +18,24 @@ import aiohttp
 
 from jsonrpcclient.aiohttp_client import aiohttpClient
 
-import rest.configure.configure as conf
+from ..default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion, NodeType
 from ..utils.message_queue.stub_collection import StubCollection
 from ..protos import message_code
 
 
-async def redirect_request_to_rs(message, rs_target, version=conf.ApiVersion.v3.name):
-    rs_url = f"{'https' if conf.SUBSCRIBE_USE_HTTPS else 'http'}://{rs_target}/api/{version}"
+async def redirect_request_to_rs(message, rs_target, version=ApiVersion.v3.name):
+
+    subscribe_use_https = StubCollection().conf[ConfigKey.SUBSCRIBE_USE_HTTPS]
+    rs_url = f"{'https' if subscribe_use_https else 'http'}://{rs_target}/api/{version}"
     async with aiohttp.ClientSession() as session:
         result = await aiohttpClient(session, rs_url).request(
-            method_name=message["method"], message=message, node_type=conf.NodeType.CitizenNode)
+            method_name=message["method"], message=message, node_type=NodeType.CitizenNode)
 
     return result
 
 
 async def get_block_by_params(block_height=None, block_hash=""):
-    channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
+    channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
     block_data_filter = "prev_block_hash, height, block_hash, merkle_tree_root_hash," \
                         " time_stamp, peer_id, signature"
     tx_data_filter = "icx_origin_data"

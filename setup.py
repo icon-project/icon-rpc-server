@@ -1,11 +1,13 @@
 #!/usr/bin/env python
+import os
 
 from setuptools import setup, find_packages
-from rest import __version__
+
+with open(os.path.join('.', 'VERSION')) as version_file:
+    version = version_file.read().strip()
 
 requires = [
     "jsonschema",
-    "setproctitle",
     "requests==2.19.1",
     "jsonrpcserver==3.5.3",
     "sanic==0.7.0",
@@ -19,20 +21,20 @@ requires = [
 ]
 
 setup_options = {
-    'name': 'rest',
-    'version': __version__,
-    'description': '`Rest server` for LoopChain',
+    'name': 'iconrpcserver',
+    'version': version,
+    'description': '`iconrpcserver server` for icon',
     'author': 'ICON foundation',
     'author_email': 'foo@icon.foundation',
     'packages': find_packages(exclude=['tests*', 'docs']),
-    'package_data': {'rest': ['rest_config.json']},
-    'py_modules': ['rest', ''],
+    'package_data': {'iconrpcserver': ['icon_rpcserver_config.json']},
+    'py_modules': ['iconrpcserver', ''],
     'license': "Apache License 2.0",
     'install_requires': requires,
     'test_suite': 'tests',
     'entry_points': {
         'console_scripts': [
-            'rest=rest:main'
+            'iconrpcserver=iconrpcserver:main'
         ],
     },
     'classifiers': [
