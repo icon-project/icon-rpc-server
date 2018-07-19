@@ -16,8 +16,5 @@
 
 from .iconrpcserver_cli import main
 
-# Version of iconrpcserver.
-__version__ = "0.9.4"
-
 if __name__ == "__main__":
     main()

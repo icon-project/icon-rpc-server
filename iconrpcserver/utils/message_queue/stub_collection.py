@@ -14,11 +14,12 @@
 
 from typing import Dict
 
-import iconrpcserver.configure.configure as conf
 from ...components.singleton import SingletonMetaClass
 from .peer_inner_stub import PeerInnerStub
 from .channel_inner_stub import ChannelInnerStub
 from .icon_score_inner_stub import IconScoreInnerStub
+from ...default_conf.icon_rpcserver_constant import PEER_QUEUE_NAME_FORMAT, CHANNEL_QUEUE_NAME_FORMAT,\
+    ICON_SCORE_QUEUE_NAME_FORMAT
 from iconcommons.logger import Logger
 
 
@@ -26,20 +27,20 @@ class StubCollection(metaclass=SingletonMetaClass):
     def __init__(self):
         self.amqp_target = None
         self.amqp_key = None
+        self.conf = None
 
         self.peer_stub: PeerInnerStub = None
         self.channel_stubs: Dict[str, ChannelInnerStub] = {}
         self.icon_score_stubs: Dict[str, IconScoreInnerStub] = {}
 
     async def create_peer_stub(self):
-        queue_name = conf.PEER_QUEUE_NAME_FORMAT.format(amqp_key=self.amqp_key)
+        queue_name = PEER_QUEUE_NAME_FORMAT.format(amqp_key=self.amqp_key)
         self.peer_stub = PeerInnerStub(self.amqp_target, queue_name)
         await self.peer_stub.connect()
         return self.peer_stub
 
     async def create_channel_stub(self, channel_name):
-        queue_name = conf.CHANNEL_QUEUE_NAME_FORMAT.format(
-            channel_name=channel_name, amqp_key=self.amqp_key)
+        queue_name = CHANNEL_QUEUE_NAME_FORMAT.format(channel_name=channel_name, amqp_key=self.amqp_key)
         stub = ChannelInnerStub(self.amqp_target, queue_name)
         await stub.connect()
         self.channel_stubs[channel_name] = stub
@@ -48,9 +49,7 @@ class StubCollection(metaclass=SingletonMetaClass):
         return stub
 
     async def create_icon_score_stub(self, channel_name):
-        queue_name = conf.ICON_SCORE_QUEUE_NAME_FORMAT.format(
-            channel_name=channel_name, amqp_key=self.amqp_key
-        )
+        queue_name = ICON_SCORE_QUEUE_NAME_FORMAT.format(channel_name=channel_name, amqp_key=self.amqp_key)
         stub = IconScoreInnerStub(self.amqp_target, queue_name)
         await stub.connect()
         self.icon_score_stubs[channel_name] = stub

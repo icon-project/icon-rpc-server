@@ -1,13 +1,14 @@
 {
-  "LOOPCHAIN_DEFAULT_CHANNEL": "loopchain_default",
-  "PORT_REST": 9000,
-  "AMQP_TARGET": "127.0.0.1",
-  "AMQP_KEY": "7100",
-
-  "log": {
+	"log": {
 		"colorLog": true,
 		"level": "debug",
 		"filePath": "./log/rest_server.log",
-		"outputType": "console|file|daily"
-	}
+		"outputType": "console|file",
+		"rotateType": "D",
+		"rotateInterval": 1
+	},
+	"loopchainDefaultChannel": "loopchain_default",
+	"portRest": 9000,
+	"amqpTarget": "127.0.0.1",
+	"amqpKey": "7100"
 }

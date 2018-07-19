@@ -21,7 +21,6 @@ from jsonrpcserver.aio import AsyncMethods
 from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
-import iconrpcserver.configure.configure as conf
 from iconcommons.logger import Logger
 
 from ....server.json_rpc.validator import validate_jsonschema_v3
@@ -31,6 +30,7 @@ from ...json_rpc import exception
 from ....utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
 from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params
 from ....utils.message_queue.stub_collection import StubCollection
+from ....default_conf.icon_rpcserver_constant import ConfigKey, NodeType
 
 config.log_requests = False
 config.log_responses = False
@@ -59,7 +59,7 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_call(**kwargs):
-        channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
+        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
         score_stub = StubCollection().icon_score_stubs[channel_name]
 
         method = 'icx_call'
@@ -71,7 +71,7 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getScoreApi(**kwargs):
-        channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
+        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
         score_stub = StubCollection().icon_score_stubs[channel_name]
 
         method = 'icx_getScoreApi'
@@ -83,7 +83,7 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_sendTransaction(**kwargs):
-        if RestProperty().node_type == conf.NodeType.CitizenNode:
+        if RestProperty().node_type == NodeType.CitizenNode:
             return await redirect_request_to_rs(kwargs, RestProperty().rs_target)
 
         by_citizen = kwargs.get("node_type", False)
@@ -92,11 +92,12 @@ class Version3Dispatcher:
 
         method = 'icx_sendTransaction'
         request = make_request(method, kwargs)
-        icon_stub = StubCollection().icon_score_stubs[conf.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        icon_stub = StubCollection().icon_score_stubs[channel]
         response = await icon_stub.async_task().validate_transaction(request)
         response_to_json_query(response)
 
-        channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
+        channel_name = channel
         channel_stub = StubCollection().channel_stubs[channel_name]
         tx_hash = await channel_stub.async_task().create_icx_tx(kwargs)
         if tx_hash is None:
@@ -111,7 +112,7 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getTransactionResult(**kwargs):
-        if RestProperty().node_type == conf.NodeType.CitizenNode:
+        if RestProperty().node_type == NodeType.CitizenNode:
             return await redirect_request_to_rs(kwargs, RestProperty().rs_target)
 
         by_citizen = kwargs.get("node_type", False)
@@ -119,8 +120,7 @@ class Version3Dispatcher:
             kwargs = kwargs["message"]
 
         request = convert_params(kwargs, ParamType.get_tx_request)
-
-        channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
+        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
         channel_stub = StubCollection().channel_stubs[channel_name]
         verify_result = dict()
 
@@ -150,7 +150,7 @@ class Version3Dispatcher:
     async def icx_getTransactionByHash(**kwargs):
         request = convert_params(kwargs, ParamType.get_tx_request)
 
-        channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
+        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
         channel_stub = StubCollection().channel_stubs[channel_name]
 
         tx_info = await channel_stub.async_task().get_tx_info(request["txHash"])
@@ -173,7 +173,7 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getBalance(**kwargs):
-        channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
+        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
         score_stub = StubCollection().icon_score_stubs[channel_name]
 
         method = 'icx_getBalance'
@@ -185,7 +185,7 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getTotalSupply(**kwargs):
-        channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
+        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
         score_stub = StubCollection().icon_score_stubs[channel_name]
 
         method = 'icx_getTotalSupply'
@@ -240,6 +240,6 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getLastTransaction(**kwargs):
-        channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
+        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
 
         return ""

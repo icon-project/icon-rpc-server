@@ -21,14 +21,14 @@ from jsonrpcserver.aio import AsyncMethods
 from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
-import iconrpcserver.configure.configure as conf
 from ....protos import message_code
 from ...rest_property import RestProperty
 from ...json_rpc import exception
 from ....utils.icon_service import make_request, response_to_json_query, ParamType
 from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params
 from ....utils.message_queue.stub_collection import StubCollection
-from iconrpcserver.server.json_rpc.validator import validate_jsonschema_v2
+from ....server.json_rpc.validator import validate_jsonschema_v2
+from ....default_conf.icon_rpcserver_constant import ConfigKey, NodeType, ApiVersion
 
 from iconcommons.logger import Logger
 
@@ -58,19 +58,20 @@ class Version2Dispatcher:
     @staticmethod
     @methods.add
     async def icx_sendTransaction(**kwargs):
-        if RestProperty().node_type == conf.NodeType.CitizenNode:
-            return await redirect_request_to_rs(kwargs, RestProperty().rs_target, conf.ApiVersion.v2.name)
+        if RestProperty().node_type == NodeType.CitizenNode:
+            return await redirect_request_to_rs(kwargs, RestProperty().rs_target, ApiVersion.v2.name)
 
         by_citizen = kwargs.get("node_type", False)
         if by_citizen:
             kwargs = kwargs["message"]
 
         request = make_request("icx_sendTransaction", kwargs, ParamType.send_tx)
-        icon_stub = StubCollection().icon_score_stubs[conf.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        icon_stub = StubCollection().icon_score_stubs[channel]
         response = await icon_stub.async_task().validate_transaction(request)
         response_to_json_query(response)
 
-        channel_inner_tasks = StubCollection().channel_stubs[conf.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel_inner_tasks = StubCollection().channel_stubs[channel]
         tx_hash = await channel_inner_tasks.async_task().create_icx_tx(kwargs)
 
         if tx_hash:
@@ -92,14 +93,14 @@ class Version2Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getTransactionResult(**kwargs):
-        if RestProperty().node_type == conf.NodeType.CitizenNode:
-            return await redirect_request_to_rs(kwargs, RestProperty().rs_target, conf.ApiVersion.v2.name)
+        if RestProperty().node_type == NodeType.CitizenNode:
+            return await redirect_request_to_rs(kwargs, RestProperty().rs_target, ApiVersion.v2.name)
 
         by_citizen = kwargs.get("node_type", False)
         if by_citizen:
             kwargs = kwargs["message"]
 
-        channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
+        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
         channel_stub = StubCollection().channel_stubs[channel_name]
         verify_result = {}
 
@@ -149,7 +150,7 @@ class Version2Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getBalance(**kwargs):
-        channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
+        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
 
         method = 'icx_getBalance'
         request = make_request(method, kwargs, ParamType.get_balance)
@@ -161,7 +162,7 @@ class Version2Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getTotalSupply(**kwargs):
-        channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
+        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
 
         method = 'icx_getTotalSupply'
         request = make_request(method, kwargs, ParamType.get_total_supply)
@@ -200,14 +201,14 @@ class Version2Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getLastTransaction(**kwargs):
-        channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
+        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
 
         return ""
 
     @staticmethod
     @methods.add
     async def icx_getTransactionByAddress(**kwargs):
-        channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
+        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
 
         address = kwargs.get("address", None)
         index = kwargs.get("index", None)

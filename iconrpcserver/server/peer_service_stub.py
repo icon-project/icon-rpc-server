@@ -15,21 +15,19 @@
 
 import json
 
-import iconrpcserver.configure.configure as conf
 from ..components import SingletonMetaClass
 from ..protos import loopchain_pb2, loopchain_pb2_grpc
 from ..utils.stub_manager import StubManager
 
 
 class PeerServiceStub(metaclass=SingletonMetaClass):
-    REST_GRPC_TIMEOUT = conf.GRPC_TIMEOUT + conf.REST_ADDITIONAL_TIMEOUT
-    REST_SCORE_QUERY_TIMEOUT = conf.SCORE_QUERY_TIMEOUT + conf.REST_ADDITIONAL_TIMEOUT
-
     def __init__(self):
         self.__stub_to_peer_service = None
+        self.conf = None
+        self.rest_grpc_timeout = None
+        self.rest_score_query_timeout = None
 
     def set_stub_port(self, port, IP_address):
-        IP_address = conf.IP_LOCAL
         self.__stub_to_peer_service = StubManager(
             IP_address + ':' + str(port),
             loopchain_pb2_grpc.PeerServiceStub)
@@ -41,7 +39,7 @@ class PeerServiceStub(metaclass=SingletonMetaClass):
     def get_status(self, channel: str):
         response = self.call("GetStatus",
                              loopchain_pb2.StatusRequest(request="", channel=channel),
-                             self.REST_GRPC_TIMEOUT)
+                             self.rest_grpc_timeout)
         status_json_data = json.loads(response.status)
         status_json_data['block_height'] = response.block_height
         status_json_data['total_tx'] = response.total_tx
