@@ -98,7 +98,15 @@ class Version3Dispatcher:
 
         channel_name = channel
         channel_stub = StubCollection().channel_stubs[channel_name]
-        tx_hash = await channel_stub.async_task().create_icx_tx(kwargs)
+        response_code, tx_hash = await channel_stub.async_task().create_icx_tx(kwargs)
+
+        if response_code != message_code.Response.success:
+            raise exception.GenericJsonRpcServerError(
+                code=exception.JsonError.INVALID_REQUEST,
+                message=message_code.responseCodeMap[response_code][1],
+                http_status=status.HTTP_BAD_REQUEST
+            )
+
         if tx_hash is None:
             raise exception.GenericJsonRpcServerError(
                 code=exception.JsonError.INVALID_REQUEST,
@@ -152,8 +160,8 @@ class Version3Dispatcher:
         channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
         channel_stub = StubCollection().channel_stubs[channel_name]
 
-        tx_info = await channel_stub.async_task().get_tx_info(request["txHash"])
-        if tx_info == message_code.Response.fail_invalid_key_error:
+        response_code, tx_info = await channel_stub.async_task().get_tx_info(request["txHash"])
+        if response_code == message_code.Response.fail_invalid_key_error:
             raise exception.GenericJsonRpcServerError(
                 code=exception.JsonError.INVALID_PARAMS,
                 message='Invalid params txHash',

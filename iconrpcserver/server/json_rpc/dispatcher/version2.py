@@ -71,22 +71,14 @@ class Version2Dispatcher:
         response = await icon_stub.async_task().validate_transaction(request)
         response_to_json_query(response)
 
-        channel_inner_tasks = StubCollection().channel_stubs[channel]
-        tx_hash = await channel_inner_tasks.async_task().create_icx_tx(kwargs)
+        channel_inner_tasks = StubCollection().channel_stubs[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        response_code, tx_hash = await channel_inner_tasks.async_task().create_icx_tx(kwargs)
 
-        if tx_hash:
-            code = message_code.Response.success
-            message = tx_hash
+        response_data = {'response_code': response_code}
+        if response_code != message_code.Response.success:
+            response_data['message'] = message_code.responseCodeMap[response_code][1]
         else:
-            code = message_code.Response.fail_create_tx
-            message = f"tx validate fail. tx data :: {kwargs}"
-
-        response_data = {'response_code': code}
-
-        if code != message_code.Response.success:
-            response_data['message'] = message
-        else:
-            response_data['tx_hash'] = message
+            response_data['tx_hash'] = tx_hash
 
         return response_data
 
