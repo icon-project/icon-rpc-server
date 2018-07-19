@@ -51,13 +51,13 @@ def main():
                         choices=['start', 'stop'],
                         help='rest type [start|stop]')
 
-    parser.add_argument("-p", type=str, dest=ConfigKey.PORT_REST,
+    parser.add_argument("-p", type=str, dest=ConfigKey.PORT_REST, default=None,
                         help="rest_proxy port")
-    parser.add_argument("-c", type=str, dest=ConfigKey.CONFIG,
+    parser.add_argument("-c", type=str, dest=ConfigKey.CONFIG, default=None,
                         help="json configure file path")
-    parser.add_argument("-at", type=str, dest=ConfigKey.AMQP_TARGET,
+    parser.add_argument("-at", type=str, dest=ConfigKey.AMQP_TARGET, default=None,
                         help="amqp target info [IP]:[PORT]")
-    parser.add_argument("-ak", type=str, dest=ConfigKey.AMQP_KEY,
+    parser.add_argument("-ak", type=str, dest=ConfigKey.AMQP_KEY, default=None,
                         help="key sharing peer group using queue name. use it if one more peers connect one MQ")
     parser.add_argument("-f", dest='foreground', action='store_true',
                         help="icon rpcserver run foreground")
@@ -99,7 +99,7 @@ def stop(conf: 'IconConfig') -> int:
 
 def start_process(conf: 'IconConfig'):
     Logger.debug('start_server() start')
-    python_module_string = 'iconrpcserver.rest_app'
+    python_module_string = 'iconrpcserver.icon_rpcserver_app'
 
     converted_params = {'-p': conf[ConfigKey.PORT_REST],
                         '-c': conf[ConfigKey.CONFIG],
@@ -111,7 +111,7 @@ def start_process(conf: 'IconConfig'):
         if v is None:
             continue
         custom_argv.append(k)
-        custom_argv.append(v)
+        custom_argv.append(str(v))
 
     is_foreground = conf.get('foreground', False)
     if is_foreground:

@@ -18,7 +18,15 @@ from .icon_rpcserver_constant import SSLAuthType, ConfigKey
 
 default_rpcserver_config = \
     {
-        ConfigKey.CONFIG_PATH: './conf/rest_config.json',
+        "log": {
+            "colorLog": True,
+            "level": "debug",
+            "filePath": "./log/icon_service1.log",
+            "outputType": "console|file",
+            "rotateType": "D",
+            "rotateInterval": 1
+        },
+        ConfigKey.CONFIG: './conf/rest_config.json',
         ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL: "loopchain_default",
         ConfigKey.PORT_REST: 9000,
         ConfigKey.PORT_DIFF_REST_SERVICE_CONTAINER: 1900,

@@ -40,14 +40,14 @@ class ApiVersion(IntFlag):
     v3 = 3
 
 
-ICON_RPCSERVER_PROCTITLE_FORMAT = "rest_server.{restPort}.{config}.{amqpTarget}.{amqpKey}"
+ICON_RPCSERVER_PROCTITLE_FORMAT = "rest_server.{portRest}.{config}.{amqpTarget}.{amqpKey}"
 PEER_QUEUE_NAME_FORMAT = "Peer.{amqp_key}",
 CHANNEL_QUEUE_NAME_FORMAT = "Channel.{channel_name}.{amqp_key}",
 ICON_SCORE_QUEUE_NAME_FORMAT = "IconScore.{channel_name}.{amqp_key}",
 
 
 class ConfigKey:
-    CONFIG_PATH = 'configPath'
+    CONFIG = 'config'
     LOOPCHAIN_DEFAULT_CHANNEL = 'loopchainDefaultChannel'
     PORT_REST = 'portRest'
     PORT_DIFF_REST_SERVICE_CONTAINER = 'portDiffRestServiceContainer'
@@ -65,5 +65,4 @@ class ConfigKey:
     GRPC_RETRY = 'grpcRetry'
     REST_ADDITIONAL_TIMEOUT = 'restAdditionalTimeout'
     SCORE_QUERY_TIMEOUT = 'scoreQueryTimeout'
-    CONFIG = 'config'
 

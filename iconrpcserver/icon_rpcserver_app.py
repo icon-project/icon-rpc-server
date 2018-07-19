@@ -44,18 +44,17 @@ def main():
 
     # Parse arguments.
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", type=str, dest=ConfigKey.PORT_REST,
+    parser.add_argument("-p", type=str, dest=ConfigKey.PORT_REST, default=None,
                         help="rest_proxy port")
-    parser.add_argument("-c", type=str, dest=ConfigKey.CONFIG,
+    parser.add_argument("-c", type=str, dest=ConfigKey.CONFIG, default=None,
                         help="json configure file path")
-    parser.add_argument("-at", type=str, dest=ConfigKey.AMQP_TARGET,
+    parser.add_argument("-at", type=str, dest=ConfigKey.AMQP_TARGET, default=None,
                         help="amqp target info [IP]:[PORT]")
-    parser.add_argument("-ak", type=str, dest=ConfigKey.AMQP_KEY,
+    parser.add_argument("-ak", type=str, dest=ConfigKey.AMQP_KEY, default=None,
                         help="key sharing peer group using queue name. use it if one more peers connect one MQ")
 
     args = parser.parse_args()
     args_params = dict(vars(args))
-
     setproctitle.setproctitle(ICON_RPCSERVER_PROCTITLE_FORMAT.format(**args_params))
 
     conf = IconConfig(args.config, default_rpcserver_config)
@@ -104,7 +103,7 @@ def _run(conf: 'IconConfig'):
 
     # Launch gunicorn web server.
     ServerComponents.conf = conf
-    ServerComponents().ready(conf[ConfigKey.AMQP_TARGET], conf[ConfigKey.AMQP_KEY])
+    ServerComponents().ready()
     StandaloneApplication(ServerComponents().app, options).run()
     Logger.error("Rest App Done!")
 
