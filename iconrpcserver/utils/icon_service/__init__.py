@@ -20,7 +20,7 @@ def check_error_response(result: Any):
     return isinstance(result, dict) and result.get('error')
 
 
-def response_to_json_query(response):
+def response_to_json_query(response, is_convert: bool = False):
     from ...server.json_rpc import GenericJsonRpcServerError
     if check_error_response(response):
         response = response['error']
@@ -30,10 +30,11 @@ def response_to_json_query(response):
             http_status=status.HTTP_BAD_REQUEST
         )
     else:
-        response = {
-            'response': response,
-            "response_code": 0
-        }
+        if is_convert:
+            response = {
+                'response': response,
+                "response_code": 0
+            }
 
     return response
 
