@@ -338,6 +338,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
                 "value": "0xde0b6b3a7640000",
                 "stepLimit": "0x12345",
                 "timestamp": "0x563a6cf330136",
+                "nid": "0x3fcb",
                 "nonce": "0x1",
                 "signature": "VAia7YZ2Ji6igKWzjR2YsGa2m53nKPrfK7uXYW78QLE+ATehAVZPC40szvAiA6NEU5gCYB4c4qaQzqDh2ugcHgA=",
                 "dataType": "call",
@@ -464,7 +465,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
         self.check_valid(full_data=full_data)
 
         # check full_data['params']
-        required_keys = ['version', 'from', 'stepLimit', 'timestamp', 'signature']
+        required_keys = ['version', 'from', 'stepLimit', 'timestamp', 'nid', 'signature']
         self.check_more(full_data=full_data, data=params, required_keys=required_keys)
 
         # check full_data['params']['data']
