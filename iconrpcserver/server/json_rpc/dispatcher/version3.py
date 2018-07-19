@@ -20,7 +20,6 @@ from jsonrpcserver import config, status
 from jsonrpcserver.aio import AsyncMethods
 from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
-from typing import Any
 
 from iconcommons.logger import Logger
 
