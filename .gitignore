@@ -68,9 +68,6 @@ fabric.properties
 
 ### Grpc Samples and Personal note ###
 grpc
-worknote
-loopchain/peer/radiopeer_pb2.py
-loopchain/protos/loopchain_pb2*.py
 
 ### level db and sqlite dirs ###
 db
@@ -183,7 +180,6 @@ testcase/db/
 test_chain_helper_block/
 sample_score
 servertool.py
-*_pb2.py
 *_profile.txt
 *_profile_.txt
 test_performance_result.txt
