@@ -84,7 +84,6 @@ class ServerComponents(metaclass=SingletonMetaClass):
         StubCollection().amqp_key = ServerComponents.conf[ConfigKey.AMQP_KEY]
         StubCollection().conf = ServerComponents.conf
 
-
         async def ready_tasks():
             Logger.debug('rest_server:initialize')
             await StubCollection().create_peer_stub()

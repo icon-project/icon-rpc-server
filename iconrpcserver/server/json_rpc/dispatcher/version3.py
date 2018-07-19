@@ -20,6 +20,7 @@ from jsonrpcserver import config, status
 from jsonrpcserver.aio import AsyncMethods
 from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
+from typing import Any
 
 from iconcommons.logger import Logger
 
@@ -65,8 +66,7 @@ class Version3Dispatcher:
         method = 'icx_call'
         request = make_request(method, kwargs)
         response = await score_stub.async_task().query(request)
-
-        return response
+        return response_to_json_query(response)
 
     @staticmethod
     @methods.add
@@ -78,7 +78,7 @@ class Version3Dispatcher:
         request = make_request(method, kwargs)
         response = await score_stub.async_task().query(request)
 
-        return response
+        return response_to_json_query(response)
 
     @staticmethod
     @methods.add
@@ -180,7 +180,7 @@ class Version3Dispatcher:
         request = make_request(method, kwargs)
         response = await score_stub.async_task().query(request)
 
-        return response
+        return response_to_json_query(response)
 
     @staticmethod
     @methods.add
@@ -192,7 +192,7 @@ class Version3Dispatcher:
         request = make_request(method, kwargs)
         response = await score_stub.async_task().query(request)
 
-        return response
+        return response_to_json_query(response)
 
     @staticmethod
     @methods.add
@@ -200,7 +200,7 @@ class Version3Dispatcher:
         block_hash, result = await get_block_by_params(block_height=-1)
         response = convert_params(result['block'], ParamType.get_block_response)
 
-        return response
+        return response_to_json_query(response)
 
     @staticmethod
     @methods.add

@@ -34,12 +34,14 @@ class StubCollection(metaclass=SingletonMetaClass):
         self.icon_score_stubs: Dict[str, IconScoreInnerStub] = {}
 
     async def create_peer_stub(self):
+        Logger.debug(f"create_peer_stub")
         queue_name = PEER_QUEUE_NAME_FORMAT.format(amqp_key=self.amqp_key)
         self.peer_stub = PeerInnerStub(self.amqp_target, queue_name)
         await self.peer_stub.connect()
         return self.peer_stub
 
     async def create_channel_stub(self, channel_name):
+        Logger.debug(f"create_channel_stub")
         queue_name = CHANNEL_QUEUE_NAME_FORMAT.format(channel_name=channel_name, amqp_key=self.amqp_key)
         stub = ChannelInnerStub(self.amqp_target, queue_name)
         await stub.connect()
@@ -49,6 +51,7 @@ class StubCollection(metaclass=SingletonMetaClass):
         return stub
 
     async def create_icon_score_stub(self, channel_name):
+        Logger.debug(f"create_icon_score_stub")
         queue_name = ICON_SCORE_QUEUE_NAME_FORMAT.format(channel_name=channel_name, amqp_key=self.amqp_key)
         stub = IconScoreInnerStub(self.amqp_target, queue_name)
         await stub.connect()
