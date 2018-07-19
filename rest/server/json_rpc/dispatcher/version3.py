@@ -90,11 +90,11 @@ class Version3Dispatcher:
         if by_citizen:
             kwargs = kwargs["message"]
 
-        # method = 'icx_sendTransaction'
-        # request = make_request(method, kwargs)
-        # icon_stub = StubCollection().icon_score_stubs[conf.LOOPCHAIN_DEFAULT_CHANNEL]
-        # response = await icon_stub.async_task().validate_transaction(request)
-        # response_to_json_query(response)
+        method = 'icx_sendTransaction'
+        request = make_request(method, kwargs)
+        icon_stub = StubCollection().icon_score_stubs[conf.LOOPCHAIN_DEFAULT_CHANNEL]
+        response = await icon_stub.async_task().validate_transaction(request)
+        response_to_json_query(response)
 
         channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
         channel_stub = StubCollection().channel_stubs[channel_name]
