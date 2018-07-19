@@ -19,7 +19,7 @@ import sys
 import subprocess
 from enum import IntEnum
 
-from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
+from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, ICON_RPCSERVER_PROCTITLE_FORMAT
 from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
 from iconcommons.icon_config import IconConfig
 from iconcommons.logger import Logger
@@ -135,9 +135,9 @@ def _is_running_icon_service(conf: 'IconConfig') -> bool:
 
 def _check_service_running(conf: 'IconConfig') -> bool:
     Logger.info(f'check_serve_rest_app!', REST_SERVICE_STANDALONE)
-    # proc_title = conf.REST_SERVER_PROCTITLE_FORMAT.format(**params)
-    # return find_procs_by_params(proc_title)
-    return find_procs_by_params("gunicorn")
+    proc_title = ICON_RPCSERVER_PROCTITLE_FORMAT.format(**conf)
+    return find_procs_by_params(proc_title)
+    # return find_procs_by_params("gunicorn")
 
 
 def find_procs_by_params(name) -> bool:
