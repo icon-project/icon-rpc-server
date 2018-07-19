@@ -77,8 +77,10 @@ def _run(conf: 'IconConfig'):
         conf[ConfigKey.GRPC_TIMEOUT] + conf[ConfigKey.REST_ADDITIONAL_TIMEOUT]
     PeerServiceStub().rest_score_query_timeout = \
         conf[ConfigKey.SCORE_QUERY_TIMEOUT] + conf[ConfigKey.REST_ADDITIONAL_TIMEOUT]
-    PeerServiceStub().set_stub_port(conf[ConfigKey.PORT_REST] - conf[ConfigKey.PORT_DIFF_REST_SERVICE_CONTAINER],
+    PeerServiceStub().set_stub_port(int(conf[ConfigKey.PORT_REST]) -
+                                    int(conf[ConfigKey.PORT_DIFF_REST_SERVICE_CONTAINER]),
                                     conf[ConfigKey.IP_LOCAL])
+    ServerComponents.conf = conf
     ServerComponents().set_resource()
 
     Logger.debug(f"Run gunicorn webserver for HA. Port = {conf[ConfigKey.PORT_REST]}")

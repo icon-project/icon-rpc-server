@@ -41,9 +41,9 @@ class ApiVersion(IntFlag):
 
 
 ICON_RPCSERVER_PROCTITLE_FORMAT = "rest_server.{portRest}.{config}.{amqpTarget}.{amqpKey}"
-PEER_QUEUE_NAME_FORMAT = "Peer.{amqp_key}",
-CHANNEL_QUEUE_NAME_FORMAT = "Channel.{channel_name}.{amqp_key}",
-ICON_SCORE_QUEUE_NAME_FORMAT = "IconScore.{channel_name}.{amqp_key}",
+PEER_QUEUE_NAME_FORMAT = "Peer.{amqp_key}"
+CHANNEL_QUEUE_NAME_FORMAT = "Channel.{channel_name}.{amqp_key}"
+ICON_SCORE_QUEUE_NAME_FORMAT = "IconScore.{channel_name}.{amqp_key}"
 
 
 class ConfigKey:
