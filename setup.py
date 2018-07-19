@@ -25,14 +25,14 @@ setup_options = {
     'author': 'ICON foundation',
     'author_email': 'foo@icon.foundation',
     'packages': find_packages(exclude=['tests*', 'docs']),
-    'package_data': {'rest': ['rest_config.json']},
-    'py_modules': ['rest', ''],
+    'package_data': {'iconrpcserver': ['icon_rpcserver_config.json']},
+    'py_modules': ['iconrpcserver', ''],
     'license': "Apache License 2.0",
     'install_requires': requires,
     'test_suite': 'tests',
     'entry_points': {
         'console_scripts': [
-            'rest=rest:main'
+            'iconrpcserver=iconrpcserver:main'
         ],
     },
     'classifiers': [

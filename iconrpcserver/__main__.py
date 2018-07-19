@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import sys
-from .rest_cli import main
+from .iconrpcserver_cli import main
 
 
 if __name__ == "__main__":
