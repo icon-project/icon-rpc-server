@@ -90,15 +90,23 @@ class Version3Dispatcher:
         if by_citizen:
             kwargs = kwargs["message"]
 
-        method = 'icx_sendTransaction'
-        request = make_request(method, kwargs)
-        icon_stub = StubCollection().icon_score_stubs[conf.LOOPCHAIN_DEFAULT_CHANNEL]
-        response = await icon_stub.async_task().validate_transaction(request)
-        response_to_json_query(response)
+        # method = 'icx_sendTransaction'
+        # request = make_request(method, kwargs)
+        # icon_stub = StubCollection().icon_score_stubs[conf.LOOPCHAIN_DEFAULT_CHANNEL]
+        # response = await icon_stub.async_task().validate_transaction(request)
+        # response_to_json_query(response)
 
         channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
         channel_stub = StubCollection().channel_stubs[channel_name]
-        tx_hash = await channel_stub.async_task().create_icx_tx(kwargs)
+        response_code, tx_hash = await channel_stub.async_task().create_icx_tx(kwargs)
+
+        if response_code != message_code.Response.success:
+            raise exception.GenericJsonRpcServerError(
+                code=exception.JsonError.INVALID_REQUEST,
+                message=message_code.responseCodeMap[response_code][1],
+                http_status=status.HTTP_BAD_REQUEST
+            )
+
         if tx_hash is None:
             raise exception.GenericJsonRpcServerError(
                 code=exception.JsonError.INVALID_REQUEST,
@@ -153,8 +161,8 @@ class Version3Dispatcher:
         channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL
         channel_stub = StubCollection().channel_stubs[channel_name]
 
-        tx_info = await channel_stub.async_task().get_tx_info(request["txHash"])
-        if tx_info == message_code.Response.fail_invalid_key_error:
+        response_code, tx_info = await channel_stub.async_task().get_tx_info(request["txHash"])
+        if response_code == message_code.Response.fail_invalid_key_error:
             raise exception.GenericJsonRpcServerError(
                 code=exception.JsonError.INVALID_PARAMS,
                 message='Invalid params txHash',
