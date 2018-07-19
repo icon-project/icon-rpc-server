@@ -19,7 +19,7 @@ import sys
 import subprocess
 from enum import IntEnum
 
-from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, ICON_RPCSERVER_PROCTITLE_FORMAT
+from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
 from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
 from iconcommons.icon_config import IconConfig
 from iconcommons.logger import Logger
@@ -124,7 +124,7 @@ def start_process(conf: 'IconConfig'):
 
 
 def stop_process(conf: 'IconConfig'):
-    command = f"pkill gunicorn"
+    command = f'lsof -i :{conf[ConfigKey.PORT_REST]} -t | xargs kill'
     subprocess.run(command, stdout=subprocess.PIPE, shell=True)
     Logger.info(f'stop_process_rest_app!', REST_SERVICE_STANDALONE)
 
@@ -135,14 +135,12 @@ def _is_running_icon_service(conf: 'IconConfig') -> bool:
 
 def _check_service_running(conf: 'IconConfig') -> bool:
     Logger.info(f'check_serve_rest_app!', REST_SERVICE_STANDALONE)
-    proc_title = ICON_RPCSERVER_PROCTITLE_FORMAT.format(**conf)
-    return find_procs_by_params(proc_title)
-    # return find_procs_by_params("gunicorn")
+    return find_procs_by_params(conf[ConfigKey.PORT_REST])
 
 
-def find_procs_by_params(name) -> bool:
+def find_procs_by_params(port) -> bool:
     # Return a list of processes matching 'name'.
-    command = f"ps -ef | grep {name} | grep -v grep"
+    command = f"lsof -i TCP:{port}"
     result = subprocess.run(command, stdout=subprocess.PIPE, shell=True)
     if result.returncode == 1:
         return False
