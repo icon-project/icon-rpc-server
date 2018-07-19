@@ -7,7 +7,6 @@ with open(os.path.join('.', 'VERSION')) as version_file:
     version = version_file.read().strip()
 
 requires = [
-    "grpc",
     "jsonschema",
     "setproctitle",
     "requests==2.19.1",
