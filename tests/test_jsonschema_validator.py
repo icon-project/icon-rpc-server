@@ -16,8 +16,8 @@
 
 import unittest
 
-from rest.server.json_rpc.exception import GenericJsonRpcServerError
-from rest.server.json_rpc.validator import validate_jsonschema_v2, validate_jsonschema_v3
+from iconrpcserver.server.json_rpc.exception import GenericJsonRpcServerError
+from iconrpcserver.server.json_rpc.validator import validate_jsonschema_v2, validate_jsonschema_v3
 from tests import create_address, create_tx_hash
 
 
@@ -152,6 +152,10 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
 
         # remove non-required key and test
         params.pop('nonce')
+        self.check_valid(full_data=full_data)
+        params.pop('node_type')
+        self.check_valid(full_data=full_data)
+        params.pop('node_message')
         self.check_valid(full_data=full_data)
 
         # check full_data['params']
@@ -338,6 +342,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
                 "value": "0xde0b6b3a7640000",
                 "stepLimit": "0x12345",
                 "timestamp": "0x563a6cf330136",
+                "nid": "0x3fcb",
                 "nonce": "0x1",
                 "signature": "VAia7YZ2Ji6igKWzjR2YsGa2m53nKPrfK7uXYW78QLE+ATehAVZPC40szvAiA6NEU5gCYB4c4qaQzqDh2ugcHgA=",
                 "dataType": "call",
@@ -462,9 +467,13 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
         params = full_data['params']
         params.pop('to')
         self.check_valid(full_data=full_data)
+        params.pop('node_type')
+        self.check_valid(full_data=full_data)
+        params.pop('node_message')
+        self.check_valid(full_data=full_data)
 
         # check full_data['params']
-        required_keys = ['version', 'from', 'stepLimit', 'timestamp', 'signature']
+        required_keys = ['version', 'from', 'stepLimit', 'timestamp', 'nid', 'signature']
         self.check_more(full_data=full_data, data=params, required_keys=required_keys)
 
         # check full_data['params']['data']

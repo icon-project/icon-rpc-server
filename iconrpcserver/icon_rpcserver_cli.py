@@ -19,9 +19,10 @@ import sys
 import subprocess
 from enum import IntEnum
 
-import rest
-import rest.configure.configure as conf
-from iconservice.logger import Logger
+from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
+from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
+from iconcommons.icon_config import IconConfig
+from iconcommons.logger import Logger
 
 REST_SERVICE_STANDALONE = "RestServerStandAlone"
 
@@ -32,17 +33,17 @@ class ExitCode(IntEnum):
 
 
 def main():
-    parser = argparse.ArgumentParser(prog='rest_cli.py', usage=f"""
+    parser = argparse.ArgumentParser(prog='iconrpcserver_cli.py', usage=f"""
     ==========================
-    JsonRpcRest server version : {rest.__version__}
+    iconrpcserver server
     ==========================
-    JsonRpcRest commands:
+    iconrpcserver commands:
         start : icon_service start
         stop : icon_service stop
-        -p[--port] : rest_proxy port
-        -o[--configure_file_path] : json configure file path
-        --amqp_target : amqp target info [IP]:[PORT]
-        --amqp_key : key sharing peer group using queue name. use it if one more peers connect one MQ
+        -p : rest_proxy port
+        -c : json configure file path
+        -at : amqp target info [IP]:[PORT]
+        -ak : key sharing peer group using queue name. use it if one more peers connect one MQ
     """)
 
     parser.add_argument('command', type=str,
@@ -50,14 +51,16 @@ def main():
                         choices=['start', 'stop'],
                         help='rest type [start|stop]')
 
-    parser.add_argument("-p", "--port", type=str, dest="port",
+    parser.add_argument("-p", type=str, dest=ConfigKey.PORT, default=None,
                         help="rest_proxy port")
-    parser.add_argument("-o", "--configure_file_path", type=str, dest="config",
+    parser.add_argument("-c", type=str, dest=ConfigKey.CONFIG, default=None,
                         help="json configure file path")
-    parser.add_argument("--amqp_target", type=str, dest="amqp_target",
+    parser.add_argument("-at", type=str, dest=ConfigKey.AMQP_TARGET, default=None,
                         help="amqp target info [IP]:[PORT]")
-    parser.add_argument("--amqp_key", type=str, dest="amqp_key",
+    parser.add_argument("-ak", type=str, dest=ConfigKey.AMQP_KEY, default=None,
                         help="key sharing peer group using queue name. use it if one more peers connect one MQ")
+    parser.add_argument("-f", dest='foreground', action='store_true',
+                        help="icon rpcserver run foreground")
 
     args = parser.parse_args()
 
@@ -65,83 +68,79 @@ def main():
         parser.print_help()
         sys.exit(ExitCode.COMMAND_IS_WRONG.value)
 
-    if args.config:
-        conf.Configure().load_configure_json(args.config)
-    config_path = conf.CONFIG_PATH
-    port = args.port or conf.PORT_REST
-    amqp_target = args.amqp_target or conf.AMQP_TARGET
-    amqp_key = args.amqp_key or conf.AMQP_KEY
-
-    params = {'port': port,
-              'config': config_path,
-              'amqp_target': amqp_target,
-              'amqp_key': amqp_key}
-
-    Logger(config_path)
+    conf = IconConfig(args.config, default_rpcserver_config)
+    conf.load(dict(vars(args)))
+    Logger.load_config(conf)
 
     command = args.command[0]
     if command == 'start' and len(args.command) == 1:
-        result = start(params)
+        result = start(conf)
     elif command == 'stop' and len(args.command) == 1:
-        result = stop(params)
+        result = stop(conf)
     else:
         parser.print_help()
         result = ExitCode.COMMAND_IS_WRONG.value
     sys.exit(result)
 
 
-def start(params: dict) -> int:
-    if not is_serve_rest_server(params):
-        start_process(params)
+def start(conf: 'IconConfig') -> int:
+    if not _is_running_icon_service(conf):
+        start_process(conf)
     Logger.info(f'start_command done!', REST_SERVICE_STANDALONE)
     return ExitCode.SUCCEEDED
 
 
-def stop(params: dict) -> int:
-    if is_serve_rest_server(params):
-        stop_process(params)
+def stop(conf: 'IconConfig') -> int:
+    if _is_running_icon_service(conf):
+        stop_process(conf)
     Logger.info(f'stop_command done!', REST_SERVICE_STANDALONE)
     return ExitCode.SUCCEEDED
 
 
-def start_process(params: dict):
+def start_process(conf: 'IconConfig'):
     Logger.debug('start_server() start')
-    python_module_string = 'rest.rest_app'
+    python_module_string = 'iconrpcserver.icon_rpcserver_app'
 
-    converted_params = {'-p': params['port'],
-                        '-o': params['config'],
-                        '--amqp_target': params['amqp_target'],
-                        '--amqp_key': params['amqp_key']}
+    converted_params = {'-p': conf[ConfigKey.PORT],
+                        '-c': conf[ConfigKey.CONFIG],
+                        '-at': conf[ConfigKey.AMQP_TARGET],
+                        '-ak': conf[ConfigKey.AMQP_KEY]}
 
     custom_argv = []
     for k, v in converted_params.items():
+        if v is None:
+            continue
         custom_argv.append(k)
         custom_argv.append(str(v))
 
-    subprocess.Popen([sys.executable, '-m', python_module_string, *custom_argv], close_fds=True)
+    is_foreground = conf.get('foreground', False)
+    if is_foreground:
+        from iconrpcserver.icon_rpcserver_app import run_in_foreground
+        del conf['foreground']
+        run_in_foreground(conf)
+    else:
+        subprocess.Popen([sys.executable, '-m', python_module_string, *custom_argv], close_fds=True)
     Logger.debug('start_process() end')
 
 
-def stop_process(params: dict):
-    command = f"pkill gunicorn"
+def stop_process(conf: 'IconConfig'):
+    command = f'lsof -i :{conf[ConfigKey.PORT]} -t | xargs kill'
     subprocess.run(command, stdout=subprocess.PIPE, shell=True)
     Logger.info(f'stop_process_rest_app!', REST_SERVICE_STANDALONE)
 
 
-def is_serve_rest_server(params: dict) -> bool:
-    return _check_serve(params)
+def _is_running_icon_service(conf: 'IconConfig') -> bool:
+    return _check_service_running(conf)
 
 
-def _check_serve(params: dict) -> bool:
+def _check_service_running(conf: 'IconConfig') -> bool:
     Logger.info(f'check_serve_rest_app!', REST_SERVICE_STANDALONE)
-    # proc_title = conf.REST_SERVER_PROCTITLE_FORMAT.format(**params)
-    # return find_procs_by_params(proc_title)
-    return find_procs_by_params("gunicorn")
+    return find_procs_by_params(conf[ConfigKey.PORT])
 
 
-def find_procs_by_params(name) -> bool:
+def find_procs_by_params(port) -> bool:
     # Return a list of processes matching 'name'.
-    command = f"ps -ef | grep {name} | grep -v grep"
+    command = f"lsof -i TCP:{port}"
     result = subprocess.run(command, stdout=subprocess.PIPE, shell=True)
     if result.returncode == 1:
         return False

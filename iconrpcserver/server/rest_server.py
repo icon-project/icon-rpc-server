@@ -19,7 +19,8 @@ import ssl
 from sanic import Sanic, response
 from sanic.views import HTTPMethodView
 
-import rest.configure.configure as conf
+from iconcommons.icon_config import IconConfig
+from ..default_conf.icon_rpcserver_constant import ConfigKey, NodeType, SSLAuthType
 from ..components import SingletonMetaClass
 from .peer_service_stub import PeerServiceStub
 from .rest_property import RestProperty
@@ -27,30 +28,41 @@ from .json_rpc.dispatcher.node import NodeDispatcher
 from .json_rpc.dispatcher.version2 import Version2Dispatcher
 from .json_rpc.dispatcher.version3 import Version3Dispatcher
 from ..utils.message_queue.stub_collection import StubCollection
+from sanic_cors import CORS
 
-from iconservice.logger.logger import Logger
+from iconcommons.logger import Logger
 
 
 class ServerComponents(metaclass=SingletonMetaClass):
+    conf: 'IconConfig' = None
+
     def __init__(self):
         self.__app = Sanic(__name__)
         self.__app.config.KEEP_ALIVE = False
+        CORS(self.__app)
 
         # Decide whether to create context or not according to whether SSL is applied
-        if conf.REST_SSL_TYPE == conf.SSLAuthType.none:
+
+        rest_ssl_type = ServerComponents.conf[ConfigKey.REST_SSL_TYPE]
+        if rest_ssl_type == SSLAuthType.none:
             self.__ssl_context = None
-        elif conf.REST_SSL_TYPE == conf.SSLAuthType.server_only:
-            self.__ssl_context = (conf.DEFAULT_SSL_CERT_PATH, conf.DEFAULT_SSL_KEY_PATH)
-        elif conf.REST_SSL_TYPE == conf.SSLAuthType.mutual:
+        elif rest_ssl_type == SSLAuthType.server_only:
+
+            self.__ssl_context = (ServerComponents.conf[ConfigKey.DEFAULT_SSL_CERT_PATH],
+                                  ServerComponents.conf[ConfigKey.DEFAULT_SSL_KEY_PATH])
+        elif rest_ssl_type == SSLAuthType.mutual:
             self.__ssl_context = ssl.SSLContext(_ssl.PROTOCOL_SSLv23)
 
-            self.__ssl_context.verify_mode = ssl.CERT_REQUIRED
+            self.__ssl_context.verify_mode = _ssl.CERT_REQUIRED
             self.__ssl_context.check_hostname = False
 
-            self.__ssl_context.load_verify_locations(cafile=conf.DEFAULT_SSL_TRUST_CERT_PATH)
-            self.__ssl_context.load_cert_chain(conf.DEFAULT_SSL_CERT_PATH, conf.DEFAULT_SSL_KEY_PATH)
+            self.__ssl_context.load_verify_locations(
+                cafile=ServerComponents.conf[ConfigKey.DEFAULT_SSL_TRUST_CERT_PATH])
+
+            self.__ssl_context.load_cert_chain(ServerComponents.conf[ConfigKey.DEFAULT_SSL_CERT_PATH],
+                                               ServerComponents.conf[ConfigKey.DEFAULT_SSL_KEY_PATH])
         else:
-            Logger.error(f"REST_SSL_TYPE must be one of [0,1,2]. But now conf.REST_SSL_TYPE is {conf.REST_SSL_TYPE}")
+            Logger.error(f"REST_SSL_TYPE must be one of [0,1,2]. But now conf.REST_SSL_TYPE is {rest_ssl_type}")
 
     @property
     def app(self):
@@ -69,9 +81,10 @@ class ServerComponents(metaclass=SingletonMetaClass):
         self.__app.add_route(Disable.as_view(), '/api/v1', methods=['POST', 'GET'])
         self.__app.add_route(Status.as_view(), '/api/v1/status/peer')
 
-    def ready(self, amqp_target, amqp_key):
-        StubCollection().amqp_target = amqp_target
-        StubCollection().amqp_key = amqp_key
+    def ready(self):
+        StubCollection().amqp_target = ServerComponents.conf[ConfigKey.AMQP_TARGET]
+        StubCollection().amqp_key = ServerComponents.conf[ConfigKey.AMQP_KEY]
+        StubCollection().conf = ServerComponents.conf
 
         async def ready_tasks():
             Logger.debug('rest_server:initialize')
@@ -85,7 +98,7 @@ class ServerComponents(metaclass=SingletonMetaClass):
 
             results = await StubCollection().peer_stub.async_task().get_channel_info_detail(channel_name)
 
-            RestProperty().node_type = conf.NodeType(results[6])
+            RestProperty().node_type = NodeType(results[6])
             RestProperty().rs_target = results[3]
 
             Logger.debug(f'rest_server:initialize complete. '
@@ -93,15 +106,15 @@ class ServerComponents(metaclass=SingletonMetaClass):
 
         self.__app.add_task(ready_tasks())
 
-    def serve(self, amqp_target, amqp_key, api_port):
-        self.ready(amqp_target, amqp_key)
+    def serve(self, api_port):
+        self.ready()
         self.__app.run(host='0.0.0.0', port=api_port, debug=False, ssl=self.ssl_context)
 
 
 class Status(HTTPMethodView):
     async def get(self, request):
         args = request.raw_args
-        channel_name = conf.LOOPCHAIN_DEFAULT_CHANNEL if args.get('channel') is None else args.get('channel')
+        channel_name = ServerComponents.conf[ConfigKey.CHANNEL] if args.get('channel') is None else args.get('channel')
         return response.json(PeerServiceStub().get_status(channel_name))
 
 

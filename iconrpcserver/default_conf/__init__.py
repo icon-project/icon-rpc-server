@@ -14,10 +14,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .rest_cli import main
-
-# Version of rest.
-__version__ = "0.9.4"
-
-if __name__ == "__main__":
-    main()
+from .icon_rpcserver_config import *

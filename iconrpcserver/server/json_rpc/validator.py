@@ -18,7 +18,7 @@ from jsonrpcserver import status
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
-from rest.server.json_rpc.exception import GenericJsonRpcServerError, JsonError
+from iconrpcserver.server.json_rpc.exception import GenericJsonRpcServerError, JsonError
 
 icx_sendTransaction_v2: dict = {
     "$schema": "http://json-schema.org/schema#",
@@ -344,6 +344,7 @@ icx_sendTransaction_v3: dict = {
                 "value": {"type": "string"},
                 "stepLimit": {"type": "string"},
                 "timestamp": {"type": "string"},
+                "nid": {"type": "string"},
                 "nonce": {"type": "string"},
                 "signature": {"type": "string"},
                 "dataType": {"type": "string", "enum": ["call", "deploy"]},
@@ -359,7 +360,7 @@ icx_sendTransaction_v3: dict = {
                 },
             },
             "additionalProperties": False,
-            "required": ["version", "from", "stepLimit", "timestamp", "signature"]
+            "required": ["version", "from", "stepLimit", "timestamp", "nid", "signature"]
         }
     },
     "additionalProperties": False,
