@@ -58,12 +58,12 @@ class Version2Dispatcher:
     @staticmethod
     @methods.add
     async def icx_sendTransaction(**kwargs):
-        if RestProperty().node_type == NodeType.CitizenNode:
-            return await redirect_request_to_rs(kwargs, RestProperty().rs_target, ApiVersion.v2.name)
-
         by_citizen = kwargs.get("node_type", False)
         if by_citizen:
             kwargs = kwargs["message"]
+
+        if RestProperty().node_type == NodeType.CitizenNode:
+            return await redirect_request_to_rs(kwargs, RestProperty().rs_target, ApiVersion.v2.name)
 
         request = make_request("icx_sendTransaction", kwargs, ParamType.send_tx)
         channel = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
@@ -93,13 +93,6 @@ class Version2Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getTransactionResult(**kwargs):
-        if RestProperty().node_type == NodeType.CitizenNode:
-            return await redirect_request_to_rs(kwargs, RestProperty().rs_target, ApiVersion.v2.name)
-
-        by_citizen = kwargs.get("node_type", False)
-        if by_citizen:
-            kwargs = kwargs["message"]
-
         channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
         channel_stub = StubCollection().channel_stubs[channel_name]
         verify_result = {}
