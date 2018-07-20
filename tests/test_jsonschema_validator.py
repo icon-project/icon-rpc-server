@@ -70,6 +70,10 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
             "id": 1234,
             'method': 'icx_sendTransaction',
             'params': {
+                "node_message": {
+                    "from": 1,
+                    "to": 'a',
+                },
                 "node_type": 0,
                 "from": create_address(data=b'from'),
                 "to": create_address(data=b'to'),
@@ -155,6 +159,8 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
         params.pop('nonce')
         self.check_valid(full_data=full_data)
         params.pop('node_type')
+        self.check_valid(full_data=full_data)
+        params.pop('node_message')
         self.check_valid(full_data=full_data)
 
         # check full_data['params']
@@ -335,6 +341,10 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
             "id": 1234,
             'method': 'icx_sendTransaction',
             'params': {
+                "node_message": {
+                    "from": 1,
+                    "to": 'a',
+                },
                 "node_type": 0,
                 "version": "0x3",
                 "from": create_address(data=b'from'),
@@ -468,6 +478,8 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
         params.pop('to')
         self.check_valid(full_data=full_data)
         params.pop('node_type')
+        self.check_valid(full_data=full_data)
+        params.pop('node_message')
         self.check_valid(full_data=full_data)
 
         # check full_data['params']
