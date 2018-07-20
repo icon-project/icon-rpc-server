@@ -153,10 +153,6 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
         # remove non-required key and test
         params.pop('nonce')
         self.check_valid(full_data=full_data)
-        params.pop('node_type')
-        self.check_valid(full_data=full_data)
-        params.pop('node_message')
-        self.check_valid(full_data=full_data)
 
         # check full_data['params']
         required_keys = ['from', 'to', 'value', 'fee', 'timestamp', 'tx_hash', 'signature']
@@ -466,10 +462,6 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
         # remove non-required key and test
         params = full_data['params']
         params.pop('to')
-        self.check_valid(full_data=full_data)
-        params.pop('node_type')
-        self.check_valid(full_data=full_data)
-        params.pop('node_message')
         self.check_valid(full_data=full_data)
 
         # check full_data['params']
