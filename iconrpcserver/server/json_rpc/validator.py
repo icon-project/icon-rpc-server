@@ -32,10 +32,6 @@ icx_sendTransaction_v2: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "node_message": {
-                    "type": "object"
-                },
-                "node_type": {"type": "integer"},
                 "from": {"type": "string", "maxLength": 42, "pattern": "^hx"},
                 "to": {"type": "string", "maxLength": 42, "pattern": "^hx"},
                 "value": {"type": "string"},
@@ -342,10 +338,6 @@ icx_sendTransaction_v3: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "node_message": {
-                    "type": "object"
-                },
-                "node_type": {"type": "integer"},
                 "version": {"type": "string"},
                 "from": {"type": "string", "maxLength": 42},
                 "to": {"type": "string", "maxLength": 42},

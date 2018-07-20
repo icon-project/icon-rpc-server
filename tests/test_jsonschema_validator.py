@@ -70,11 +70,6 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
             "id": 1234,
             'method': 'icx_sendTransaction',
             'params': {
-                "node_message": {
-                    "from": 1,
-                    "to": 'a',
-                },
-                "node_type": 0,
                 "from": create_address(data=b'from'),
                 "to": create_address(data=b'to'),
                 "value": "0xde0b6b3a7640000",
@@ -341,11 +336,6 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
             "id": 1234,
             'method': 'icx_sendTransaction',
             'params': {
-                "node_message": {
-                    "from": 1,
-                    "to": 'a',
-                },
-                "node_type": 0,
                 "version": "0x3",
                 "from": create_address(data=b'from'),
                 "to": create_address(data=b'to', is_eoa=False),
