@@ -20,18 +20,16 @@ default_rpcserver_config = \
     {
         "log": {
             "colorLog": True,
-            "level": "debug",
+            "level": "info",
             "filePath": "./log/icon_service1.log",
-            "outputType": "console|file",
-            "rotateType": "D",
-            "rotateInterval": 1
+            "outputType": "console|file"
         },
-        ConfigKey.CONFIG: './conf/rest_config.json',
-        ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL: "loopchain_default",
-        ConfigKey.PORT_REST: 9000,
+        ConfigKey.CONFIG: './conf/iconrpcserver_config.json',
+        ConfigKey.CHANNEL: "loopchain_default",
+        ConfigKey.PORT: 9000,
         ConfigKey.PORT_DIFF_REST_SERVICE_CONTAINER: 1900,
-        ConfigKey.AMQP_TARGET: "127.0.0.1",
         ConfigKey.AMQP_KEY: "amqp_key",
+        ConfigKey.AMQP_TARGET: "127.0.0.1",
         ConfigKey.GUNICORN_WORKER_COUNT: os.cpu_count() * 2 + 1,
         ConfigKey.DISABLE_V1_API: True,
         ConfigKey.REST_SSL_TYPE: SSLAuthType.none.value,

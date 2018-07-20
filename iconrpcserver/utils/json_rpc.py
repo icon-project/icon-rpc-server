@@ -38,7 +38,7 @@ async def redirect_request_to_rs(message, rs_target, version=ApiVersion.v3.name)
 
 
 async def get_block_by_params(block_height=None, block_hash=""):
-    channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+    channel_name = StubCollection().conf[ConfigKey.CHANNEL]
     block_data_filter = "prev_block_hash, height, block_hash, merkle_tree_root_hash," \
                         " time_stamp, peer_id, signature"
     tx_data_filter = "icx_origin_data"

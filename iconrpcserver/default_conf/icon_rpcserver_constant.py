@@ -47,8 +47,8 @@ ICON_SCORE_QUEUE_NAME_FORMAT = "IconScore.{channel_name}.{amqp_key}"
 
 class ConfigKey:
     CONFIG = 'config'
-    LOOPCHAIN_DEFAULT_CHANNEL = 'loopchainDefaultChannel'
-    PORT_REST = 'portRest'
+    CHANNEL = 'channel'
+    PORT = 'port'
     PORT_DIFF_REST_SERVICE_CONTAINER = 'portDiffRestServiceContainer'
     AMQP_TARGET = 'amqpTarget'
     AMQP_KEY = 'amqpKey'

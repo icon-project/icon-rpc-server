@@ -62,13 +62,13 @@ class Version2Dispatcher:
             return await redirect_request_to_rs(kwargs, RestProperty().rs_target, ApiVersion.v2.name)
 
         request = make_request("icx_sendTransaction", kwargs, ParamType.send_tx)
-        channel = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel = StubCollection().conf[ConfigKey.CHANNEL]
         icon_stub = StubCollection().icon_score_stubs[channel]
         response = await icon_stub.async_task().validate_transaction(request)
         # Error Check
         response_to_json_query(response)
 
-        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
         channel_inner_tasks = StubCollection().channel_stubs[channel_name]
         response_code, tx_hash = await channel_inner_tasks.async_task().create_icx_tx(kwargs)
 
@@ -83,7 +83,7 @@ class Version2Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getTransactionResult(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
         channel_stub = StubCollection().channel_stubs[channel_name]
         verify_result = {}
 
@@ -133,7 +133,7 @@ class Version2Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getBalance(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
         method = 'icx_getBalance'
         request = make_request(method, kwargs, ParamType.get_balance)
@@ -145,7 +145,7 @@ class Version2Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getTotalSupply(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
         method = 'icx_getTotalSupply'
         request = make_request(method, kwargs, ParamType.get_total_supply)
@@ -184,14 +184,14 @@ class Version2Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getLastTransaction(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
         return ""
 
     @staticmethod
     @methods.add
     async def icx_getTransactionByAddress(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
         address = kwargs.get("address", None)
         index = kwargs.get("index", None)
