@@ -69,7 +69,8 @@ class Version2Dispatcher:
         channel = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
         icon_stub = StubCollection().icon_score_stubs[channel]
         response = await icon_stub.async_task().validate_transaction(request)
-        response_to_json_query(response) #raise Exception
+        # Error Check
+        response_to_json_query(response)
 
         channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
         channel_inner_tasks = StubCollection().channel_stubs[channel_name]
