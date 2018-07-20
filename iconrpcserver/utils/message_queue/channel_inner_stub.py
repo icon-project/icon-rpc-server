@@ -51,7 +51,7 @@ class ChannelInnerTask:
         pass
 
     @message_queue_task
-    async def announce_confirmed_block(self, serialized_block):
+    async def announce_confirmed_block(self, serialized_block, commit_state):
         pass
 
 
