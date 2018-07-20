@@ -17,7 +17,8 @@ requires = [
     "protobuf == 3.5.1",
     "aiohttp == 3.0.9",
     "jsonrpcclient == 2.6.0",
-    "secp256k1==0.13.2"
+    "secp256k1==0.13.2",
+    "sanic-cors==0.9.4"
 ]
 
 setup_options = {
