@@ -28,6 +28,7 @@ from .json_rpc.dispatcher.node import NodeDispatcher
 from .json_rpc.dispatcher.version2 import Version2Dispatcher
 from .json_rpc.dispatcher.version3 import Version3Dispatcher
 from ..utils.message_queue.stub_collection import StubCollection
+from sanic_cors import CORS
 
 from iconcommons.logger import Logger
 
@@ -38,6 +39,7 @@ class ServerComponents(metaclass=SingletonMetaClass):
     def __init__(self):
         self.__app = Sanic(__name__)
         self.__app.config.KEEP_ALIVE = False
+        CORS(self.__app)
 
         # Decide whether to create context or not according to whether SSL is applied
 
