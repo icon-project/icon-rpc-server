@@ -14,10 +14,6 @@
 """ A massage class for the loopchain """
 
 
-class TxPreValidateException(Exception):
-    pass
-
-
 class Request:
     status = 1
     is_alive = 2
@@ -34,7 +30,6 @@ class Request:
     rs_send_channel_manage_info_to_rs = 802
     rs_restart_channel = 803
 
-    tx_create = 900  # json-rpc:icx_sendTransaction create tx to inner tx service
     tx_connect_to_leader = 901  # connect to leader
     tx_connect_to_inner_peer = 902  # connect to mother peer service in same inner gRPC micro service network
     get_tx_result = 903  # json-rpc:icx_getTransactionResult
@@ -75,6 +70,18 @@ class Response:
     fail_tx_pre_validate = -14
     fail_subscribe_limit = -15
     fail_invalid_key_error = -16
+    fail_tx_invalid_unknown = -100
+    fail_tx_invalid_hash_format = -101
+    fail_tx_invalid_hash_generation = -102
+    fail_tx_invalid_hash_not_match = -103
+    fail_tx_invalid_address_not_match = -104
+    fail_tx_invalid_address_format = -105
+    fail_tx_invalid_signature = -106
+    fail_tx_invalid_params = -107
+    fail_tx_invalid_duplicated_hash = -108
+    fain_tx_invalid_out_of_time_bound = -109
+    fail_tx_invalid_wrong_nid = -110
+
     fail_no_peer_info_in_rs = -800
     timeout_exceed = -900
     not_treat_message_code = -999
@@ -82,26 +89,98 @@ class Response:
 
 
 responseCodeMap = {
-    Response.success:                   (Response.success,                      "success"),
-    Response.success_validate_block:    (Response.success_validate_block,       "success validate block"),
-    Response.success_announce_block:    (Response.success_announce_block,       "success announce block"),
-    Response.fail:                      (Response.fail,                         "fail"),
-    Response.fail_validate_block:       (Response.fail_validate_block,          "fail validate block"),
-    Response.fail_announce_block:       (Response.fail_announce_block,          "fail announce block"),
-    Response.fail_wrong_block_hash:     (Response.fail_wrong_block_hash,        "fail wrong block hash"),
-    Response.fail_no_leader_peer:       (Response.fail_no_leader_peer,          "fail no leader peer"),
-    Response.fail_validate_params:      (Response.fail_validate_params,         "fail validate params"),
-    Response.fail_wrong_subscribe_info: (Response.fail_wrong_subscribe_info,    "fail wrong subscribe info"),
-    Response.fail_connect_to_leader:    (Response.fail_connect_to_leader,       "fail connect to leader"),
-    Response.fail_add_tx_to_leader:     (Response.fail_add_tx_to_leader,        "fail add tx to leader"),
-    Response.fail_invalid_peer_target:  (Response.fail_invalid_peer_target,     "fail invalid peer target for channel"),
-    Response.fail_not_enough_data:      (Response.fail_not_enough_data,         "fail not enough data"),
-    Response.fail_tx_pre_validate:      (Response.fail_tx_pre_validate,         "fail tx pre-validate"),
-    Response.fail_subscribe_limit:      (Response.fail_subscribe_limit,         "fail subscribe limit"),
-    Response.fail_no_peer_info_in_rs:   (Response.fail_no_peer_info_in_rs,      "fail no peer info in radio station"),
-    Response.fail_create_tx:            (Response.fail_create_tx,               "fail create tx to peer"),
-    Response.timeout_exceed:            (Response.timeout_exceed,               "timeout exceed"),
-    Response.fail_illegal_params:       (Response.fail_illegal_params,          "fail_illegal_params")
+    Response.success:
+        (Response.success,"success"),
+
+    Response.success_validate_block:
+        (Response.success_validate_block, "success validate block"),
+
+    Response.success_announce_block:
+        (Response.success_announce_block, "success announce block"),
+
+    Response.fail:
+        (Response.fail, "fail"),
+
+    Response.fail_validate_block:
+        (Response.fail_validate_block, "fail validate block"),
+
+    Response.fail_announce_block:
+        (Response.fail_announce_block, "fail announce block"),
+
+    Response.fail_wrong_block_hash:
+        (Response.fail_wrong_block_hash, "fail wrong block hash"),
+
+    Response.fail_no_leader_peer:
+        (Response.fail_no_leader_peer, "fail no leader peer"),
+
+    Response.fail_validate_params:
+        (Response.fail_validate_params, "fail validate params"),
+
+    Response.fail_wrong_subscribe_info:
+        (Response.fail_wrong_subscribe_info, "fail wrong subscribe info"),
+
+    Response.fail_connect_to_leader:
+        (Response.fail_connect_to_leader, "fail connect to leader"),
+
+    Response.fail_add_tx_to_leader:
+        (Response.fail_add_tx_to_leader, "fail add tx to leader"),
+
+    Response.fail_invalid_peer_target:
+        (Response.fail_invalid_peer_target, "fail invalid peer target for channel"),
+
+    Response.fail_not_enough_data:
+        (Response.fail_not_enough_data, "fail not enough data"),
+
+    Response.fail_tx_pre_validate:
+        (Response.fail_tx_pre_validate, "fail tx pre-validate"),
+
+    Response.fail_subscribe_limit:
+        (Response.fail_subscribe_limit, "fail subscribe limit"),
+
+    Response.fail_no_peer_info_in_rs:
+        (Response.fail_no_peer_info_in_rs, "fail no peer info in radio station"),
+
+    Response.fail_create_tx:
+        (Response.fail_create_tx, "fail create tx to peer"),
+
+    Response.fail_tx_invalid_unknown:
+        (Response.fail_tx_invalid_unknown, "fail tx invalid unknown"),
+
+    Response.fail_tx_invalid_hash_format:
+        (Response.fail_tx_invalid_hash_format, "fail tx invalid hash format"),
+
+    Response.fail_tx_invalid_hash_generation:
+        (Response.fail_tx_invalid_hash_generation, "fail tx invalid hash generation"),
+
+    Response.fail_tx_invalid_address_not_match:
+        (Response.fail_tx_invalid_address_not_match, "fail tx invalid address not match"),
+
+    Response.fail_tx_invalid_address_format:
+        (Response.fail_tx_invalid_address_format, "fail tx invalid address"),
+
+    Response.fail_tx_invalid_hash_not_match:
+        (Response.fail_tx_invalid_hash_not_match, "fail tx invalid hash not match"),
+
+    Response.fail_tx_invalid_signature:
+        (Response.fail_tx_invalid_signature, "fail tx invalid signature"),
+
+    Response.fail_tx_invalid_params:
+        (Response.fail_tx_invalid_params, "fail tx invalid params"),
+
+    Response.fail_tx_invalid_duplicated_hash:
+        (Response.fail_tx_invalid_duplicated_hash, "fail tx invalid duplicated hash"),
+
+    Response.fain_tx_invalid_out_of_time_bound:
+        (Response.fain_tx_invalid_out_of_time_bound, "fain tx invalid out of time bound"),
+
+    Response.fail_tx_invalid_wrong_nid:
+        (Response.fail_tx_invalid_wrong_nid, "fail tx invalid no nid"),
+
+    Response.timeout_exceed:
+        (Response.timeout_exceed, "timeout exceed"),
+
+    Response.fail_illegal_params:
+        (Response.fail_illegal_params, "fail_illegal_params")
 }
 
 

@@ -8,7 +8,6 @@ with open(os.path.join('.', 'VERSION')) as version_file:
 
 requires = [
     "jsonschema",
-    "setproctitle",
     "requests==2.19.1",
     "jsonrpcserver==3.5.3",
     "sanic==0.7.0",

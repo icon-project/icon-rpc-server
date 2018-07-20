@@ -69,24 +69,18 @@ class Version2Dispatcher:
         channel = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
         icon_stub = StubCollection().icon_score_stubs[channel]
         response = await icon_stub.async_task().validate_transaction(request)
+        # Error Check
         response_to_json_query(response)
 
-        channel_inner_tasks = StubCollection().channel_stubs[channel]
-        tx_hash = await channel_inner_tasks.async_task().create_icx_tx(kwargs)
+        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel_inner_tasks = StubCollection().channel_stubs[channel_name]
+        response_code, tx_hash = await channel_inner_tasks.async_task().create_icx_tx(kwargs)
 
-        if tx_hash:
-            code = message_code.Response.success
-            message = tx_hash
+        response_data = {'response_code': response_code}
+        if response_code != message_code.Response.success:
+            response_data['message'] = message_code.responseCodeMap[response_code][1]
         else:
-            code = message_code.Response.fail_create_tx
-            message = f"tx validate fail. tx data :: {kwargs}"
-
-        response_data = {'response_code': code}
-
-        if code != message_code.Response.success:
-            response_data['message'] = message
-        else:
-            response_data['tx_hash'] = message
+            response_data['tx_hash'] = tx_hash
 
         return response_data
 
@@ -150,7 +144,7 @@ class Version2Dispatcher:
 
         stub = StubCollection().icon_score_stubs[channel_name]
         response = await stub.async_task().query(request)
-        return response_to_json_query(response)
+        return response_to_json_query(response, True)
 
     @staticmethod
     @methods.add
@@ -162,7 +156,7 @@ class Version2Dispatcher:
 
         stub = StubCollection().icon_score_stubs[channel_name]
         response = await stub.async_task().query(request)
-        return response_to_json_query(response)
+        return response_to_json_query(response, True)
 
     @staticmethod
     @methods.add

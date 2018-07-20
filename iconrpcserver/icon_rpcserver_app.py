@@ -1,12 +1,11 @@
 import argparse
-import setproctitle
 
 import gunicorn
 from gunicorn.six import iteritems
 import gunicorn.app.base
 
 from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
-from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, ICON_RPCSERVER_PROCTITLE_FORMAT
+from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
 from iconcommons.icon_config import IconConfig
 from iconcommons.logger import Logger
 
@@ -55,7 +54,6 @@ def main():
 
     args = parser.parse_args()
     args_params = dict(vars(args))
-    setproctitle.setproctitle(ICON_RPCSERVER_PROCTITLE_FORMAT.format(**args_params))
 
     conf = IconConfig(args.config, default_rpcserver_config)
     conf.load(args_params)
