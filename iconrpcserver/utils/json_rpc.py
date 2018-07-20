@@ -32,8 +32,7 @@ async def redirect_request_to_rs(message, rs_target, version=ApiVersion.v3.name)
     subscribe_use_https = StubCollection().conf[ConfigKey.SUBSCRIBE_USE_HTTPS]
     rs_url = f"{'https' if subscribe_use_https else 'http'}://{rs_target}/api/{version}"
     async with aiohttp.ClientSession() as session:
-        result = await aiohttpClient(session, rs_url).request(
-            method_name=method_name, message=message, node_type=NodeType.CitizenNode)
+        result = await aiohttpClient(session, rs_url).request(method_name, message)
 
     return result
 

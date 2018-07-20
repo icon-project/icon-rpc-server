@@ -82,10 +82,6 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_sendTransaction(**kwargs):
-        by_citizen = kwargs.get("node_type", False)
-        if by_citizen:
-            kwargs = kwargs["message"]
-
         if RestProperty().node_type == NodeType.CitizenNode:
             return await redirect_request_to_rs(kwargs, RestProperty().rs_target)
 
