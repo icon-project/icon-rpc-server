@@ -43,7 +43,7 @@ def main():
 
     # Parse arguments.
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", type=str, dest=ConfigKey.PORT_REST, default=None,
+    parser.add_argument("-p", type=str, dest=ConfigKey.PORT, default=None,
                         help="rest_proxy port")
     parser.add_argument("-c", type=str, dest=ConfigKey.CONFIG, default=None,
                         help="json configure file path")
@@ -75,13 +75,13 @@ def _run(conf: 'IconConfig'):
         conf[ConfigKey.GRPC_TIMEOUT] + conf[ConfigKey.REST_ADDITIONAL_TIMEOUT]
     PeerServiceStub().rest_score_query_timeout = \
         conf[ConfigKey.SCORE_QUERY_TIMEOUT] + conf[ConfigKey.REST_ADDITIONAL_TIMEOUT]
-    PeerServiceStub().set_stub_port(int(conf[ConfigKey.PORT_REST]) -
+    PeerServiceStub().set_stub_port(int(conf[ConfigKey.PORT]) -
                                     int(conf[ConfigKey.PORT_DIFF_REST_SERVICE_CONTAINER]),
                                     conf[ConfigKey.IP_LOCAL])
     ServerComponents.conf = conf
     ServerComponents().set_resource()
 
-    Logger.debug(f"Run gunicorn webserver for HA. Port = {conf[ConfigKey.PORT_REST]}")
+    Logger.debug(f"Run gunicorn webserver for HA. Port = {conf[ConfigKey.PORT]}")
 
     # Configure SSL.
     ssl_context = ServerComponents().ssl_context
@@ -93,7 +93,7 @@ def _run(conf: 'IconConfig'):
         keyfile = ssl_context[1]
 
     options = {
-        'bind': f"{host}:{conf[ConfigKey.PORT_REST]}",
+        'bind': f"{host}:{conf[ConfigKey.PORT]}",
         'workers': conf[ConfigKey.GUNICORN_WORKER_COUNT],
         'worker_class': "sanic.worker.GunicornWorker",
         'certfile': certfile,

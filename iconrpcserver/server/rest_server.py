@@ -114,7 +114,7 @@ class ServerComponents(metaclass=SingletonMetaClass):
 class Status(HTTPMethodView):
     async def get(self, request):
         args = request.raw_args
-        channel_name = ServerComponents.conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL] if args.get('channel') is None else args.get('channel')
+        channel_name = ServerComponents.conf[ConfigKey.CHANNEL] if args.get('channel') is None else args.get('channel')
         return response.json(PeerServiceStub().get_status(channel_name))
 
 

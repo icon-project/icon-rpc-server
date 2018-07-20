@@ -51,7 +51,7 @@ def main():
                         choices=['start', 'stop'],
                         help='rest type [start|stop]')
 
-    parser.add_argument("-p", type=str, dest=ConfigKey.PORT_REST, default=None,
+    parser.add_argument("-p", type=str, dest=ConfigKey.PORT, default=None,
                         help="rest_proxy port")
     parser.add_argument("-c", type=str, dest=ConfigKey.CONFIG, default=None,
                         help="json configure file path")
@@ -101,7 +101,7 @@ def start_process(conf: 'IconConfig'):
     Logger.debug('start_server() start')
     python_module_string = 'iconrpcserver.icon_rpcserver_app'
 
-    converted_params = {'-p': conf[ConfigKey.PORT_REST],
+    converted_params = {'-p': conf[ConfigKey.PORT],
                         '-c': conf[ConfigKey.CONFIG],
                         '-at': conf[ConfigKey.AMQP_TARGET],
                         '-ak': conf[ConfigKey.AMQP_KEY]}
@@ -124,7 +124,7 @@ def start_process(conf: 'IconConfig'):
 
 
 def stop_process(conf: 'IconConfig'):
-    command = f'lsof -i :{conf[ConfigKey.PORT_REST]} -t | xargs kill'
+    command = f'lsof -i :{conf[ConfigKey.PORT]} -t | xargs kill'
     subprocess.run(command, stdout=subprocess.PIPE, shell=True)
     Logger.info(f'stop_process_rest_app!', REST_SERVICE_STANDALONE)
 
@@ -135,7 +135,7 @@ def _is_running_icon_service(conf: 'IconConfig') -> bool:
 
 def _check_service_running(conf: 'IconConfig') -> bool:
     Logger.info(f'check_serve_rest_app!', REST_SERVICE_STANDALONE)
-    return find_procs_by_params(conf[ConfigKey.PORT_REST])
+    return find_procs_by_params(conf[ConfigKey.PORT])
 
 
 def find_procs_by_params(port) -> bool:

@@ -59,7 +59,7 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_call(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
         score_stub = StubCollection().icon_score_stubs[channel_name]
 
         method = 'icx_call'
@@ -70,7 +70,7 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getScoreApi(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
         score_stub = StubCollection().icon_score_stubs[channel_name]
 
         method = 'icx_getScoreApi'
@@ -87,7 +87,7 @@ class Version3Dispatcher:
 
         method = 'icx_sendTransaction'
         request = make_request(method, kwargs)
-        channel = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel = StubCollection().conf[ConfigKey.CHANNEL]
         icon_stub = StubCollection().icon_score_stubs[channel]
         response = await icon_stub.async_task().validate_transaction(request)
         # Error Check
@@ -117,7 +117,7 @@ class Version3Dispatcher:
     @methods.add
     async def icx_getTransactionResult(**kwargs):
         request = convert_params(kwargs, ParamType.get_tx_request)
-        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
         channel_stub = StubCollection().channel_stubs[channel_name]
         verify_result = dict()
 
@@ -147,7 +147,7 @@ class Version3Dispatcher:
     async def icx_getTransactionByHash(**kwargs):
         request = convert_params(kwargs, ParamType.get_tx_request)
 
-        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
         channel_stub = StubCollection().channel_stubs[channel_name]
 
         response_code, tx_info = await channel_stub.async_task().get_tx_info(request["txHash"])
@@ -170,7 +170,7 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getBalance(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
         score_stub = StubCollection().icon_score_stubs[channel_name]
 
         method = 'icx_getBalance'
@@ -182,7 +182,7 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getTotalSupply(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
         score_stub = StubCollection().icon_score_stubs[channel_name]
 
         method = 'icx_getTotalSupply'
@@ -237,6 +237,6 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getLastTransaction(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.LOOPCHAIN_DEFAULT_CHANNEL]
+        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
         return ""
