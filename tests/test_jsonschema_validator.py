@@ -70,6 +70,7 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
             "id": 1234,
             'method': 'icx_sendTransaction',
             'params': {
+                "node_type": 0,
                 "from": create_address(data=b'from'),
                 "to": create_address(data=b'to'),
                 "value": "0xde0b6b3a7640000",
@@ -152,6 +153,8 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
 
         # remove non-required key and test
         params.pop('nonce')
+        self.check_valid(full_data=full_data)
+        params.pop('node_type')
         self.check_valid(full_data=full_data)
 
         # check full_data['params']
@@ -332,6 +335,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
             "id": 1234,
             'method': 'icx_sendTransaction',
             'params': {
+                "node_type": 0,
                 "version": "0x3",
                 "from": create_address(data=b'from'),
                 "to": create_address(data=b'to', is_eoa=False),
@@ -462,6 +466,8 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
         # remove non-required key and test
         params = full_data['params']
         params.pop('to')
+        self.check_valid(full_data=full_data)
+        params.pop('node_type')
         self.check_valid(full_data=full_data)
 
         # check full_data['params']
