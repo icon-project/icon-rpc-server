@@ -1,9 +1,17 @@
 {
 	"log": {
+		"logger": "iconrpcserver",
 		"colorLog": true,
 		"level": "info",
-		"filePath": "./log/iconrpcserver.log",
-		"outputType": "console|file"
+		"filePath": "./log/iconservice.log",
+		"outputType": "console|file",
+		"rotate": {
+			"type": "period|bytes",
+			"period": "daily",
+			"interval": 1,
+			"backupCount": 10,
+			"maxBytes": 10485760
+		}
 	},
 	"channel": "loopchain_default",
 	"port": 9000,
