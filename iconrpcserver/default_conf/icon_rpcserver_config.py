@@ -19,9 +19,10 @@ from .icon_rpcserver_constant import SSLAuthType, ConfigKey
 default_rpcserver_config = \
     {
         "log": {
+            "loggerName": "iconrpcserver",
             "colorLog": True,
             "level": "info",
-            "filePath": "./log/icon_service1.log",
+            "filePath": "./log/iconrpcserver.log",
             "outputType": "console|file"
         },
         ConfigKey.CONFIG: './conf/iconrpcserver_config.json',
