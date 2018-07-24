@@ -347,7 +347,7 @@ icx_sendTransaction_v3: dict = {
                 "nid": {"type": "string"},
                 "nonce": {"type": "string"},
                 "signature": {"type": "string"},
-                "dataType": {"type": "string", "enum": ["call", "deploy"]},
+                "dataType": {"type": "string", "enum": ["call", "deploy", "message"]},
                 "data": {
                     "type": "object",
                     "properties": {
