@@ -44,6 +44,8 @@ def main():
         -c : json configure file path
         -at : amqp target info [IP]:[PORT]
         -ak : key sharing peer group using queue name. use it if one more peers connect one MQ
+        -ch : loopchain channel ex) loopchain_default
+        -fg : foreground process
     """)
 
     parser.add_argument('command', type=str,
@@ -59,7 +61,9 @@ def main():
                         help="amqp target info [IP]:[PORT]")
     parser.add_argument("-ak", type=str, dest=ConfigKey.AMQP_KEY, default=None,
                         help="key sharing peer group using queue name. use it if one more peers connect one MQ")
-    parser.add_argument("-f", dest='foreground', action='store_true',
+    parser.add_argument("-ch", dest=ConfigKey.CHANNEL, default=None,
+                        help="icon score channel")
+    parser.add_argument("-fg", dest='foreground', action='store_true',
                         help="icon rpcserver run foreground")
 
     args = parser.parse_args()
