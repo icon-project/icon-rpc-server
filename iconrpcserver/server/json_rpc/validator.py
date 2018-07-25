@@ -231,7 +231,7 @@ icx_call_v3: dict = {
                 },
             },
             "additionalProperties": False,
-            "required": ["from", "to", "dataType", "data"]
+            "required": ["to", "dataType", "data"]
         }
     },
     "additionalProperties": False,

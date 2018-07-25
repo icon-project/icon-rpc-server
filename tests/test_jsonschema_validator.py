@@ -392,7 +392,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
 
         # check required key validation
         params = full_data['params']
-        required_keys = ['from', 'to', 'dataType', 'data']
+        required_keys = ['to', 'dataType', 'data']
         self.check_more(full_data=full_data, data=params, required_keys=required_keys)
 
         data = params['data']
