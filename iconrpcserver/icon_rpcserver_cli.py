@@ -106,7 +106,7 @@ def start_process(conf: 'IconConfig'):
     python_module_string = 'iconrpcserver.icon_rpcserver_app'
 
     converted_params = {'-p': conf[ConfigKey.PORT],
-                        '-c': conf[ConfigKey.CONFIG],
+                        '-c': conf.get(ConfigKey.CONFIG),
                         '-at': conf[ConfigKey.AMQP_TARGET],
                         '-ak': conf[ConfigKey.AMQP_KEY],
                         '-ch': conf[ConfigKey.CHANNEL]}
