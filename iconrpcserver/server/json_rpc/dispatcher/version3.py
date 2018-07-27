@@ -44,7 +44,7 @@ class Version3Dispatcher:
     @staticmethod
     async def dispatch(request):
         req = request.json
-        Logger.debug(f'rest_server_v3 request with {req}', REST_SERVER_V3)
+        Logger.info(f'rest_server_v3 request with {req}', REST_SERVER_V3)
 
         try:
             validate_jsonschema_v3(request=req)
@@ -53,7 +53,7 @@ class Version3Dispatcher:
         else:
             response = await methods.dispatch(req)
 
-        Logger.debug(f'rest_server_v3 with response {response}', REST_SERVER_V3)
+        Logger.info(f'rest_server_v3 with response {response}', REST_SERVER_V3)
         return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
 
     @staticmethod

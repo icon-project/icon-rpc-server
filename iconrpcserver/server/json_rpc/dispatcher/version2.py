@@ -44,7 +44,7 @@ class Version2Dispatcher:
     @staticmethod
     async def dispatch(request):
         req = request.json
-        Logger.debug(f'rest_server_v2 request with {req}', REST_SERVER_V2)
+        Logger.info(f'rest_server_v2 request with {req}', REST_SERVER_V2)
 
         if "node_" in req["method"]:
             return sanic_response.text("no support method!")
@@ -56,7 +56,7 @@ class Version2Dispatcher:
         else:
             response = await methods.dispatch(req)
 
-        Logger.debug(f'rest_server_v2 response with {response}', REST_SERVER_V2)
+        Logger.info(f'rest_server_v2 response with {response}', REST_SERVER_V2)
         return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
 
     @staticmethod
