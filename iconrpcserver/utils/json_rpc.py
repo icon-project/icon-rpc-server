@@ -18,7 +18,7 @@ import aiohttp
 
 from jsonrpcclient.aiohttp_client import aiohttpClient
 
-from ..default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion, NodeType
+from ..default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion
 from ..utils.message_queue.stub_collection import StubCollection
 from ..protos import message_code
 
@@ -37,7 +37,7 @@ async def redirect_request_to_rs(message, rs_target, version=ApiVersion.v3.name)
     return result
 
 
-async def get_block_by_params(block_height=None, block_hash=""):
+async def get_block_by_params(block_height=None, block_hash="", with_commit_state=False):
     channel_name = StubCollection().conf[ConfigKey.CHANNEL]
     block_data_filter = "prev_block_hash, height, block_hash, merkle_tree_root_hash," \
                         " time_stamp, peer_id, signature"
@@ -61,5 +61,8 @@ async def get_block_by_params(block_height=None, block_hash=""):
         'response_code': response_code,
         'block': block
     }
+
+    if 'commit_state' in result['block'] and not with_commit_state:
+        del result['block']['commit_state']
 
     return block_hash, result

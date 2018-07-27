@@ -18,6 +18,7 @@ from jsonrpcserver.aio import AsyncMethods
 from sanic import response
 
 from ....protos import message_code
+from ....utils.json_rpc import get_block_by_params
 from ....utils.message_queue.stub_collection import StubCollection
 
 methods = AsyncMethods()
@@ -71,3 +72,9 @@ class NodeDispatcher:
         response_code = await channel_stub.async_task().announce_confirmed_block(block.encode('utf-8'), commit_state)
         return {"response_code": response_code,
                 "message": message_code.get_response_msg(response_code)}
+
+    @staticmethod
+    @methods.add
+    async def node_GetBlockByHeight(**kwargs):
+        block_hash, response = await get_block_by_params(block_height=kwargs['height'], with_commit_state=True)
+        return response
