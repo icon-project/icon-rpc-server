@@ -174,7 +174,7 @@ responseCodeMap = {
         (Response.fain_tx_invalid_out_of_time_bound, "fain tx invalid out of time bound"),
 
     Response.fail_tx_invalid_wrong_nid:
-        (Response.fail_tx_invalid_wrong_nid, "fail tx invalid no nid"),
+        (Response.fail_tx_invalid_wrong_nid, "fail tx invalid nid"),
 
     Response.timeout_exceed:
         (Response.timeout_exceed, "timeout exceed"),
