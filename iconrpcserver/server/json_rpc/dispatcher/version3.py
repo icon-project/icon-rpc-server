@@ -124,8 +124,14 @@ class Version3Dispatcher:
         tx_hash = request["txHash"]
         response_code, result = await channel_stub.async_task().get_invoke_result(tx_hash)
 
-        if response_code == message_code.Response.fail_invalid_key_error or \
-                response_code == message_code.Response.fail:
+        if response_code == message_code.Response.fail_tx_not_invoked:
+            raise exception.GenericJsonRpcServerError(
+                code=exception.JsonError.INVALID_PARAMS,
+                message=message_code.responseCodeMap[response_code][1],
+                http_status=status.HTTP_BAD_REQUEST
+            )
+        elif response_code == message_code.Response.fail_invalid_key_error or \
+            response_code == message_code.Response.fail:
             raise exception.GenericJsonRpcServerError(
                 code=exception.JsonError.INVALID_PARAMS,
                 message='Invalid params txHash',
