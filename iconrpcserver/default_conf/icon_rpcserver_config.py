@@ -21,7 +21,8 @@ default_rpcserver_config = \
         "log": {
             "logger": "iconrpcserver",
             "level": "info",
-            "outputType": "console"
+            "outputType": "console",
+            "colorLog": False,
         },
         ConfigKey.CHANNEL: "loopchain_default",
         ConfigKey.PORT: 9000,
