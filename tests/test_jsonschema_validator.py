@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import unittest
+from typing import Union
 
 from iconrpcserver.server.json_rpc.exception import GenericJsonRpcServerError
 from iconrpcserver.server.json_rpc.validator import validate_jsonschema_v2, validate_jsonschema_v3
@@ -34,13 +35,14 @@ class TestJsonschemaValidator(unittest.TestCase):
     def check_invalid(self, full_data: dict):
         self.assertRaises(GenericJsonRpcServerError, self.validator, full_data)
 
-    def check_more(self, full_data: dict, data: dict, required_keys: list, invalid_value: object = list()):
+    def check_more(self, full_data: dict, data: Union[dict, str, None], required_keys: list, invalid_value: object = list()):
         # check required key validation
         for key in required_keys:
             self._check_required(full_data, data, key, invalid_value)
 
         # check required key validation
-        self._check_invalid_key(full_data, data)
+        if isinstance(data, dict):
+            self._check_invalid_key(full_data, data)
 
     def _check_required(self, full_data: dict, data: dict, key: str, invalid_value: object = list()):
         # remove required key and test
@@ -341,6 +343,23 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
                 "nid": "0x3fcb",
                 "nonce": "0x1",
                 "signature": "VAia7YZ2Ji6igKWzjR2YsGa2m53nKPrfK7uXYW78QLE+ATehAVZPC40szvAiA6NEU5gCYB4c4qaQzqDh2ugcHgA=",
+            }
+        }
+
+        self.sendTransaction_call = {
+            "jsonrpc": "2.0",
+            "id": 1234,
+            'method': 'icx_sendTransaction',
+            'params': {
+                "version": "0x3",
+                "from": create_address(data=b'from'),
+                "to": create_address(data=b'to', is_eoa=False),
+                "value": "0xde0b6b3a7640000",
+                "stepLimit": "0x12345",
+                "timestamp": "0x563a6cf330136",
+                "nid": "0x3fcb",
+                "nonce": "0x1",
+                "signature": "VAia7YZ2Ji6igKWzjR2YsGa2m53nKPrfK7uXYW78QLE+ATehAVZPC40szvAiA6NEU5gCYB4c4qaQzqDh2ugcHgA=",
                 "dataType": "call",
                 "data": {
                     "method": "transfer",
@@ -349,6 +368,51 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
                         "value": "0x1"
                     }
                 }
+            }
+        }
+
+        self.sendTransaction_deploy = {
+            "jsonrpc": "2.0",
+            "id": 1234,
+            'method': 'icx_sendTransaction',
+            'params': {
+                "version": "0x3",
+                "from": create_address(data=b'from'),
+                "to": create_address(data=b'to', is_eoa=False),
+                "value": "0xde0b6b3a7640000",
+                "stepLimit": "0x12345",
+                "timestamp": "0x563a6cf330136",
+                "nid": "0x3fcb",
+                "nonce": "0x1",
+                "signature": "VAia7YZ2Ji6igKWzjR2YsGa2m53nKPrfK7uXYW78QLE+ATehAVZPC40szvAiA6NEU5gCYB4c4qaQzqDh2ugcHgA=",
+                "dataType": "deploy",
+                "data": {
+                    "contentType": "application/zip",
+                    "content": "0xcontent",
+                    "params": {
+                        "arg1": "value1",
+                        "arg2": "value2"
+                    }
+                }
+            }
+        }
+
+        self.sendTransaction_message = {
+            "jsonrpc": "2.0",
+            "id": 1234,
+            'method': 'icx_sendTransaction',
+            'params': {
+                "version": "0x3",
+                "from": create_address(data=b'from'),
+                "to": create_address(data=b'to', is_eoa=False),
+                "value": "0xde0b6b3a7640000",
+                "stepLimit": "0x12345",
+                "timestamp": "0x563a6cf330136",
+                "nid": "0x3fcb",
+                "nonce": "0x1",
+                "signature": "VAia7YZ2Ji6igKWzjR2YsGa2m53nKPrfK7uXYW78QLE+ATehAVZPC40szvAiA6NEU5gCYB4c4qaQzqDh2ugcHgA=",
+                "dataType": "deploy",
+                "data": "0xmessage"
             }
         }
 
@@ -454,8 +518,17 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
         self.check_more(full_data=full_data, data=params, required_keys=required_keys)
 
     def test_sendTransaction(self):
-        full_data = self.sendTransaction
+        sendTxs = [
+            self.sendTransaction,
+            self.sendTransaction_call,
+            self.sendTransaction_deploy,
+            self.sendTransaction_message
+        ]
 
+        for data in sendTxs:
+            self.check_sendTransaction(data)
+
+    def check_sendTransaction(self, full_data):
         # check default function
         self.check_valid(full_data=full_data)
 
@@ -469,7 +542,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
         self.check_more(full_data=full_data, data=params, required_keys=required_keys)
 
         # check full_data['params']['data']
-        data = params['data']
+        data = params.get('data', None)
         self.check_more(full_data=full_data, data=data, required_keys=[])
 
     def test_batch_request(self):
