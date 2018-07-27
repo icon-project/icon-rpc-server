@@ -83,6 +83,7 @@ class Response:
     fail_tx_invalid_duplicated_hash = -108
     fain_tx_invalid_out_of_time_bound = -109
     fail_tx_invalid_wrong_nid = -110
+    fail_tx_not_invoked = -111
 
     fail_no_peer_info_in_rs = -800
     timeout_exceed = -900
@@ -180,7 +181,7 @@ responseCodeMap = {
 
     Response.fail_tx_invalid_wrong_nid:
         (Response.fail_tx_invalid_wrong_nid, "fail tx invalid no nid"),
-        
+
     Response.fail_tx_not_invoked:
         (Response.fail_tx_not_invoked, "Pending transaction"),
 
