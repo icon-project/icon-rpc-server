@@ -21,7 +21,6 @@ default_rpcserver_config = \
         "log": {
             "logger": "iconrpcserver"
         },
-        ConfigKey.CONFIG: './conf/iconrpcserver_config.json',
         ConfigKey.CHANNEL: "loopchain_default",
         ConfigKey.PORT: 9000,
         ConfigKey.PORT_DIFF_REST_SERVICE_CONTAINER: 1900,
