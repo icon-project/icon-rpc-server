@@ -19,7 +19,9 @@ from .icon_rpcserver_constant import SSLAuthType, ConfigKey
 default_rpcserver_config = \
     {
         "log": {
-            "logger": "iconrpcserver"
+            "logger": "iconrpcserver",
+            "level": "info",
+            "outputType": "console"
         },
         ConfigKey.CHANNEL: "loopchain_default",
         ConfigKey.PORT: 9000,
