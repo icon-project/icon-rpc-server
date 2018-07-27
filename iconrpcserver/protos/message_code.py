@@ -29,6 +29,7 @@ class Request:
     rs_set_configuration = 801
     rs_send_channel_manage_info_to_rs = 802
     rs_restart_channel = 803
+    rs_delete_peer = 804
 
     tx_connect_to_leader = 901  # connect to leader
     tx_connect_to_inner_peer = 902  # connect to mother peer service in same inner gRPC micro service network
@@ -70,6 +71,7 @@ class Response:
     fail_tx_pre_validate = -14
     fail_subscribe_limit = -15
     fail_invalid_key_error = -16
+    fail_wrong_block_height = -17
     fail_tx_invalid_unknown = -100
     fail_tx_invalid_hash_format = -101
     fail_tx_invalid_hash_generation = -102
@@ -143,6 +145,9 @@ responseCodeMap = {
     Response.fail_create_tx:
         (Response.fail_create_tx, "fail create tx to peer"),
 
+    Response.fail_wrong_block_height:
+        (Response.fail_wrong_block_height, "fail wrong block height"),
+
     Response.fail_tx_invalid_unknown:
         (Response.fail_tx_invalid_unknown, "fail tx invalid unknown"),
 
@@ -174,7 +179,7 @@ responseCodeMap = {
         (Response.fain_tx_invalid_out_of_time_bound, "fain tx invalid out of time bound"),
 
     Response.fail_tx_invalid_wrong_nid:
-        (Response.fail_tx_invalid_wrong_nid, "fail tx invalid nid"),
+        (Response.fail_tx_invalid_wrong_nid, "fail tx invalid no nid"),
 
     Response.timeout_exceed:
         (Response.timeout_exceed, "timeout exceed"),

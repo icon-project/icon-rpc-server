@@ -205,15 +205,16 @@ class Version3Dispatcher:
         request = convert_params(kwargs, ParamType.get_block_by_hash_request)
 
         block_hash, result = await get_block_by_params(block_hash=request['hash'])
-        if result['response_code'] == message_code.Response.fail_wrong_block_hash:
+
+        response_code = result['response_code']
+        if response_code != message_code.Response.success:
             raise exception.GenericJsonRpcServerError(
                 code=exception.JsonError.INVALID_PARAMS,
-                message='Invalid params hash',
+                message=message_code.responseCodeMap[response_code][1],
                 http_status=status.HTTP_BAD_REQUEST
             )
 
         response = convert_params(result['block'], ParamType.get_block_response)
-
         return response
 
     @staticmethod
@@ -221,17 +222,17 @@ class Version3Dispatcher:
     async def icx_getBlockByHeight(**kwargs):
         request = convert_params(kwargs, ParamType.get_block_by_height_request)
 
-        try:
-            block_hash, result = await get_block_by_params(block_height=request['height'])
-        except MessageQueueException as e:
+        block_hash, result = await get_block_by_params(block_height=request['height'])
+
+        response_code = result['response_code']
+        if response_code != message_code.Response.success:
             raise exception.GenericJsonRpcServerError(
                 code=exception.JsonError.INVALID_PARAMS,
-                message='Invalid params height',
+                message=message_code.responseCodeMap[response_code][1],
                 http_status=status.HTTP_BAD_REQUEST
             )
 
         response = convert_params(result['block'], ParamType.get_block_response)
-
         return response
 
     @staticmethod
