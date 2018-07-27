@@ -52,14 +52,14 @@ async def get_block_by_params(block_height=None, block_hash=""):
         )
 
     try:
-        result = {
-            'response_code': response_code,
-            'block': json.loads(block_data_json)
-        }
+        block = json.loads(block_data_json) if response_code == message_code.Response.success else {}
     except Exception as e:
         logging.error(f"get_block_by_params error caused by : {e}")
-        result = {
-            'response_code': message_code.Response.fail_wrong_block_hash,
-            'block': {}
-        }
+        block = {}
+
+    result = {
+        'response_code': response_code,
+        'block': block
+    }
+
     return block_hash, result

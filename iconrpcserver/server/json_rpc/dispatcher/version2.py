@@ -177,7 +177,7 @@ class Version2Dispatcher:
             block_height = int(kwargs["height"])
         except Exception as e:
             verify_result = {
-                'response_code': message_code.Response.fail_validate_params,
+                'response_code': message_code.Response.fail_wrong_block_height,
                 'message': f"Invalid block height. error: {e}"
             }
             return verify_result
