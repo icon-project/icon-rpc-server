@@ -180,6 +180,9 @@ responseCodeMap = {
 
     Response.fail_tx_invalid_wrong_nid:
         (Response.fail_tx_invalid_wrong_nid, "fail tx invalid no nid"),
+        
+    Response.fail_tx_not_invoked:
+        (Response.fail_tx_not_invoked, "Pending transaction"),
 
     Response.timeout_exceed:
         (Response.timeout_exceed, "timeout exceed"),
