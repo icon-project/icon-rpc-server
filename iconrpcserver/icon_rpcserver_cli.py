@@ -15,14 +15,15 @@
 # limitations under the License.
 
 import argparse
-import sys
 import subprocess
+import sys
 from enum import IntEnum
 
-from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
-from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
 from iconcommons.icon_config import IconConfig
 from iconcommons.logger import Logger
+
+from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
+from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
 
 REST_SERVICE_STANDALONE = "RestServerStandAlone"
 
@@ -76,7 +77,8 @@ def main():
 
     if conf_path is not None:
         if not IconConfig.valid_conf_path(conf_path):
-            raise Exception(f'invalid config path {conf_path}')
+            Logger.error(f'invalid config path {conf_path}')
+            sys.exit(ExitCode.COMMAND_IS_WRONG.value)
     if conf_path is None:
         conf_path = str()
 

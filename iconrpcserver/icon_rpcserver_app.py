@@ -1,4 +1,17 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import argparse
+import sys
 
 import gunicorn
 import gunicorn.app.base
@@ -8,7 +21,7 @@ from iconcommons.logger import Logger
 
 from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
-from iconrpcserver.icon_rpcserver_cli import REST_SERVICE_STANDALONE
+from iconrpcserver.icon_rpcserver_cli import REST_SERVICE_STANDALONE, ExitCode
 from iconrpcserver.server.peer_service_stub import PeerServiceStub
 from iconrpcserver.server.rest_server import ServerComponents
 
@@ -59,7 +72,8 @@ def main():
 
     if conf_path is not None:
         if not IconConfig.valid_conf_path(conf_path):
-            raise Exception(f'invalid config path {conf_path}')
+            Logger.error(f'invalid config path {conf_path}')
+            sys.exit(ExitCode.COMMAND_IS_WRONG.value)
     if conf_path is None:
         conf_path = str()
 
