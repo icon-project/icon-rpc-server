@@ -37,11 +37,14 @@ config.log_responses = False
 
 methods = AsyncMethods()
 
+REST_SERVER_V2 = 'REST_SERVER_V2'
+
 
 class Version2Dispatcher:
     @staticmethod
     async def dispatch(request):
         req = request.json
+        Logger.info(f'rest_server_v2 request with {req}', REST_SERVER_V2)
 
         if "node_" in req["method"]:
             return sanic_response.text("no support method!")
@@ -53,6 +56,7 @@ class Version2Dispatcher:
         else:
             response = await methods.dispatch(req)
 
+        Logger.info(f'rest_server_v2 response with {response}', REST_SERVER_V2)
         return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
 
     @staticmethod
@@ -173,7 +177,7 @@ class Version2Dispatcher:
             block_height = int(kwargs["height"])
         except Exception as e:
             verify_result = {
-                'response_code': message_code.Response.fail_validate_params,
+                'response_code': message_code.Response.fail_wrong_block_height,
                 'message': f"Invalid block height. error: {e}"
             }
             return verify_result

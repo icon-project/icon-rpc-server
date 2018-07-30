@@ -51,7 +51,8 @@ def main():
                         help="amqp target info [IP]:[PORT]")
     parser.add_argument("-ak", type=str, dest=ConfigKey.AMQP_KEY, default=None,
                         help="key sharing peer group using queue name. use it if one more peers connect one MQ")
-
+    parser.add_argument("-ch", dest=ConfigKey.CHANNEL, default=None,
+                        help="icon score channel")
     args = parser.parse_args()
     args_params = dict(vars(args))
 

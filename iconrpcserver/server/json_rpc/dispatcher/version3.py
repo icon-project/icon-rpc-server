@@ -44,7 +44,7 @@ class Version3Dispatcher:
     @staticmethod
     async def dispatch(request):
         req = request.json
-        Logger.debug(f'rest_server_v3 request with {req}', REST_SERVER_V3)
+        Logger.info(f'rest_server_v3 request with {req}', REST_SERVER_V3)
 
         try:
             validate_jsonschema_v3(request=req)
@@ -53,7 +53,7 @@ class Version3Dispatcher:
         else:
             response = await methods.dispatch(req)
 
-        Logger.debug(f'rest_server_v3 with response {response}', REST_SERVER_V3)
+        Logger.info(f'rest_server_v3 with response {response}', REST_SERVER_V3)
         return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
 
     @staticmethod
@@ -124,8 +124,14 @@ class Version3Dispatcher:
         tx_hash = request["txHash"]
         response_code, result = await channel_stub.async_task().get_invoke_result(tx_hash)
 
-        if response_code == message_code.Response.fail_invalid_key_error or \
-                response_code == message_code.Response.fail:
+        if response_code == message_code.Response.fail_tx_not_invoked:
+            raise exception.GenericJsonRpcServerError(
+                code=exception.JsonError.INVALID_PARAMS,
+                message=message_code.responseCodeMap[response_code][1],
+                http_status=status.HTTP_BAD_REQUEST
+            )
+        elif response_code == message_code.Response.fail_invalid_key_error or \
+            response_code == message_code.Response.fail:
             raise exception.GenericJsonRpcServerError(
                 code=exception.JsonError.INVALID_PARAMS,
                 message='Invalid params txHash',
@@ -205,15 +211,16 @@ class Version3Dispatcher:
         request = convert_params(kwargs, ParamType.get_block_by_hash_request)
 
         block_hash, result = await get_block_by_params(block_hash=request['hash'])
-        if result['response_code'] == message_code.Response.fail_wrong_block_hash:
+
+        response_code = result['response_code']
+        if response_code != message_code.Response.success:
             raise exception.GenericJsonRpcServerError(
                 code=exception.JsonError.INVALID_PARAMS,
-                message='Invalid params hash',
+                message=message_code.responseCodeMap[response_code][1],
                 http_status=status.HTTP_BAD_REQUEST
             )
 
         response = convert_params(result['block'], ParamType.get_block_response)
-
         return response
 
     @staticmethod
@@ -221,17 +228,17 @@ class Version3Dispatcher:
     async def icx_getBlockByHeight(**kwargs):
         request = convert_params(kwargs, ParamType.get_block_by_height_request)
 
-        try:
-            block_hash, result = await get_block_by_params(block_height=request['height'])
-        except MessageQueueException as e:
+        block_hash, result = await get_block_by_params(block_height=request['height'])
+
+        response_code = result['response_code']
+        if response_code != message_code.Response.success:
             raise exception.GenericJsonRpcServerError(
                 code=exception.JsonError.INVALID_PARAMS,
-                message='Invalid params height',
+                message=message_code.responseCodeMap[response_code][1],
                 http_status=status.HTTP_BAD_REQUEST
             )
 
         response = convert_params(result['block'], ParamType.get_block_response)
-
         return response
 
     @staticmethod

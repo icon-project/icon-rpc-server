@@ -18,7 +18,7 @@ import aiohttp
 
 from jsonrpcclient.aiohttp_client import aiohttpClient
 
-from ..default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion, NodeType
+from ..default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion
 from ..utils.message_queue.stub_collection import StubCollection
 from ..protos import message_code
 
@@ -37,7 +37,7 @@ async def redirect_request_to_rs(message, rs_target, version=ApiVersion.v3.name)
     return result
 
 
-async def get_block_by_params(block_height=None, block_hash=""):
+async def get_block_by_params(block_height=None, block_hash="", with_commit_state=False):
     channel_name = StubCollection().conf[ConfigKey.CHANNEL]
     block_data_filter = "prev_block_hash, height, block_hash, merkle_tree_root_hash," \
                         " time_stamp, peer_id, signature"
@@ -52,14 +52,17 @@ async def get_block_by_params(block_height=None, block_hash=""):
         )
 
     try:
-        result = {
-            'response_code': response_code,
-            'block': json.loads(block_data_json)
-        }
+        block = json.loads(block_data_json) if response_code == message_code.Response.success else {}
     except Exception as e:
         logging.error(f"get_block_by_params error caused by : {e}")
-        result = {
-            'response_code': message_code.Response.fail_wrong_block_hash,
-            'block': {}
-        }
+        block = {}
+
+    result = {
+        'response_code': response_code,
+        'block': block
+    }
+
+    if 'commit_state' in result['block'] and not with_commit_state:
+        del result['block']['commit_state']
+
     return block_hash, result

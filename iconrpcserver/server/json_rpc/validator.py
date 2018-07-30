@@ -231,7 +231,7 @@ icx_call_v3: dict = {
                 },
             },
             "additionalProperties": False,
-            "required": ["from", "to", "dataType", "data"]
+            "required": ["to", "dataType", "data"]
         }
     },
     "additionalProperties": False,
@@ -349,14 +349,19 @@ icx_sendTransaction_v3: dict = {
                 "signature": {"type": "string"},
                 "dataType": {"type": "string", "enum": ["call", "deploy", "message"]},
                 "data": {
-                    "type": "object",
-                    "properties": {
-                        "method": {"type": "string"},
-                        "contentType": {"type": "string"},
-                        "content": {"type": "string"},
-                        "params": {"type": "object"}
-                    },
-                    "additionalProperties": False,
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "properties": {
+                                "method": {"type": "string"},
+                                "contentType": {"type": "string"},
+                                "content": {"type": "string"},
+                                "params": {"type": "object"}
+                            },
+                            "additionalProperties": False,
+                        },
+                        {"type": "string"}
+                    ]
                 },
             },
             "additionalProperties": False,
