@@ -54,7 +54,6 @@ def main():
     parser.add_argument("-ch", dest=ConfigKey.CHANNEL, default=None,
                         help="icon score channel")
     args = parser.parse_args()
-    args_params = dict(vars(args))
 
     conf_path = args.config
 
