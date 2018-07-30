@@ -1,16 +1,16 @@
 import argparse
 
 import gunicorn
-from gunicorn.six import iteritems
 import gunicorn.app.base
-
-from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
-from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
+from gunicorn.six import iteritems
 from iconcommons.icon_config import IconConfig
 from iconcommons.logger import Logger
 
-from .server.peer_service_stub import PeerServiceStub
-from .server.rest_server import ServerComponents
+from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
+from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
+from iconrpcserver.icon_rpcserver_cli import REST_SERVICE_STANDALONE
+from iconrpcserver.server.peer_service_stub import PeerServiceStub
+from iconrpcserver.server.rest_server import ServerComponents
 
 
 class StandaloneApplication(gunicorn.app.base.BaseApplication):
@@ -56,9 +56,19 @@ def main():
     args = parser.parse_args()
     args_params = dict(vars(args))
 
-    conf = IconConfig(args.config, default_rpcserver_config)
-    conf.load(args_params)
+    conf_path = args.config
+
+    if conf_path is not None:
+        if not IconConfig.valid_conf_path(conf_path):
+            raise Exception(f'invalid config path {conf_path}')
+    if conf_path is None:
+        conf_path = str()
+
+    conf = IconConfig(conf_path, default_rpcserver_config)
+    conf.load(dict(vars(args)))
     Logger.load_config(conf)
+    Logger.print_config(conf, REST_SERVICE_STANDALONE)
+
     _run(conf)
 
 
