@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+HOST="tbears.icon.foundation"
+S3_HOST="${HOST}.s3-website.ap-northeast-2.amazonaws.com"
+PRODUCT="iconrpcserver"
+DEPS="earlgrey iconcommons"
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
 PYVER=$(python -c 'import sys; print(sys.version_info[0])')
 if [[ PYVER -ne 3 ]];then
   echo "The script should be run on python3"
@@ -10,11 +16,14 @@ fi
 if [[ ("$1" = "test" && "$2" != "--ignore-test") || ("$1" = "build") || ("$1" = "deploy") ]]; then
   pip install -r requirements.txt
 
-  WGET_VER=$(curl http://tbears.icon.foundation.s3-website.ap-northeast-2.amazonaws.com/earlgrey/VERSION)
-  pip install --force-reinstall "http://tbears.icon.foundation.s3-website.ap-northeast-2.amazonaws.com/earlgrey/earlgrey-${WGET_VER}-py3-none-any.whl"
+  for PKG in $DEPS
+  do
+    URL="http://${S3_HOST}/${PKG}/VERSION"
+    PKG_VER=$(curl $URL)
 
-  WGET_VER=$(curl http://tbears.icon.foundation.s3-website.ap-northeast-2.amazonaws.com/iconcommons/VERSION)
-  pip install --force-reinstall "http://tbears.icon.foundation.s3-website.ap-northeast-2.amazonaws.com/iconcommons/iconcommons-${WGET_VER}-py3-none-any.whl"
+    URL="http://${S3_HOST}/${BRANCH}/${PKG}/${PKG}-${PKG_VER}-py3-none-any.whl"
+    pip install --force-reinstall "$URL"
+  done
 
   if [[ "$2" != "--ignore-test" ]]; then
     python -m unittest
@@ -33,10 +42,12 @@ if [[ ("$1" = "test" && "$2" != "--ignore-test") || ("$1" = "build") || ("$1" = 
         exit 1
       fi
 
-      pip install awscli
-      aws s3 cp VERSION s3://tbears.icon.foundation/iconrpcserver/ --acl public-read
-      aws s3 cp dist/*$VER*.whl s3://tbears.icon.foundation/iconrpcserver/ --acl public-read
+      S3_URL="s3://${HOST}/${BRANCH}/${PRODUCT}/"
+      echo "$S3_URL"
 
+      pip install awscli
+      aws s3 cp VERSION "$S3_URL" --acl public-read
+      aws s3 cp dist/*$VER*.whl "$S3_URL" --acl public-read
     fi
   fi
 

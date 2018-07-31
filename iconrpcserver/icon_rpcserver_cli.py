@@ -15,14 +15,15 @@
 # limitations under the License.
 
 import argparse
-import sys
 import subprocess
+import sys
 from enum import IntEnum
 
-from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
-from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
 from iconcommons.icon_config import IconConfig
 from iconcommons.logger import Logger
+
+from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
+from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
 
 REST_SERVICE_STANDALONE = "RestServerStandAlone"
 
@@ -72,8 +73,18 @@ def main():
         parser.print_help()
         sys.exit(ExitCode.COMMAND_IS_WRONG.value)
 
-    conf = IconConfig(args.config, default_rpcserver_config)
-    conf.load(dict(vars(args)))
+    conf_path = args.config
+
+    if conf_path is not None:
+        if not IconConfig.valid_conf_path(conf_path):
+            print(f'invalid config file : {conf_path}')
+            sys.exit(ExitCode.COMMAND_IS_WRONG.value)
+    if conf_path is None:
+        conf_path = str()
+
+    conf = IconConfig(conf_path, default_rpcserver_config)
+    conf.load()
+    conf.update_conf(dict(vars(args)))
     Logger.load_config(conf)
 
     command = args.command[0]

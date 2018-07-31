@@ -1,16 +1,29 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import argparse
+import sys
 
 import gunicorn
-from gunicorn.six import iteritems
 import gunicorn.app.base
-
-from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
-from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
+from gunicorn.six import iteritems
 from iconcommons.icon_config import IconConfig
 from iconcommons.logger import Logger
 
-from .server.peer_service_stub import PeerServiceStub
-from .server.rest_server import ServerComponents
+from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
+from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
+from iconrpcserver.icon_rpcserver_cli import REST_SERVICE_STANDALONE, ExitCode
+from iconrpcserver.server.peer_service_stub import PeerServiceStub
+from iconrpcserver.server.rest_server import ServerComponents
 
 
 class StandaloneApplication(gunicorn.app.base.BaseApplication):
@@ -54,11 +67,22 @@ def main():
     parser.add_argument("-ch", dest=ConfigKey.CHANNEL, default=None,
                         help="icon score channel")
     args = parser.parse_args()
-    args_params = dict(vars(args))
 
-    conf = IconConfig(args.config, default_rpcserver_config)
-    conf.load(args_params)
+    conf_path = args.config
+
+    if conf_path is not None:
+        if not IconConfig.valid_conf_path(conf_path):
+            print(f'invalid config file : {conf_path}')
+            sys.exit(ExitCode.COMMAND_IS_WRONG.value)
+    if conf_path is None:
+        conf_path = str()
+
+    conf = IconConfig(conf_path, default_rpcserver_config)
+    conf.load()
+    conf.update_conf(dict(vars(args)))
     Logger.load_config(conf)
+    Logger.print_config(conf, REST_SERVICE_STANDALONE)
+
     _run(conf)
 
 
