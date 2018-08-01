@@ -30,12 +30,13 @@ class TestJsonschemaValidator(unittest.TestCase):
         try:
             self.validator(full_data)
         except:
-            self.fail('raise exception!')
+            self.fail(f'error with : {full_data}')
 
     def check_invalid(self, full_data: dict):
         self.assertRaises(GenericJsonRpcServerError, self.validator, full_data)
 
-    def check_more(self, full_data: dict, data: Union[dict, str, None], required_keys: list, invalid_value: object = list()):
+    def check_more(self, full_data: dict, data: Union[dict, str, None], required_keys: list,
+                   invalid_value: object = list()):
         # check required key validation
         for key in required_keys:
             self._check_required(full_data, data, key, invalid_value)
@@ -76,9 +77,9 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
                 "to": create_address(data=b'to'),
                 "value": "0xde0b6b3a7640000",
                 "fee": "0x12345",
-                "timestamp": "0x563a6cf330136",
-                "nonce": "0x1",
-                'tx_hash': bytes.hex(create_tx_hash(b'tx')),
+                "timestamp": "1516942975500598",
+                "nonce": "1234",
+                'tx_hash': create_tx_hash(b'tx', is_v3=False),
                 "signature": "VAia7YZ2Ji6igKWzjR2YsGa2m53nKPrfK7uXYW78QLE+ATehAVZPC40szvAiA6NEU5gCYB4c4qaQzqDh2ugcHgA=",
             }
         }
@@ -87,7 +88,7 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
             "id": 1234,
             "method": "icx_getTransactionResult",
             "params": {
-                'tx_hash': bytes.hex(create_tx_hash(b'tx')),
+                'tx_hash': create_tx_hash(b'tx', is_v3=False),
             }
         }
         self.getBalance = {
@@ -103,7 +104,7 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
             "id": 1234,
             "method": "icx_getBlockByHeight",
             "params": {
-                "height": "0x4d2"
+                "height": "412"
             }
         }
         self.getBlockByHash = {
@@ -111,7 +112,7 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
             "method": "icx_getBlockByHash",
             "id": 1234,
             "params": {
-                "hash": "0x1fcf7c34dc875681761bdaa5d75d770e78e8166b5c4f06c226c53300cbe85f57"
+                "hash": create_tx_hash(b'tx', is_v3=False),
             }
         }
         self.getLastBlock = {
@@ -125,11 +126,11 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
             "method": "icx_getTotalSupply",
         }
         self.icx_getTransactionByAddress = {
-            "jsonrpc" : "2.0",
+            "jsonrpc": "2.0",
             "method": "icx_getTransactionByAddress",
             "id": 1234,
             "params": {
-                "address": "hxaa688d74eb5f98b577883ca203535d2aa4f0838c",
+                "address": create_address(data=b'address'),
                 "index": 0
             }
         }
@@ -318,7 +319,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
             "id": 1234,
             "method": "icx_getTransactionResult",
             "params": {
-                'txHash': bytes.hex(create_tx_hash(b'tx')),
+                'txHash': create_tx_hash(b'tx')
             }
         }
         self.getTransactionByHash = {
@@ -331,7 +332,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
         }
         self.sendTransaction = {
             "jsonrpc": "2.0",
-            "id": 1234,
+            "id": 3000,
             'method': 'icx_sendTransaction',
             'params': {
                 "version": "0x3",
@@ -348,7 +349,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
 
         self.sendTransaction_call = {
             "jsonrpc": "2.0",
-            "id": 1234,
+            "id": 3001,
             'method': 'icx_sendTransaction',
             'params': {
                 "version": "0x3",
@@ -373,7 +374,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
 
         self.sendTransaction_deploy = {
             "jsonrpc": "2.0",
-            "id": 1234,
+            "id": 3002,
             'method': 'icx_sendTransaction',
             'params': {
                 "version": "0x3",
@@ -388,7 +389,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
                 "dataType": "deploy",
                 "data": {
                     "contentType": "application/zip",
-                    "content": "0xcontent",
+                    "content": "0x0102c2",
                     "params": {
                         "arg1": "value1",
                         "arg2": "value2"
@@ -399,7 +400,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
 
         self.sendTransaction_message = {
             "jsonrpc": "2.0",
-            "id": 1234,
+            "id": 3003,
             'method': 'icx_sendTransaction',
             'params': {
                 "version": "0x3",
@@ -518,14 +519,14 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
         self.check_more(full_data=full_data, data=params, required_keys=required_keys)
 
     def test_sendTransaction(self):
-        sendTxs = [
+        send_txs = [
             self.sendTransaction,
             self.sendTransaction_call,
             self.sendTransaction_deploy,
             self.sendTransaction_message
         ]
 
-        for data in sendTxs:
+        for data in send_txs:
             self.check_sendTransaction(data)
 
     def check_sendTransaction(self, full_data):
@@ -551,3 +552,128 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
             validate_jsonschema_v3(batch_request)
         except:
             self.fail('raise exception!')
+
+    def test_format_checker(self):
+        from iconrpcserver.server.json_rpc import validator
+        # address
+        inputs = [
+            (create_address(data=b'test', is_eoa=True), True, "EOA address"),
+            (create_address(data=b'test', is_eoa=False), True, "SCORE address"),
+            (f'hx{"a"*40}', True, "valid length 42"),
+            (f'hx{"a"*39}', False, "invalid length 41"),
+            (f'hx{"a"*41}', False, "invalid length 43"),
+            (f'hx{"a"*39}a', True, "valid lowercase string"),
+            (f'hx{"a"*39}A', False, "invalid lowercase string"),
+            (f'hx{"a"*39}w', False, "invalid hex string"),
+            (f'0x{"a"*40}', False, "invalid prefix '0x'"),
+            (b'hx{"a"*40}', False, "invalid type bytes"),
+        ]
+        self.validate_format_checker(validator.check_address, inputs)
+
+        # address_eoa
+        inputs = [
+            (create_address(data=b'test', is_eoa=True), True, "EOA address"),
+            (create_address(data=b'test', is_eoa=False), False, "SCORE address"),
+            (f'hx{"a"*40}', True, "valid length 42"),
+            (f'hx{"a"*39}', False, "invalid length 41"),
+            (f'hx{"a"*41}', False, "invalid length 43"),
+            (f'hx{"a"*39}a', True, "valid lowercase string"),
+            (f'hx{"a"*39}A', False, "invalid lowercase string"),
+            (f'hx{"a"*39}w', False, "invalid hex string"),
+            (f'0x{"a"*40}', False, "invalid prefix '0x'"),
+            (f'cx{"a"*40}', False, "invalid prefix 'cx'"),
+            (b'hx{"a"*40}', False, "invalid type bytes"),
+        ]
+        self.validate_format_checker(validator.check_address_eoa, inputs)
+
+        # address_score
+        inputs = [
+            (create_address(data=b'test', is_eoa=True), False, "EOA address"),
+            (create_address(data=b'test', is_eoa=False), True, "SCORE address"),
+            (f'cx{"a"*40}', True, "valid length 42"),
+            (f'cx{"a"*39}', False, "invalid length 41"),
+            (f'cx{"a"*41}', False, "invalid length 43"),
+            (f'cx{"a"*39}a', True, "valid lowercase string"),
+            (f'cx{"a"*39}A', False, "invalid lowercase string"),
+            (f'cx{"a"*39}w', False, "invalid hex string"),
+            (f'0x{"a"*40}', False, "invalid prefix '0x'"),
+            (f'hx{"a"*40}', False, "invalid prefix 'hx'"),
+            (b'cx{"a"*40}', False, "invalid type bytes"),
+        ]
+        self.validate_format_checker(validator.check_address_score, inputs)
+
+        # int_16
+        inputs = [
+            ('0x123cf', True, "valid lowercase string"),
+            ('0x123CF', False, "invalid lowercase string"),
+            ('0x123w', False, "invalid hex string"),
+            ('123cf', False, "invalid prefix"),
+            ('cx123cf', False, "invalid prefix 'cx'"),
+            ('hx123cf', False, "invalid prefix 'hx'"),
+            (b'123cf}', False, "invalid type bytes"),
+            (1234, False, "invalid type int"),
+            (1e18, False, "invalid type float"),
+        ]
+        self.validate_format_checker(validator.check_int_16, inputs)
+
+        # int_10
+        inputs = [
+            ('123', True, "valid decimal string"),
+            ('123a', False, "invalid hex string"),
+            ('0x123cf', False, "invalid prefix"),
+            (b'123', False, "invalid type bytes"),
+            (1234, False, "invalid type int"),
+            (1e18, False, "invalid type float"),
+        ]
+        self.validate_format_checker(validator.check_int_10, inputs)
+
+        # hash
+        inputs = [
+            (create_tx_hash(b'hash'), True, "valid lowercase string"),
+            (f'0x{"a"*64}', True, "valid length"),
+            (f'0x{"a"*63}', False, "invalid length 65"),
+            (f'0x{"a"*65}', False, "invalid length 67"),
+            (f'0x{"a"*63}a', True, "valid lowercase string"),
+            (f'0x{"a"*63}A', False, "invalid lowercase string"),
+            (f'0x{"a"*63}w', False, "invalid hex string"),
+            (f'cx{"a"*64}', False, "invalid prefix 'cx'"),
+            (f'hx{"a"*64}', False, "invalid prefix 'hx'"),
+            (b'0x{"a"*64}', False, "invalid type bytes"),
+        ]
+        self.validate_format_checker(validator.check_hash, inputs)
+
+        # hash_v2
+        inputs = [
+            (create_tx_hash(b'hash', is_v3=False), True, "valid lowercase string"),
+            (f'{"a"*64}', True, "valid length"),
+            (f'{"a"*63}', False, "invalid length 65"),
+            (f'{"a"*65}', False, "invalid length 67"),
+            (f'{"a"*63}a', True, "valid lowercase string"),
+            (f'{"a"*63}A', False, "invalid lowercase string"),
+            (f'{"a"*63}w', False, "invalid hex string"),
+            (f'0x{"a"*62}', False, "invalid prefix '0x'"),
+            (f'hx{"a"*62}', False, "invalid prefix 'cx'"),
+            (f'hx{"a"*62}', False, "invalid prefix 'hx'"),
+            (b'{"a"*64}', False, "invalid type bytes"),
+        ]
+        self.validate_format_checker(validator.check_hash_v2, inputs)
+
+        # binary data
+        inputs = [
+            (f'0x01', True, "valid length even"),
+            (f'0x1', False, "invalid length odd"),
+            (f'0x1a', True, "valid lowercase string"),
+            (f'0x1A', False, "invalid lowercase string"),
+            (f'0x1w', False, "invalid hex string"),
+            (f'cx01', False, "invalid prefix 'cx'"),
+            (f'hx01', False, "invalid prefix 'hx'"),
+            (b'0x01', False, "invalid type bytes"),
+        ]
+        self.validate_format_checker(validator.check_binary_data, inputs)
+
+        pass
+
+    def validate_format_checker(self, func: callable, case_list: list):
+        for case in case_list:
+            if func(case[0]) != case[1]:
+                self.fail(f'error case : [{func.__name__}] {case[2]}')

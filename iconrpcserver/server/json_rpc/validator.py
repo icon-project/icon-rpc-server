@@ -15,13 +15,13 @@
 # limitations under the License.
 
 from jsonrpcserver import status
-from jsonschema import validate
+from jsonschema import Draft4Validator, FormatChecker
 from jsonschema.exceptions import ValidationError
+import re
 
 from iconrpcserver.server.json_rpc.exception import GenericJsonRpcServerError, JsonError
 
 icx_sendTransaction_v2: dict = {
-    "$schema": "http://json-schema.org/schema#",
     "title": "icx_sendTransaction",
     "id": "https://github.com/icon-project/icx_JSON_RPC#icx_sendtransaction",
     "type": "object",
@@ -32,13 +32,13 @@ icx_sendTransaction_v2: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "from": {"type": "string", "maxLength": 42, "pattern": "^hx"},
-                "to": {"type": "string", "maxLength": 42, "pattern": "^hx"},
-                "value": {"type": "string"},
-                "fee": {"type": "string"},
-                "timestamp": {"type": "string"},
-                "nonce": {"type": "string"},
-                "tx_hash": {"type": "string"},
+                "from": {"type": "string", "format": "address_eoa"},
+                "to": {"type": "string", "format": "address_eoa"},
+                "value": {"type": "string", "format": "int_16"},
+                "fee": {"type": "string", "format": "int_16"},
+                "timestamp": {"type": "string", "format": "int_10"},
+                "nonce": {"type": "string", "format": "int_10"},
+                "tx_hash": {"type": "string", "format": "hash_v2"},
                 "signature": {"type": "string"},
             },
             "additionalProperties": False,
@@ -51,7 +51,6 @@ icx_sendTransaction_v2: dict = {
 }
 
 icx_getTransactionResult_v2: dict = {
-    "$schema": "http://json-schema.org/schema#",
     "title": "icx_getBalance",
     "id": "https://github.com/icon-project/icx_JSON_RPC#icx_getbalance",
     "type": "object",
@@ -62,7 +61,7 @@ icx_getTransactionResult_v2: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "tx_hash": {"type": "string"},
+                "tx_hash": {"type": "string", "format": "hash_v2"},
             },
             "additionalProperties": False,
             "required": ["tx_hash"]
@@ -73,7 +72,6 @@ icx_getTransactionResult_v2: dict = {
 }
 
 icx_getBalance_v2: dict = {
-    "$schema": "http://json-schema.org/schema#",
     "title": "icx_getBalance",
     "id": "https://github.com/icon-project/icx_JSON_RPC#icx_getbalance",
     "type": "object",
@@ -84,7 +82,7 @@ icx_getBalance_v2: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "address": {"type": "string", "maxLength": 42, "pattern": "^hx"},
+                "address": {"type": "string", "format": "address_eoa"},
             },
             "additionalProperties": False,
             "required": ["address"]
@@ -95,7 +93,6 @@ icx_getBalance_v2: dict = {
 }
 
 icx_getBlockByHeight_v2: dict = {
-    "$schema": "http://json-schema.org/schema#",
     "title": "icx_getBlockByHeight",
     "id": "https://github.com/icon-project/icx_JSON_RPC#icx_getblockbyheight",
     "type": "object",
@@ -106,7 +103,7 @@ icx_getBlockByHeight_v2: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "height": {"type": "string"},
+                "height": {"type": "string", "format": "int_10"},
             },
             "additionalProperties": False,
             "required": ["height"]
@@ -117,7 +114,6 @@ icx_getBlockByHeight_v2: dict = {
 }
 
 icx_getBlockByHash_v2: dict = {
-    "$schema": "http://json-schema.org/schema#",
     "title": "icx_getBlockByHash",
     "id": "https://github.com/icon-project/icx_JSON_RPC#icx_getblockbyhash",
     "type": "object",
@@ -128,7 +124,7 @@ icx_getBlockByHash_v2: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "hash": {"type": "string"},
+                "hash": {"type": "string", "format": "hash_v2"},
             },
             "additionalProperties": False,
             "required": ["hash"]
@@ -138,8 +134,7 @@ icx_getBlockByHash_v2: dict = {
     "required": ["jsonrpc", "method", "id", "params"]
 }
 
-icx_getLastBlock_v2: dict = {
-    "$schema": "http://json-schema.org/schema#",
+icx_getLastBlock: dict = {
     "title": "icx_getLastBlock",
     "id": "https://github.com/icon-project/icx_JSON_RPC#icx_getlastblock",
     "type": "object",
@@ -153,7 +148,6 @@ icx_getLastBlock_v2: dict = {
 }
 
 icx_getTransactionByAddress_v2: dict = {
-    "$schema": "http://json-schema.org/schema#",
     "title": "icx_getTransactionByAddress",
     "id": "googledoc.icx_getTransactionByAddress",
     "type": "object",
@@ -164,7 +158,7 @@ icx_getTransactionByAddress_v2: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "address": {"type": "string", "maxLength": 42, "pattern": "^hx"},
+                "address": {"type": "string", "format": "address_eoa"},
                 "index": {"type": "number"},
             },
             "additionalProperties": False,
@@ -175,8 +169,7 @@ icx_getTransactionByAddress_v2: dict = {
     "required": ["jsonrpc", "method", "id"]
 }
 
-icx_getTotalSupply_v2: dict = {
-    "$schema": "http://json-schema.org/schema#",
+icx_getTotalSupply: dict = {
     "title": "icx_getTotalSupply",
     "id": "googledoc.icx_getTotalSupplu",
     "type": "object",
@@ -193,8 +186,8 @@ SCHEMA_V2: dict = {
     "icx_sendTransaction": icx_sendTransaction_v2,
     "icx_getTransactionResult": icx_getTransactionResult_v2,
     "icx_getBalance": icx_getBalance_v2,
-    "icx_getTotalSupply": icx_getTotalSupply_v2,
-    "icx_getLastBlock": icx_getLastBlock_v2,
+    "icx_getTotalSupply": icx_getTotalSupply,
+    "icx_getLastBlock": icx_getLastBlock,
     "icx_getBlockByHash": icx_getBlockByHash_v2,
     "icx_getBlockByHeight": icx_getBlockByHeight_v2,
     "icx_getTransactionByAddress": icx_getTransactionByAddress_v2
@@ -205,8 +198,49 @@ def validate_jsonschema_v2(request: object):
     validate_jsonschema(request, SCHEMA_V2)
 
 
+icx_getBlockByHeight_v3: dict = {
+    "title": "icx_getBlockByHeight",
+    "id": "https://github.com/icon-project/icx_JSON_RPC#icx_getblockbyheight",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": "number"},
+        "params": {
+            "type": "object",
+            "properties": {
+                "height": {"type": "string", "format": "int_16"},
+            },
+            "additionalProperties": False,
+            "required": ["height"]
+        }
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id", "params"]
+}
+
+icx_getBlockByHash_v3: dict = {
+    "title": "icx_getBlockByHash",
+    "id": "https://github.com/icon-project/icx_JSON_RPC#icx_getblockbyhash",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": "number"},
+        "params": {
+            "type": "object",
+            "properties": {
+                "hash": {"type": "string", "format": "hash"},
+            },
+            "additionalProperties": False,
+            "required": ["hash"]
+        }
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id", "params"]
+}
+
 icx_call_v3: dict = {
-    "$schema": "http://json-schema.org/schema#",
     "title": "icx_call",
     "id": "https://repo.theloop.co.kr/theloop/LoopChain/wikis/doc/loopchain-json-rpc-v3#icx_call",
     "type": "object",
@@ -217,8 +251,8 @@ icx_call_v3: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "from": {"type": "string", "maxLength": 42},
-                "to": {"type": "string", "maxLength": 42},
+                "from": {"type": "string", "format": "address_eoa"},
+                "to": {"type": "string", "format": "address_score"},
                 "dataType": {"type": "string", "enum": ["call"]},
                 "data": {
                     "type": "object",
@@ -239,7 +273,6 @@ icx_call_v3: dict = {
 }
 
 icx_getBalance_v3: dict = {
-    "$schema": "http://json-schema.org/schema#",
     "title": "icx_getBalance",
     "id": "https://repo.theloop.co.kr/theloop/LoopChain/wikis/doc/loopchain-json-rpc-v3#icx_getbalance",
     "type": "object",
@@ -250,7 +283,7 @@ icx_getBalance_v3: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "address": {"type": "string", "maxLength": 42, "pattern": "^hx|^cx"},
+                "address": {"type": "string", "format": "address"}
             },
             "additionalProperties": False,
             "required": ["address"]
@@ -261,7 +294,6 @@ icx_getBalance_v3: dict = {
 }
 
 icx_getScoreApi_v3: dict = {
-    "$schema": "http://json-schema.org/schema#",
     "title": "icx_getScoreApi",
     "id": "https://repo.theloop.co.kr/theloop/LoopChain/wikis/doc/loopchain-json-rpc-v3#icx_getscoreapi",
     "type": "object",
@@ -272,7 +304,7 @@ icx_getScoreApi_v3: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "address": {"type": "string", "maxLength": 42, "pattern": "^cx"},
+                "address": {"type": "string", "format": "address_score"}
             },
             "additionalProperties": False,
             "required": ["address"]
@@ -283,7 +315,6 @@ icx_getScoreApi_v3: dict = {
 }
 
 icx_getTransactionResult_v3: dict = {
-    "$schema": "http://json-schema.org/schema#",
     "title": "icx_getTransactionResult",
     "id": "https://repo.theloop.co.kr/theloop/LoopChain/wikis/doc/loopchain-json-rpc-v3#icx_gettransactionresult",
     "type": "object",
@@ -294,7 +325,7 @@ icx_getTransactionResult_v3: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "txHash": {"type": "string"}
+                "txHash": {"type": "string", "format": "hash"}
             },
             "additionalProperties": False,
             "required": ["txHash"]
@@ -305,7 +336,6 @@ icx_getTransactionResult_v3: dict = {
 }
 
 icx_getTransactionByHash_v3: dict = {
-    "$schema": "http://json-schema.org/schema#",
     "title": "icx_getTransactionByHash",
     "id": "https://repo.theloop.co.kr/theloop/LoopChain/wikis/doc/loopchain-json-rpc-v3#icx_gettransactionbyhash",
     "type": "object",
@@ -316,7 +346,7 @@ icx_getTransactionByHash_v3: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "txHash": {"type": "string", "minLength": 66, "maxLength": 66, "pattern": "^0x[0-9a-f]{64}"}
+                "txHash": {"type": "string", "format": "hash"}
             },
             "additionalProperties": False,
             "required": ["txHash"]
@@ -327,7 +357,6 @@ icx_getTransactionByHash_v3: dict = {
 }
 
 icx_sendTransaction_v3: dict = {
-    "$schema": "http://json-schema.org/schema#",
     "title": "icx_sendTransaction",
     "id": "https://repo.theloop.co.kr/theloop/LoopChain/wikis/doc/loopchain-json-rpc-v3#icx_sendtransaction",
     "type": "object",
@@ -338,14 +367,14 @@ icx_sendTransaction_v3: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "version": {"type": "string"},
-                "from": {"type": "string", "maxLength": 42},
-                "to": {"type": "string", "maxLength": 42},
-                "value": {"type": "string"},
-                "stepLimit": {"type": "string"},
-                "timestamp": {"type": "string"},
-                "nid": {"type": "string"},
-                "nonce": {"type": "string"},
+                "version": {"type": "string", "format": "int_16"},
+                "from": {"type": "string", "format": "address_eoa"},
+                "to": {"type": "string", "format": "address"},
+                "value": {"type": "string", "format": "int_16"},
+                "stepLimit": {"type": "string", "format": "int_16"},
+                "timestamp": {"type": "string", "format": "int_16"},
+                "nid": {"type": "string", "format": "int_16"},
+                "nonce": {"type": "string", "format": "int_16"},
                 "signature": {"type": "string"},
                 "dataType": {"type": "string", "enum": ["call", "deploy", "message"]},
                 "data": {
@@ -354,15 +383,24 @@ icx_sendTransaction_v3: dict = {
                             "type": "object",
                             "properties": {
                                 "method": {"type": "string"},
-                                "contentType": {"type": "string"},
-                                "content": {"type": "string"},
                                 "params": {"type": "object"}
                             },
                             "additionalProperties": False,
+                            "required": ["method"]
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "contentType": {"type": "string", "eunm": ["application/zip", "application/tbears"]},
+                                "content": {"type": "string"},  # tbears get string content
+                                "params": {"type": "object"}
+                            },
+                            "additionalProperties": False,
+                            "required": ["contentType", "content"]
                         },
                         {"type": "string"}
-                    ]
-                },
+                    ],
+                }
             },
             "additionalProperties": False,
             "required": ["version", "from", "stepLimit", "timestamp", "nid", "signature"]
@@ -374,13 +412,13 @@ icx_sendTransaction_v3: dict = {
 }
 
 SCHEMA_V3: dict = {
-    "icx_getLastBlock": icx_getLastBlock_v2,
-    "icx_getBlockByHeight": icx_getBlockByHeight_v2,
-    "icx_getBlockByHash": icx_getBlockByHash_v2,
+    "icx_getLastBlock": icx_getLastBlock,
+    "icx_getBlockByHeight": icx_getBlockByHeight_v3,
+    "icx_getBlockByHash": icx_getBlockByHash_v3,
     "icx_call": icx_call_v3,
     "icx_getBalance": icx_getBalance_v3,
     "icx_getScoreApi": icx_getScoreApi_v3,
-    "icx_getTotalSupply": icx_getTotalSupply_v2,
+    "icx_getTotalSupply": icx_getTotalSupply,
     "icx_getTransactionResult": icx_getTransactionResult_v3,
     "icx_getTransactionByHash": icx_getTransactionByHash_v3,
     "icx_sendTransaction": icx_sendTransaction_v3
@@ -418,10 +456,102 @@ def validate_jsonschema(request: object, schemas: dict = SCHEMA_V3):
                                         message=f"JSON schema validation error: Method not found",
                                         http_status=status.HTTP_BAD_REQUEST)
 
+    # create a new validator with format_checker
+    validator = Draft4Validator(schema=schema, format_checker=format_checker)
+
     # check request
     try:
-        validate(instance=request, schema=schema)
+        validator.validate(request)
     except ValidationError as e:
         raise GenericJsonRpcServerError(code=JsonError.INVALID_PARAMS,
                                         message=f"JSON schema validation error: {e}",
                                         http_status=status.HTTP_BAD_REQUEST)
+
+
+def is_lowercase_hex_string(value: str) -> bool:
+    """Check whether value is hexadecimal format or not
+
+    :param value: text
+    :return: True(lowercase hexadecimal) otherwise False
+    """
+
+    try:
+        result = re.match('[0-9a-f]+', value)
+        return len(result.group(0)) == len(value)
+    except:
+        pass
+
+    return False
+
+
+format_checker = FormatChecker()
+
+
+@format_checker.checks('address')
+def check_address(address: str):
+    if isinstance(address, str) and len(address) == 42 and is_lowercase_hex_string(address[2:]) \
+            and (address.startswith('cx') or address.startswith('hx')):
+        return True
+
+    return False
+
+
+@format_checker.checks('address_eoa')
+def check_address_eoa(address: str):
+    if isinstance(address, str) and len(address) == 42 and is_lowercase_hex_string(address[2:]) \
+            and address.startswith('hx'):
+        return True
+
+    return False
+
+
+@format_checker.checks('address_score')
+def check_address_score(address: str):
+    if isinstance(address, str) and len(address) == 42 and is_lowercase_hex_string(address[2:]) \
+            and address.startswith('cx'):
+        return True
+
+    return False
+
+
+@format_checker.checks('int_10')
+def check_int_10(value: str):
+    if not isinstance(value, str):
+        return False
+    try:
+        int(value)
+        return True
+    except ValueError:
+        return False
+
+
+@format_checker.checks('int_16')
+def check_int_16(value: str):
+    if isinstance(value, str) and value.startswith('0x') and is_lowercase_hex_string(value[2:]):
+        return True
+
+    return False
+
+
+@format_checker.checks('hash')
+def check_hash(value: str):
+    if isinstance(value, str) and len(value) == 66 and value.startswith('0x') and is_lowercase_hex_string(value[2:]):
+        return True
+
+    return False
+
+
+@format_checker.checks('hash_v2')
+def check_hash_v2(value: str):
+    if isinstance(value, str) and len(value) == 64 and is_lowercase_hex_string(value):
+        return True
+
+    return False
+
+
+@format_checker.checks('binary_data')
+def check_binary_data(value: str):
+    if isinstance(value, str) and len(value) % 2 == 0 and value.startswith('0x') and is_lowercase_hex_string(value[2:]):
+        return True
+
+    return False

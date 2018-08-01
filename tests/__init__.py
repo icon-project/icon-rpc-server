@@ -18,12 +18,12 @@ import time
 
 
 def create_address(data: bytes, is_eoa: bool = True):
-    hash_value = hashlib.sha3_256(data).hexdigest()
-    return f'{"hx" if is_eoa else "cx"}{hash_value[-20:]}'
+    hash_value = hashlib.sha3_256(data).digest()
+    return f'{"hx" if is_eoa else "cx"}{hash_value[-20:].hex()}'
 
 
-def create_tx_hash(data: bytes=None):
+def create_tx_hash(data: bytes=None, is_v3: bool = True):
     if data is None:
         data = int(time.time()).to_bytes(8, 'big')
 
-    return bytes.fromhex(hashlib.sha3_256(data).hexdigest())
+    return f'{"0x" if is_v3 else ""}{hashlib.sha3_256(data).hexdigest()}'
