@@ -171,7 +171,7 @@ icx_getTransactionByAddress_v2: dict = {
 
 icx_getTotalSupply: dict = {
     "title": "icx_getTotalSupply",
-    "id": "googledoc.icx_getTotalSupplu",
+    "id": "googledoc.icx_getTotalSupply",
     "type": "object",
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
