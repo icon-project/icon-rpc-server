@@ -104,9 +104,8 @@ class Version2Dispatcher:
                         result_dict = json.loads(result)
                         fail_status = bool(result_dict.get('failure'))
                         if fail_status:
-                            error_code_hex_str = result_dict['failure']['code']
-                            error_code = int(error_code_hex_str, 16)
-                            message = result_dict['failure']['message']
+                            error_code = message_code.Response.fail_validate_params
+                            message = "Invalid transaction hash."
                         else:
                             error_code = message_code.Response.success
                     except Exception as e:
@@ -116,7 +115,7 @@ class Version2Dispatcher:
                         message = error_message
                 else:
                     error_code = message_code.Response.fail_validate_params
-                    message = 'tx_reult is empty'
+                    message = 'tx_result is empty'
             else:
                 error_code = message_code.Response.fail_validate_params
                 message = "Invalid transaction hash."
