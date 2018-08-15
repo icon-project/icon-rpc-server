@@ -18,6 +18,7 @@ import ssl
 
 from sanic import Sanic, response
 from sanic.views import HTTPMethodView
+from sanic.log import LOGGING_CONFIG_DEFAULTS
 
 from iconcommons.icon_config import IconConfig
 from ..default_conf.icon_rpcserver_constant import ConfigKey, NodeType, SSLAuthType
@@ -37,7 +38,7 @@ class ServerComponents(metaclass=SingletonMetaClass):
     conf: 'IconConfig' = None
 
     def __init__(self):
-        self.__app = Sanic(__name__)
+        self.__app = Sanic(__name__, log_config=self._make_log_config())
         self.__app.config.KEEP_ALIVE = False
         CORS(self.__app)
 
@@ -63,6 +64,14 @@ class ServerComponents(metaclass=SingletonMetaClass):
                                                ServerComponents.conf[ConfigKey.DEFAULT_SSL_KEY_PATH])
         else:
             Logger.error(f"REST_SSL_TYPE must be one of [0,1,2]. But now conf.REST_SSL_TYPE is {rest_ssl_type}")
+
+    def _make_log_config(self) -> dict:
+        log_name = self.conf["log"][Logger.LOGGER_NAME]
+        log_level = Logger.get_logger_level(log_name)
+        log_config = LOGGING_CONFIG_DEFAULTS
+        log_config["loggers"]["sanic.access"]["level"] = log_level
+        log_config["loggers"]["sanic.error"]["level"] = log_level
+        return log_config
 
     @property
     def app(self):
