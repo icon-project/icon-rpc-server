@@ -371,6 +371,7 @@ icx_sendTransaction_v3: dict = {
                 "from": {"type": "string", "format": "address_eoa"},
                 "to": {"type": "string", "format": "address"},
                 "value": {"type": "string", "format": "int_16"},
+                "message": {"type": "string"},
                 "stepLimit": {"type": "string", "format": "int_16"},
                 "timestamp": {"type": "string", "format": "int_16"},
                 "nid": {"type": "string", "format": "int_16"},
@@ -391,7 +392,7 @@ icx_sendTransaction_v3: dict = {
                         {
                             "type": "object",
                             "properties": {
-                                "contentType": {"type": "string", "eunm": ["application/zip", "application/tbears"]},
+                                "contentType": {"type": "string", "enum": ["application/zip", "application/tbears"]},
                                 "content": {"type": "string"},  # tbears get string content
                                 "params": {"type": "object"}
                             },
