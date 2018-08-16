@@ -464,7 +464,7 @@ def validate_jsonschema(request: object, schemas: dict = SCHEMA_V3):
         validator.validate(request)
     except ValidationError as e:
         raise GenericJsonRpcServerError(code=JsonError.INVALID_PARAMS,
-                                        message=f"JSON schema validation error: {e}",
+                                        message=f"JSON schema validation error: {e.message}",
                                         http_status=status.HTTP_BAD_REQUEST)
 
 
