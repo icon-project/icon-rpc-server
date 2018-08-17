@@ -247,3 +247,15 @@ class Version3Dispatcher:
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
         return ""
+
+    @staticmethod
+    @methods.add
+    async def ise_getStatus(**kwargs):
+        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
+        score_stub = StubCollection().icon_score_stubs[channel_name]
+
+        method = 'ise_getStatus'
+        request = make_request(method, kwargs)
+        response = await score_stub.async_task().query(request)
+
+        return response_to_json_query(response)
