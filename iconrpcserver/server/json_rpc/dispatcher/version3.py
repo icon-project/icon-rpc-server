@@ -272,7 +272,6 @@ class Version3Dispatcher:
             result = response[key]
         if isinstance(result, dict):
             for key in result:
-                Logger.error(f'key: {key} value: {response}')
                 Version3Dispatcher._hash_convert(key, result)
         elif key in Version3Dispatcher.HASH_KEY_DICT:
             if isinstance(result, str):
