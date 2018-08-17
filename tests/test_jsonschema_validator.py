@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2017-2018 theloop Inc.
+# Copyright 2018 ICON Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -314,6 +314,14 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
             "id": 1234,
             "method": "icx_getTotalSupply",
         }
+        self.ise_GetStatus = {
+            "jsonrpc": "2.0",
+            "id": 1234,
+            "method": "ise_getStatus",
+            "params": {
+                "filter": ["aaaa"]
+            }
+        }
         self.getTransactionResult = {
             "jsonrpc": "2.0",
             "id": 1234,
@@ -488,6 +496,16 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
 
     def test_getTotalSupply(self):
         full_data = self.getTotalSupply
+
+        # check default function
+        self.check_valid(full_data=full_data)
+
+        # check required key validation
+        required_keys = ['jsonrpc', 'id', 'method']
+        self.check_more(full_data=full_data, data=full_data, required_keys=required_keys)
+
+    def test_ise_getStatus(self):
+        full_data = self.ise_GetStatus
 
         # check default function
         self.check_valid(full_data=full_data)

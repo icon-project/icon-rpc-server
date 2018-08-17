@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2017-2018 theloop Inc.
+# Copyright 2018 ICON Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -356,6 +356,31 @@ icx_getTransactionByHash_v3: dict = {
     "required": ["jsonrpc", "method", "id", "params"]
 }
 
+ise_getStatus_v3: dict = {
+    "title": "ise_getStatus",
+    "id": "https://repo.theloop.co.kr/theloop/LoopChain/wikis/doc/loopchain-json-rpc-v3#ise_getStatus",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": "number"},
+        "params": {
+            "type": "object",
+            "properties": {
+                "filter": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": False,
+        }
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id", "params"]
+}
+
 icx_sendTransaction_v3: dict = {
     "title": "icx_sendTransaction",
     "id": "https://repo.theloop.co.kr/theloop/LoopChain/wikis/doc/loopchain-json-rpc-v3#icx_sendtransaction",
@@ -421,7 +446,8 @@ SCHEMA_V3: dict = {
     "icx_getTotalSupply": icx_getTotalSupply,
     "icx_getTransactionResult": icx_getTransactionResult_v3,
     "icx_getTransactionByHash": icx_getTransactionByHash_v3,
-    "icx_sendTransaction": icx_sendTransaction_v3
+    "icx_sendTransaction": icx_sendTransaction_v3,
+    "ise_getStatus": ise_getStatus_v3
 }
 
 
@@ -464,7 +490,7 @@ def validate_jsonschema(request: object, schemas: dict = SCHEMA_V3):
         validator.validate(request)
     except ValidationError as e:
         raise GenericJsonRpcServerError(code=JsonError.INVALID_PARAMS,
-                                        message=f"JSON schema validation error: {e}",
+                                        message=f"JSON schema validation error: {e.message}",
                                         http_status=status.HTTP_BAD_REQUEST)
 
 

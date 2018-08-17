@@ -1,4 +1,4 @@
-# Copyright 2017 theloop Inc.
+# Copyright 2018 ICON Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -66,11 +66,10 @@ class ServerComponents(metaclass=SingletonMetaClass):
             Logger.error(f"REST_SSL_TYPE must be one of [0,1,2]. But now conf.REST_SSL_TYPE is {rest_ssl_type}")
 
     def _make_log_config(self) -> dict:
-        log_name = self.conf["log"][Logger.LOGGER_NAME]
-        log_level = Logger.get_logger_level(log_name)
         log_config = LOGGING_CONFIG_DEFAULTS
-        log_config["loggers"]["sanic.access"]["level"] = log_level
-        log_config["loggers"]["sanic.error"]["level"] = log_level
+        log_config['loggers'] = {}
+        log_config['handlers'] = {}
+        log_config['formatters'] = {}
         return log_config
 
     @property
