@@ -14,8 +14,8 @@
 """json rpc dispatcher version 3"""
 
 import json
+from typing import Any, Optional
 
-from earlgrey import MessageQueueException
 from jsonrpcserver import config, status
 from jsonrpcserver.aio import AsyncMethods
 from jsonrpcserver.response import ExceptionResponse
@@ -41,6 +41,8 @@ REST_SERVER_V3 = 'REST_SERVER_V3'
 
 
 class Version3Dispatcher:
+    HASH_KEY_DICT = ['hash', 'blockHash', 'txHash', 'prevBlockHash']
+
     @staticmethod
     async def dispatch(request):
         req = request.json
@@ -257,5 +259,22 @@ class Version3Dispatcher:
         method = 'ise_getStatus'
         request = make_request(method, kwargs)
         response = await score_stub.async_task().query(request)
-
+        error = response.get('error')
+        if error is None:
+            Version3Dispatcher._hash_convert(None, response)
         return response_to_json_query(response)
+
+    @staticmethod
+    def _hash_convert(key: Optional[str], response: Any):
+        if key is None:
+            result = response
+        else:
+            result = response[key]
+        if isinstance(result, dict):
+            for key in result:
+                Logger.error(f'key: {key} value: {response}')
+                Version3Dispatcher._hash_convert(key, result)
+        elif key in Version3Dispatcher.HASH_KEY_DICT:
+            if isinstance(result, str):
+                if not result.startswith('0x'):
+                    response[key] = f'0x{result}'
