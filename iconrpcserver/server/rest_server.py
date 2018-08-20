@@ -96,18 +96,24 @@ class ServerComponents(metaclass=SingletonMetaClass):
 
         async def ready_tasks():
             Logger.debug('rest_server:initialize')
-            await StubCollection().create_peer_stub()
 
-            channels_info = await StubCollection().peer_stub.async_task().get_channel_infos()
-            channel_name = None
-            for channel_name, channel_info in channels_info.items():
+            if self.conf.get(ConfigKey.TBEARS_MODE, False):
+                channel_name = self.conf.get(ConfigKey.CHANNEL, 'loopchain_default')
                 await StubCollection().create_channel_stub(channel_name)
                 await StubCollection().create_icon_score_stub(channel_name)
 
-            results = await StubCollection().peer_stub.async_task().get_channel_info_detail(channel_name)
-
-            RestProperty().node_type = NodeType(results[6])
-            RestProperty().rs_target = results[3]
+                RestProperty().node_type = NodeType.CommunityNode
+                RestProperty().rs_target = None
+            else:
+                await StubCollection().create_peer_stub()
+                channels_info = await StubCollection().peer_stub.async_task().get_channel_infos()
+                channel_name = None
+                for channel_name, channel_info in channels_info.items():
+                    await StubCollection().create_channel_stub(channel_name)
+                    await StubCollection().create_icon_score_stub(channel_name)
+                results = await StubCollection().peer_stub.async_task().get_channel_info_detail(channel_name)
+                RestProperty().node_type = NodeType(results[6])
+                RestProperty().rs_target = results[3]
 
             Logger.debug(f'rest_server:initialize complete. '
                          f'node_type({RestProperty().node_type}), rs_target({RestProperty().rs_target})')

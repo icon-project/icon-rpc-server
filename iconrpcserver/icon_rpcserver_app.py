@@ -13,7 +13,9 @@
 # limitations under the License.
 
 import argparse
+import asyncio
 import sys
+import aio_pika
 
 import gunicorn
 import gunicorn.app.base
@@ -68,6 +70,8 @@ def main():
                         help="key sharing peer group using queue name. use it if one more peers connect one MQ")
     parser.add_argument("-ch", dest=ConfigKey.CHANNEL, default=None,
                         help="icon score channel")
+    parser.add_argument("-tbears", dest=ConfigKey.TBEARS_MODE, action='store_true',
+                        help="tbears mode")
     args = parser.parse_args()
 
     conf_path = args.config
@@ -85,14 +89,25 @@ def main():
     Logger.load_config(conf)
     Logger.print_config(conf, REST_SERVICE_STANDALONE)
 
-    _run(conf)
+    _run_async(_run(conf))
+
+
+def _run_async(async_func):
+    loop = asyncio.new_event_loop()
+    return loop.run_until_complete(async_func)
 
 
 def run_in_foreground(conf: 'IconConfig'):
-    _run(conf)
+    _run_async(_run(conf))
 
 
-def _run(conf: 'IconConfig'):
+async def _run(conf: 'IconConfig'):
+    try:
+        await aio_pika.connect()
+    except ConnectionRefusedError:
+        Logger.error("rabbitmq-service disable", REST_SERVICE_STANDALONE)
+        exit(0)
+
     # Setup port and host values.
     host = '0.0.0.0'
 
@@ -125,7 +140,9 @@ def _run(conf: 'IconConfig'):
         'worker_class': "sanic.worker.GunicornWorker",
         'certfile': certfile,
         'SERVER_SOFTWARE': gunicorn.SERVER_SOFTWARE,
-        'keyfile': keyfile
+        'keyfile': keyfile,
+        'errorlog': conf[Logger.CATEGORY][Logger.FILE_PATH],
+        'capture_output': True
     }
 
     # Launch gunicorn web server.
