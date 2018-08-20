@@ -70,6 +70,8 @@ def main():
                         help="key sharing peer group using queue name. use it if one more peers connect one MQ")
     parser.add_argument("-ch", dest=ConfigKey.CHANNEL, default=None,
                         help="icon score channel")
+    parser.add_argument("-tbears", dest=ConfigKey.TBEARS_MODE, action='store_true',
+                        help="tbears mode")
     args = parser.parse_args()
 
     conf_path = args.config

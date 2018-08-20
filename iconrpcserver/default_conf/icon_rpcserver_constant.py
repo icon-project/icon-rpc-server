@@ -64,6 +64,5 @@ class ConfigKey:
     GRPC_RETRY = 'grpcRetry'
     REST_ADDITIONAL_TIMEOUT = 'restAdditionalTimeout'
     SCORE_QUERY_TIMEOUT = 'scoreQueryTimeout'
-    SERVICE = 'service'
-    SERVICE_TBEARS_MODE = 'tbearsMode'
+    TBEARS_MODE = 'tbearsMode'
 
