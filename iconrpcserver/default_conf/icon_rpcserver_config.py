@@ -37,5 +37,8 @@ default_rpcserver_config = \
         ConfigKey.GRPC_TIMEOUT: 30,
         ConfigKey.GRPC_RETRY: 5,
         ConfigKey.REST_ADDITIONAL_TIMEOUT: 30,
-        ConfigKey.SCORE_QUERY_TIMEOUT: 120
+        ConfigKey.SCORE_QUERY_TIMEOUT: 120,
+        ConfigKey.SERVICE: {
+            ConfigKey.SERVICE_TBEARS_MODE: False
+        }
     }

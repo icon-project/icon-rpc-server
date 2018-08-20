@@ -96,23 +96,37 @@ class ServerComponents(metaclass=SingletonMetaClass):
 
         async def ready_tasks():
             Logger.debug('rest_server:initialize')
-            await StubCollection().create_peer_stub()
 
-            channels_info = await StubCollection().peer_stub.async_task().get_channel_infos()
-            channel_name = None
-            for channel_name, channel_info in channels_info.items():
+            if self._get_tbears_mode():
+                channel_name = 'loopchain_default'
                 await StubCollection().create_channel_stub(channel_name)
                 await StubCollection().create_icon_score_stub(channel_name)
 
-            results = await StubCollection().peer_stub.async_task().get_channel_info_detail(channel_name)
-
-            RestProperty().node_type = NodeType(results[6])
-            RestProperty().rs_target = results[3]
+                RestProperty().node_type = NodeType.CommunityNode
+                RestProperty().rs_target = None
+            else:
+                await StubCollection().create_peer_stub()
+                channels_info = await StubCollection().peer_stub.async_task().get_channel_infos()
+                channel_name = None
+                for channel_name, channel_info in channels_info.items():
+                    await StubCollection().create_channel_stub(channel_name)
+                    await StubCollection().create_icon_score_stub(channel_name)
+                results = await StubCollection().peer_stub.async_task().get_channel_info_detail(channel_name)
+                RestProperty().node_type = NodeType(results[6])
+                RestProperty().rs_target = results[3]
 
             Logger.debug(f'rest_server:initialize complete. '
                          f'node_type({RestProperty().node_type}), rs_target({RestProperty().rs_target})')
 
         self.__app.add_task(ready_tasks())
+
+    @classmethod
+    def _get_tbears_mode(cls) -> bool:
+        tbears_mode = False
+        service = cls.conf.get(ConfigKey.SERVICE)
+        if service is not None:
+            tbears_mode = service.get(ConfigKey.SERVICE_TBEARS_MODE, False)
+        return tbears_mode
 
     def serve(self, api_port):
         self.ready()
