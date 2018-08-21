@@ -47,7 +47,7 @@ def main():
         -ak : key sharing peer group using queue name. use it if one more peers connect one MQ
         -ch : loopchain channel ex) loopchain_default
         -fg : foreground process
-        -tbears: tbears mode
+        -tbears : tbears mode
     """)
 
     parser.add_argument('command', type=str,

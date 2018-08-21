@@ -13,12 +13,11 @@
 # limitations under the License.
 
 import argparse
-import asyncio
 import sys
-import aio_pika
 
 import gunicorn
 import gunicorn.app.base
+from earlgrey import asyncio, aio_pika
 from gunicorn.six import iteritems
 from iconcommons.icon_config import IconConfig
 from iconcommons.logger import Logger
