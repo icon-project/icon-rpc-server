@@ -32,7 +32,7 @@ ICON RPC Server development and execution requires following environments.
 
 ```bash
 # Install the ICON RPC Server
-(work) $ pip install icon-rpc-server
+(work) $ pip install iconrpcserver
 ```
 
 ##  Reference
