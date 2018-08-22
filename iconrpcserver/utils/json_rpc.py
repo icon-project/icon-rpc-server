@@ -24,11 +24,7 @@ from ..protos import message_code
 
 
 async def redirect_request_to_rs(message, rs_target, version=ApiVersion.v3.name):
-    if version == ApiVersion.v2.name:
-        method_name = message['method']
-    elif version == ApiVersion.v3.name:
-        method_name = 'icx_sendTransaction'
-
+    method_name = "icx_sendTransaction"
     subscribe_use_https = StubCollection().conf[ConfigKey.SUBSCRIBE_USE_HTTPS]
     rs_url = f"{'https' if subscribe_use_https else 'http'}://{rs_target}/api/{version}"
     async with aiohttp.ClientSession() as session:
