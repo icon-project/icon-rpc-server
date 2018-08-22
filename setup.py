@@ -10,6 +10,8 @@ if version is None:
 		version = version_file.read().strip()
 
 requires = [
+    "earlgrey",
+    "iconcommons",
     "jsonschema",
     "requests==2.19.1",
     "jsonrpcserver==3.5.3",
@@ -27,8 +29,10 @@ requires = [
 setup_options = {
     'name': 'iconrpcserver',
     'version': version,
-    'description': '`iconrpcserver server` for icon',
-    'author': 'ICON foundation',
+    'description': 'ICON RPC Server',
+    'long_description': open('README.md').read(),
+    'long_description_content_type': 'text/markdown',
+    'author': 'ICON Foundation',
     'author_email': 'foo@icon.foundation',
     'packages': find_packages(exclude=['tests*', 'docs']),
     'package_data': {'iconrpcserver': ['icon_rpcserver_config.json']},
