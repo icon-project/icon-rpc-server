@@ -37,7 +37,7 @@ ICON RPC Server development and execution requires following environments.
 
 ##  Reference
 
-- [ICON JSON-RPC API v3](https://repo.theloop.co.kr/theloop/LoopChain/wikis/doc/loopchain-json-rpc-v3)
+- [ICON JSON-RPC API v3](docs/icon-json-rpc-v3.md)
 - ICON Commons  
 - [Earlgrey](https://github.com/icon-project/earlgrey)
 
