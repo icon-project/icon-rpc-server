@@ -468,16 +468,16 @@ Number of ICX coins.
 ### Returns
 
 * Fields containing information about the function
-    - type : function, fallback, or eventlog
+    - type : `function`, `fallback`, or `eventlog`
     - name : function name
     - inputs : parameters in array
         + name : parameter name
-        + type : parameter type (int, str, bytes, bool, Address)
-        + indexed : in the case of eventlog, tells if the parameter is indexed.
+        + type : parameter type (`int`, `str`, `bytes`, `bool`, `Address`)
+        + indexed : `0x1` if the parameter is indexed (when this is `eventlog`)
     - outputs : return value
-        + type : return value type (int, str, bytes, bool, Address)
-    - readonly : external(readonly=True)
-    - payable : payable
+        + type : return value type (`int`, `str`, `bytes`, `bool`, `Address`)
+    - readonly : `0x1` if this is declared as `external(readonly=True)`
+    - payable : `0x1` if this has `payable` decorator
 
 ### Example
 
@@ -512,6 +512,27 @@ Number of ICX coins.
                 }
             ],
             "readonly": "0x1"
+        },
+        {
+            "type": "eventlog",
+            "name": "FundTransfer",
+            "inputs": [
+                {
+                    "name": "backer",
+                    "type": "Address",
+                    "indexed": "0x1"
+                },
+                {
+                    "name": "amount",
+                    "type": "int",
+                    "indexed": "0x1"
+                },
+                {
+                    "name": "is_contribution",
+                    "type": "bool",
+                    "indexed": "0x1"
+                }
+            ]
         },
         {...}
     ]
@@ -845,7 +866,7 @@ This function causes state transition.
 | value | [T_INT](#T_INT) | optional | Amount of ICX coins in loop to transfer. When ommitted, assumes 0. (1 icx = 1 ^ 18 loop) |
 | stepLimit |[T_INT](#T_INT) | required | Maximum step allowance that can be used by the transaction. |
 | timestamp | [T_INT](#T_INT) | required | Transaction creation time. timestamp is in microsecond. |
-| nid | [T_INT](#T_INT) | required | Network ID |
+| nid | [T_INT](#T_INT) | required | Network ID ("0x1" for Mainnet, "0x2" for Testnet, etc) |
 | nonce | [T_INT](#T_INT) | optional | An arbitrary number used to prevent transaction hash collision. |
 | signature | [T_SIG](#T_SIG) | required | Signature of the transaction. |
 | dataType | [T_DATA_TYPE](#T_DATA_TYPE) | optional | Type of data. (call, deploy, or message) |
