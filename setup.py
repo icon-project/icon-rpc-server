@@ -32,6 +32,7 @@ setup_options = {
     'description': 'ICON RPC Server',
     'long_description': open('README.md').read(),
     'long_description_content_type': 'text/markdown',
+    'url': 'https://github.com/icon-project/icon-rpc-server',
     'author': 'ICON Foundation',
     'author_email': 'foo@icon.foundation',
     'packages': find_packages(exclude=['tests*', 'docs']),
