@@ -37,8 +37,8 @@ ICON RPC Server development and execution requires following environments.
 
 ##  Reference
 
-- [ICON JSON-RPC API v3](docs/icon-json-rpc-v3.md)
-- ICON Commons  
+- [ICON JSON-RPC API v3](https://github.com/icon-project/icon-rpc-server/blob/master/docs/icon-json-rpc-v3.md)
+- [ICON Commons](https://github.com/icon-project/icon-commons)  
 - [Earlgrey](https://github.com/icon-project/earlgrey)
 
 ## License
