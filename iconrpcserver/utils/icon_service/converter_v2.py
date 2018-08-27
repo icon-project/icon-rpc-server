@@ -16,7 +16,7 @@ import traceback
 from enum import Enum
 
 key_converting = object()
-
+nonexistent_keys_in_v2 = ['version', 'stepLimit', 'nonce', 'nid', 'dataType', 'data']
 
 class ParamType(Enum):
     get_block = 0
@@ -129,3 +129,13 @@ templates[ParamType.get_block] = {
         }
     ]
 }
+
+
+def remove_nonexistent_keys(params: dict):
+    for k in nonexistent_keys_in_v2:
+        if k in params:
+            del params[k]
+
+
+def add_method_field(params: dict):
+    params['method'] = "icx_sendTransaction"
