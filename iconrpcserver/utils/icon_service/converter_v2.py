@@ -16,7 +16,9 @@ import traceback
 from enum import Enum
 
 key_converting = object()
-nonexistent_keys_in_v2 = ['version', 'stepLimit', 'nonce', 'nid', 'dataType', 'data']
+key_removing = object()
+key_adding = object()
+
 
 class ParamType(Enum):
     get_block = 0
@@ -44,6 +46,12 @@ def _convert(obj, template):
 
     if isinstance(template, dict) and key_converting in template:
         obj = _convert_key(obj, template[key_converting])
+
+    if isinstance(template, dict) and key_removing in template:
+        obj = _remove_key(obj, template[key_removing])
+
+    if isinstance(template, dict) and key_adding in template:
+        obj = _add_key(obj, template[key_adding])
 
     if isinstance(obj, dict) and isinstance(template, dict):
         new_obj = dict()
@@ -77,6 +85,23 @@ def _convert_key(obj, key_convert_dict):
             new_obj[key] = obj[key]
 
     return new_obj
+
+
+def _remove_key(obj, key_remove_list):
+    new_obj = copy.deepcopy(obj)
+    for key in obj:
+        if key in key_remove_list:
+            del new_obj[key]
+
+    return new_obj
+
+
+def _add_key(obj, key_add_dict):
+    for key in key_add_dict.keys():
+        if key not in obj.keys():
+            obj[key] = key_add_dict[key]
+
+    return obj
 
 
 def _convert_value(value, value_type):
@@ -125,17 +150,11 @@ templates[ParamType.get_block] = {
             "tx_hash": ValueType.hex_hash_number,
             key_converting: {
                 "txHash": "tx_hash"
+            },
+            key_removing: ["version", "stepLimit", "dataType", "data", "nid", "nonce"],
+            key_adding: {
+                "method": "icx_sendTransaction"
             }
         }
     ]
 }
-
-
-def remove_nonexistent_keys(params: dict):
-    for k in nonexistent_keys_in_v2:
-        if k in params:
-            del params[k]
-
-
-def add_method_field(params: dict):
-    params['method'] = "icx_sendTransaction"

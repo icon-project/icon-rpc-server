@@ -20,7 +20,7 @@ from jsonrpcclient.aiohttp_client import aiohttpClient
 
 from ..default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion
 from ..utils.message_queue.stub_collection import StubCollection
-from ..utils.icon_service.converter_v2 import convert_params, ParamType, remove_nonexistent_keys, add_method_field
+from ..utils.icon_service.converter_v2 import convert_params, ParamType
 from ..protos import message_code
 
 
@@ -48,10 +48,6 @@ async def get_block_v2_by_params(block_height=None, block_hash="", with_commit_s
 
     if block:
         block = convert_params(block, ParamType.get_block)
-
-    for tx in block['confirmed_transaction_list']:
-        remove_nonexistent_keys(tx)
-        add_method_field(tx)
 
     result = {
         'response_code': response_code,
