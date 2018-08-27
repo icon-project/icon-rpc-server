@@ -20,6 +20,7 @@ from jsonrpcclient.aiohttp_client import aiohttpClient
 
 from ..default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion
 from ..utils.message_queue.stub_collection import StubCollection
+from ..utils.icon_service.converter_v2 import convert_params, ParamType
 from ..protos import message_code
 
 
@@ -31,6 +32,29 @@ async def redirect_request_to_rs(message, rs_target, version=ApiVersion.v3.name)
         result = await aiohttpClient(session, rs_url).request(method_name, message)
 
     return result
+
+
+async def get_block_v2_by_params(block_height=None, block_hash=""):
+    channel_name = StubCollection().conf[ConfigKey.CHANNEL]
+    channel_stub = StubCollection().channel_stubs[channel_name]
+    response_code, block_hash, block_data_json, tx_data_json_list = \
+        await channel_stub.async_task().get_block_v2(
+            block_height=block_height,
+            block_hash=block_hash,
+            block_data_filter="",
+            tx_data_filter=""
+        )
+    block = json.loads(block_data_json)  # if fail, block = {}
+
+    if block:
+        block = convert_params(block, ParamType.get_block)
+
+    result = {
+        'response_code': response_code,
+        'block': block
+    }
+
+    return block_hash, result
 
 
 async def get_block_by_params(block_height=None, block_hash="", with_commit_state=False):

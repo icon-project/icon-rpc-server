@@ -39,6 +39,10 @@ class ChannelInnerTask:
         pass
 
     @message_queue_task
+    async def get_block_v2(self, block_height, block_hash, block_data_filter, tx_data_filter) -> Tuple[int, str, str, list]:
+        pass
+
+    @message_queue_task
     async def get_block(self, block_height, block_hash, block_data_filter, tx_data_filter) -> Tuple[int, str, str, list]:
         pass
 
