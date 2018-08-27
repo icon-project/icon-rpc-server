@@ -25,7 +25,7 @@ from ....protos import message_code
 from ...rest_property import RestProperty
 from ...json_rpc import exception
 from ....utils.icon_service import make_request, response_to_json_query, ParamType
-from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params
+from ....utils.json_rpc import redirect_request_to_rs, get_block_v2_by_params
 from ....utils.message_queue.stub_collection import StubCollection
 from ....server.json_rpc.validator import validate_jsonschema_v2
 from ....default_conf.icon_rpcserver_constant import ConfigKey, NodeType, ApiVersion
@@ -160,13 +160,13 @@ class Version2Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getLastBlock(**kwargs):
-        block_hash, response = await get_block_by_params(block_height=-1)
+        block_hash, response = await get_block_v2_by_params(block_height=-1)
         return response
 
     @staticmethod
     @methods.add
     async def icx_getBlockByHash(**kwargs):
-        block_hash, response = await get_block_by_params(block_hash=kwargs["hash"])
+        block_hash, response = await get_block_v2_by_params(block_hash=kwargs["hash"])
         return response
 
     @staticmethod
@@ -181,7 +181,7 @@ class Version2Dispatcher:
             }
             return verify_result
 
-        block_hash, response = await get_block_by_params(block_height=block_height)
+        block_hash, response = await get_block_v2_by_params(block_height=block_height)
         return response
 
     @staticmethod
