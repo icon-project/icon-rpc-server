@@ -34,7 +34,7 @@ async def redirect_request_to_rs(message, rs_target, version=ApiVersion.v3.name)
     return result
 
 
-async def get_block_v2_by_params(block_height=None, block_hash=""):
+async def get_block_v2_by_params(block_height=None, block_hash="", with_commit_state=False):
     channel_name = StubCollection().conf[ConfigKey.CHANNEL]
     channel_stub = StubCollection().channel_stubs[channel_name]
     response_code, block_hash, block_data_json, tx_data_json_list = \
@@ -53,6 +53,9 @@ async def get_block_v2_by_params(block_height=None, block_hash=""):
         'response_code': response_code,
         'block': block
     }
+
+    if 'commit_state' in result['block'] and not with_commit_state:
+        del result['block']['commit_state']
 
     return block_hash, result
 
