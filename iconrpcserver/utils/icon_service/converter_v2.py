@@ -151,7 +151,7 @@ templates[ParamType.get_block] = {
             key_converting: {
                 "txHash": "tx_hash"
             },
-            key_removing: ["version", "stepLimit", "dataType", "data", "nid", "nonce"],
+            key_removing: ["version", "stepLimit", "dataType", "data", "nid"],
             key_adding: {
                 "method": "icx_sendTransaction"
             }
