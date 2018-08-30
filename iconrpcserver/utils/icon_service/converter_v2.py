@@ -125,6 +125,8 @@ def _convert_value_integer_str(value):
         return str(value)
     if isinstance(value, str):
         try:
+            if value.startswith('0x') is False and value.startswith('-0x') is False:
+                value = hex(int(value))
             return str(int(value, 16))
         except BaseException as e:
             traceback.print_exc()
