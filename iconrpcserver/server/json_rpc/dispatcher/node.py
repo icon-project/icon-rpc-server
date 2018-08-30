@@ -66,8 +66,8 @@ class NodeDispatcher:
     @staticmethod
     @methods.add
     async def node_AnnounceConfirmedBlock(**kwargs):
-        message = kwargs['message']
-        channel, block, commit_state = message['channel'], message['block'], message['commit_state']
+        channel, block, commit_state = kwargs['message']['channel'], kwargs['message']['block'], \
+                                       kwargs['message'].get('commit_state', "")
         channel_stub = StubCollection().channel_stubs[channel]
         response_code = await channel_stub.async_task().announce_confirmed_block(block.encode('utf-8'), commit_state)
         return {"response_code": response_code,
@@ -76,5 +76,6 @@ class NodeDispatcher:
     @staticmethod
     @methods.add
     async def node_GetBlockByHeight(**kwargs):
-        block_hash, response = await get_block_by_params(block_height=kwargs['height'], with_commit_state=True)
+        block_hash, response = await get_block_by_params(block_height=kwargs['message']['height'],
+                                                         with_commit_state=True)
         return response
