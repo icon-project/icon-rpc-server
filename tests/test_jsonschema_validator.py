@@ -139,7 +139,7 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
         for key in keys:
             org_addr = data.get(key)
             data[key] = create_address(data=b'addr', is_eoa=False)
-            self.check_invalid(full_data=full_data)
+            self.check_valid(full_data=full_data)
             data[key] = org_addr
 
     def test_sendTransaction(self):
