@@ -139,7 +139,7 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
         for key in keys:
             org_addr = data.get(key)
             data[key] = create_address(data=b'addr', is_eoa=False)
-            self.check_valid(full_data=full_data)
+            self.check_invalid(full_data=full_data)
             data[key] = org_addr
 
     def test_sendTransaction(self):
@@ -177,15 +177,6 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
 
         # check default function
         self.check_valid(full_data=full_data)
-
-        # check with invalid address
-        params = full_data['params']
-        addr_keys = ['address']
-        self.check_address(full_data=full_data, data=params, keys=addr_keys)
-
-        # check required key validation
-        required_keys = ['address']
-        self.check_more(full_data=full_data, data=params, required_keys=required_keys)
 
     def test_getBlockByHeight(self):
         full_data = self.getBlockByHeight
