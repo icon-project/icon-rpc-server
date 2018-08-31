@@ -82,7 +82,7 @@ icx_getBalance_v2: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "address": {"type": "string", "format": "address_eoa"},
+                "address": {"type": "string"},
             },
             "additionalProperties": False,
             "required": ["address"]
@@ -283,7 +283,7 @@ icx_getBalance_v3: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "address": {"type": "string", "format": "address"}
+                "address": {"type": "string"}
             },
             "additionalProperties": False,
             "required": ["address"]
