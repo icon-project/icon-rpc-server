@@ -39,8 +39,8 @@ def main():
     iconrpcserver server
     ==========================
     iconrpcserver commands:
-        start : icon_service start
-        stop : icon_service stop
+        start : iconrpcserver start
+        stop : iconrpcserver stop
         -p : rest_proxy port
         -c : json configure file path
         -at : amqp target info [IP]:[PORT]
