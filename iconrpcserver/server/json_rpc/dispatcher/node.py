@@ -18,6 +18,7 @@ from jsonrpcserver.aio import AsyncMethods
 from sanic import response
 
 from ....protos import message_code
+from ....utils.icon_service import ParamType, convert_params
 from ....utils.json_rpc import get_block_by_params
 from ....utils.message_queue.stub_collection import StubCollection
 
@@ -29,6 +30,10 @@ class NodeDispatcher:
     async def dispatch(request):
         req = json.loads(request.body.decode())
         req["params"] = req.get("params", {})
+
+        if 'message' in req['params']:
+            req['params'] = req['params']['message']
+
         req["params"]["method"] = request.json["method"]
 
         if "node_" not in req["params"]["method"]:
@@ -48,7 +53,7 @@ class NodeDispatcher:
     @staticmethod
     @methods.add
     async def node_Subscribe(**kwargs):
-        channel, peer_target = kwargs['message']['channel'], kwargs['message']['peer_target']
+        channel, peer_target = kwargs['channel'], kwargs['peer_target']
         channel_stub = StubCollection().channel_stubs[channel]
         response_code = await channel_stub.async_task().add_audience_subscriber(peer_target=peer_target)
         return {"response_code": response_code,
@@ -57,7 +62,7 @@ class NodeDispatcher:
     @staticmethod
     @methods.add
     async def node_Unsubscribe(**kwargs):
-        channel, peer_target = kwargs['message']['channel'], kwargs['message']['peer_target']
+        channel, peer_target = kwargs['channel'], kwargs['peer_target']
         channel_stub = StubCollection().channel_stubs[channel]
         response_code = await channel_stub.async_task().remove_audience_subscriber(peer_target=peer_target)
         return {"response_code": response_code,
@@ -66,8 +71,7 @@ class NodeDispatcher:
     @staticmethod
     @methods.add
     async def node_AnnounceConfirmedBlock(**kwargs):
-        channel, block, commit_state = kwargs['message']['channel'], kwargs['message']['block'], \
-                                       kwargs['message'].get('commit_state', "")
+        channel, block, commit_state = kwargs['channel'], kwargs['block'], kwargs.get('commit_state', "")
         channel_stub = StubCollection().channel_stubs[channel]
         response_code = await channel_stub.async_task().announce_confirmed_block(block.encode('utf-8'), commit_state)
         return {"response_code": response_code,
@@ -76,6 +80,6 @@ class NodeDispatcher:
     @staticmethod
     @methods.add
     async def node_GetBlockByHeight(**kwargs):
-        block_hash, response = await get_block_by_params(block_height=kwargs['message']['height'],
-                                                         with_commit_state=True)
+        request = convert_params(kwargs, ParamType.get_block_by_height_request)
+        block_hash, response = await get_block_by_params(block_height=request['height'], with_commit_state=True)
         return response
