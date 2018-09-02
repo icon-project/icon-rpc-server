@@ -128,11 +128,13 @@ def _convert_value_integer(value):
     if isinstance(value, int):
         return value
     if isinstance(value, str):
-        try:
+        if value.startswith('0x') or value.startswith('-0x'):
             return int(value, 16)
+        try:
+            return int(value)
         except:
             pass
-        return int(value)
+        return int(value, 16)
 
 
 def _convert_value_hex_number(value):
@@ -166,6 +168,7 @@ def _convert_value_hex_0x_hash_number(value):
             return '0x' + value
         else:
             return '-0x' + value
+
 
 templates = dict()
 templates[ParamType.send_tx] = {
