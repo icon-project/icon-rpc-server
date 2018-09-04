@@ -53,7 +53,7 @@ class Version2Dispatcher:
 
         try:
             Version2Dispatcher.DISPATCH_PROTOCOL = Version2Dispatcher.get_dispatch_protocol_from_url(request.url)
-            Logger.error(f'=========={Version2Dispatcher.DISPATCH_PROTOCOL}==========')
+            Logger.debug(f'Dispatch Protocol: {Version2Dispatcher.DISPATCH_PROTOCOL}')
             validate_jsonschema_v2(request=req)
         except exception.GenericJsonRpcServerError as e:
             response = ExceptionResponse(e, request_id=req.get('id', 0))
