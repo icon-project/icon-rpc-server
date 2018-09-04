@@ -125,6 +125,8 @@ def _convert_value_integer_str(value):
         return str(value)
     if isinstance(value, str):
         try:
+            if value.startswith('0x') is False and value.startswith('-0x') is False:
+                value = hex(int(value))
             return str(int(value, 16))
         except BaseException as e:
             traceback.print_exc()
@@ -151,7 +153,7 @@ templates[ParamType.get_block] = {
             key_converting: {
                 "txHash": "tx_hash"
             },
-            key_removing: ["version", "stepLimit", "dataType", "data", "nid", "nonce"],
+            key_removing: ["version", "stepLimit", "dataType", "data", "nid"],
             key_adding: {
                 "method": "icx_sendTransaction"
             }

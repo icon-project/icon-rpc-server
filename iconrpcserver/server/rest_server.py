@@ -15,6 +15,7 @@
 
 import _ssl
 import ssl
+from http import HTTPStatus
 
 from sanic import Sanic, response
 from sanic.views import HTTPMethodView
@@ -88,6 +89,7 @@ class ServerComponents(metaclass=SingletonMetaClass):
 
         self.__app.add_route(Disable.as_view(), '/api/v1', methods=['POST', 'GET'])
         self.__app.add_route(Status.as_view(), '/api/v1/status/peer')
+        self.__app.add_route(Avail.as_view(), '/api/v1/avail/peer')
 
     def ready(self):
         StubCollection().amqp_target = ServerComponents.conf[ConfigKey.AMQP_TARGET]
@@ -130,6 +132,19 @@ class Status(HTTPMethodView):
         args = request.raw_args
         channel_name = ServerComponents.conf[ConfigKey.CHANNEL] if args.get('channel') is None else args.get('channel')
         return response.json(PeerServiceStub().get_status(channel_name))
+
+
+class Avail(HTTPMethodView):
+    async def get(self, request):
+        args = request.raw_args
+        channel_name = ServerComponents.conf[ConfigKey.CHANNEL] if args.get('channel') is None else args.get('channel')
+        status = HTTPStatus.OK
+        result = PeerServiceStub().get_status(channel_name)
+
+        if result['status'] != "Service is online: 0":
+            status = HTTPStatus.SERVICE_UNAVAILABLE
+
+        return response.json(result, status=status)
 
 
 class Disable(HTTPMethodView):
