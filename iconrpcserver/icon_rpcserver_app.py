@@ -87,6 +87,12 @@ def main():
     conf = IconConfig(conf_path, default_rpcserver_config)
     conf.load()
     conf.update_conf(dict(vars(args)))
+
+    # set env config
+    redirect_protocol = os.getenv("REDIRECT_PROTOCOL")
+    if redirect_protocol:
+        conf.update_conf({ConfigKey.REDIRECT_PROTOCOL: redirect_protocol})
+
     Logger.load_config(conf)
     Logger.print_config(conf, ICON_RPCSERVER_CLI)
 

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import json
 import logging
 
@@ -75,10 +76,14 @@ class CustomAiohttpClient(AsyncClient):
         return None
 
 
-async def redirect_request_to_rs(message, rs_target, version=ApiVersion.v3.name, channel=""):
+async def redirect_request_to_rs(protocal, message, rs_target, version=ApiVersion.v3.name, channel=""):
     method_name = "icx_sendTransaction"
-    subscribe_use_https = StubCollection().conf[ConfigKey.SUBSCRIBE_USE_HTTPS]
-    rs_url = f"{'https' if subscribe_use_https else 'http'}://{rs_target}/api/{version}/{channel}"
+    redirect_protocol = StubCollection().conf.get(ConfigKey.REDIRECT_PROTOCOL)
+    if redirect_protocol:
+        rs_url = f"{redirect_protocol}://{rs_target}/api/{version}/{channel}"
+    else:
+        rs_url = f"{protocal}://{rs_target}/api/{version}/{channel}"
+
     async with aiohttp.ClientSession() as session:
         result = await CustomAiohttpClient(session, rs_url).request(method_name, message)
 

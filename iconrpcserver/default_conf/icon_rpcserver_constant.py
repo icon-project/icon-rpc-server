@@ -59,10 +59,9 @@ class ConfigKey:
     DEFAULT_SSL_KEY_PATH = 'defaultSslKeyPath'
     DEFAULT_SSL_TRUST_CERT_PATH = 'defaultSslTrustCertPath'
     IP_LOCAL = 'ipLocal'
-    SUBSCRIBE_USE_HTTPS = 'subscribeUseHttps'
     GRPC_TIMEOUT = 'grpcTimeout'
     GRPC_RETRY = 'grpcRetry'
     REST_ADDITIONAL_TIMEOUT = 'restAdditionalTimeout'
     SCORE_QUERY_TIMEOUT = 'scoreQueryTimeout'
     TBEARS_MODE = 'tbearsMode'
-
+    REDIRECT_PROTOCOL = 'REDIRECT_PROTOCOL'
