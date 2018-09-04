@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import argparse
+import os
 import sys
 
 import gunicorn
@@ -71,6 +72,7 @@ def main():
                         help="icon score channel")
     parser.add_argument("-tbears", dest=ConfigKey.TBEARS_MODE, action='store_true',
                         help="tbears mode")
+
     args = parser.parse_args()
 
     conf_path = args.config
@@ -88,6 +90,7 @@ def main():
     Logger.load_config(conf)
     Logger.print_config(conf, REST_SERVICE_STANDALONE)
 
+    _run_async(_check_rabbitmq())
     _run_async(_run(conf))
 
 
@@ -97,16 +100,21 @@ def _run_async(async_func):
 
 
 def run_in_foreground(conf: 'IconConfig'):
+    _run_async(_check_rabbitmq())
     _run_async(_run(conf))
 
 
-async def _run(conf: 'IconConfig'):
+async def _check_rabbitmq():
     try:
-        await aio_pika.connect()
+        amqp_user_name = os.getenv("AMQP_USERNAME", "guest")
+        amqp_password = os.getenv("AMQP_PASSWORD", "guest")
+        await aio_pika.connect(login=amqp_user_name, password=amqp_password)
     except ConnectionRefusedError:
         Logger.error("rabbitmq-service disable", REST_SERVICE_STANDALONE)
         exit(0)
 
+
+async def _run(conf: 'IconConfig'):
     # Setup port and host values.
     host = '0.0.0.0'
 
