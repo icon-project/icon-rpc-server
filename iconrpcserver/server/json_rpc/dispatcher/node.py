@@ -71,7 +71,7 @@ class NodeDispatcher:
     @staticmethod
     @methods.add
     async def node_AnnounceConfirmedBlock(**kwargs):
-        channel, block, commit_state = kwargs['channel'], kwargs['block'], kwargs.get('commit_state', "")
+        channel, block, commit_state = kwargs['channel'], kwargs['block'], kwargs.get('commit_state', "{}")
         channel_stub = StubCollection().channel_stubs[channel]
         response_code = await channel_stub.async_task().announce_confirmed_block(block.encode('utf-8'), commit_state)
         return {"response_code": response_code,
