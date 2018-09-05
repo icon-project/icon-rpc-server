@@ -68,7 +68,7 @@ class Version3Dispatcher:
 
     @staticmethod
     def get_dispatch_protocol_from_url(url: str) -> str:
-        return urlsplit(url)[0]
+        return urlsplit(url).scheme
 
     @staticmethod
     @methods.add
