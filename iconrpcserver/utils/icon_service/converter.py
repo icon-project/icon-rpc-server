@@ -271,7 +271,10 @@ templates[ParamType.get_tx_result_response] = {
 templates[ParamType.get_tx_by_hash_response] = {
     "txHash": ValueType.hex_0x_hash_number,
     "blockHeight": ValueType.hex_0x_number,
-    "blockHash": ValueType.hex_0x_hash_number
+    "blockHash": ValueType.hex_0x_hash_number,
+    key_converting: {
+        "tx_hash": "txHash"
+    }
 }
 
 templates[ParamType.send_tx_response] = ValueType.hex_0x_hash_number
