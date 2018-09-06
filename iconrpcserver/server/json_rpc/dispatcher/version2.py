@@ -25,7 +25,7 @@ from sanic import response as sanic_response
 
 from ...json_rpc import exception
 from ...rest_property import RestProperty
-from ....default_conf.icon_rpcserver_constant import ConfigKey, NodeType, ApiVersion
+from ....default_conf.icon_rpcserver_constant import ConfigKey, NodeType, ApiVersion, DISPATCH_V2_TAG
 from ....protos import message_code
 from ....server.json_rpc.validator import validate_jsonschema_v2
 from ....utils.icon_service import make_request, response_to_json_query, ParamType
@@ -37,8 +37,6 @@ config.log_responses = False
 
 methods = AsyncMethods()
 
-REST_SERVER_V2 = 'REST_SERVER_V2'
-
 
 class Version2Dispatcher:
     DISPATCH_PROTOCOL = 'http'
@@ -46,7 +44,7 @@ class Version2Dispatcher:
     @staticmethod
     async def dispatch(request):
         req = request.json
-        Logger.info(f'rest_server_v2 request with {req}', REST_SERVER_V2)
+        Logger.info(f'rest_server_v2 request with {req}', DISPATCH_V2_TAG)
 
         if "node_" in req["method"]:
             return sanic_response.text("no support method!")
@@ -60,7 +58,7 @@ class Version2Dispatcher:
         else:
             response = await methods.dispatch(req)
 
-        Logger.info(f'rest_server_v2 response with {response}', REST_SERVER_V2)
+        Logger.info(f'rest_server_v2 response with {response}', DISPATCH_V2_TAG)
         return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
 
     @staticmethod
@@ -71,7 +69,8 @@ class Version2Dispatcher:
     @methods.add
     async def icx_sendTransaction(**kwargs):
         if RestProperty().node_type == NodeType.CitizenNode:
-            return await redirect_request_to_rs(Version2Dispatcher.DISPATCH_PROTOCOL, kwargs, RestProperty().rs_target, ApiVersion.v2.name)
+            return await redirect_request_to_rs(Version2Dispatcher.DISPATCH_PROTOCOL,
+                                                kwargs, RestProperty().rs_target, ApiVersion.v2.name)
 
         request = make_request("icx_sendTransaction", kwargs, ParamType.send_tx)
         channel = StubCollection().conf[ConfigKey.CHANNEL]

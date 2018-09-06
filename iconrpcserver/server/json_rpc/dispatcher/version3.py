@@ -25,6 +25,7 @@ from sanic import response as sanic_response
 
 from ...json_rpc import exception
 from ...rest_server import RestProperty
+from ....default_conf.icon_rpcserver_constant import DISPATCH_V3_TAG
 from ....protos import message_code
 from ....server.json_rpc.validator import validate_jsonschema_v3
 from ....utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
@@ -37,8 +38,6 @@ config.log_responses = False
 
 methods = AsyncMethods()
 
-REST_SERVER_V3 = 'REST_SERVER_V3'
-
 
 class Version3Dispatcher:
     HASH_KEY_DICT = ['hash', 'blockHash', 'txHash', 'prevBlockHash']
@@ -50,7 +49,7 @@ class Version3Dispatcher:
         req = request.json
         Version3Dispatcher.channel = channel_name if channel_name is not None \
             else StubCollection().conf[ConfigKey.CHANNEL]
-        Logger.info(f'rest_server_v3 request with {req}', REST_SERVER_V3)
+        Logger.info(f'rest_server_v3 request with {req}', DISPATCH_V3_TAG)
 
         try:
             Version3Dispatcher.DISPATCH_PROTOCOL = Version3Dispatcher.get_dispatch_protocol_from_url(request.url)
@@ -63,7 +62,7 @@ class Version3Dispatcher:
         else:
             response = await methods.dispatch(req)
 
-        Logger.info(f'rest_server_v3 with response {response}', REST_SERVER_V3)
+        Logger.info(f'rest_server_v3 with response {response}', DISPATCH_V3_TAG)
         return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
 
     @staticmethod

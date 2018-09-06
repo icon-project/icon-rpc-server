@@ -159,11 +159,8 @@ async def _run(conf: 'IconConfig'):
         'certfile': certfile,
         'SERVER_SOFTWARE': gunicorn.SERVER_SOFTWARE,
         'keyfile': keyfile,
-        'capture_output': True
+        'capture_output': False
     }
-
-    if conf[Logger.CATEGORY].get(Logger.FILE_PATH, None):
-        options['errorlog'] = conf[Logger.CATEGORY][Logger.FILE_PATH]
 
     # Launch gunicorn web server.
     ServerComponents.conf = conf
