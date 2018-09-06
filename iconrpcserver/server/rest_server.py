@@ -39,7 +39,7 @@ class ServerComponents(metaclass=SingletonMetaClass):
     conf: 'IconConfig' = None
 
     def __init__(self):
-        self.__app = Sanic(__name__, log_config={})
+        self.__app = Sanic(__name__, log_config=self._make_log_config())
         self.__app.config.KEEP_ALIVE = False
         CORS(self.__app)
 
@@ -65,6 +65,13 @@ class ServerComponents(metaclass=SingletonMetaClass):
                                                ServerComponents.conf[ConfigKey.DEFAULT_SSL_KEY_PATH])
         else:
             Logger.error(f"REST_SSL_TYPE must be one of [0,1,2]. But now conf.REST_SSL_TYPE is {rest_ssl_type}")
+
+    def _make_log_config(self) -> dict:
+        log_config = LOGGING_CONFIG_DEFAULTS
+        log_config['loggers'] = {}
+        log_config['handlers'] = {}
+        log_config['formatters'] = {}
+        return log_config
 
     @property
     def app(self):
