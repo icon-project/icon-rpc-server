@@ -25,7 +25,7 @@ from iconcommons.logger import Logger
 
 from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
-from iconrpcserver.icon_rpcserver_cli import REST_SERVICE_STANDALONE, ExitCode
+from iconrpcserver.icon_rpcserver_cli import ICON_RPCSERVER_CLI, ExitCode
 from iconrpcserver.server.peer_service_stub import PeerServiceStub
 from iconrpcserver.server.rest_server import ServerComponents
 
@@ -88,7 +88,7 @@ def main():
     conf.load()
     conf.update_conf(dict(vars(args)))
     Logger.load_config(conf)
-    Logger.print_config(conf, REST_SERVICE_STANDALONE)
+    Logger.print_config(conf, ICON_RPCSERVER_CLI)
 
     _run_async(_check_rabbitmq())
     _run_async(_run(conf))
@@ -105,13 +105,18 @@ def run_in_foreground(conf: 'IconConfig'):
 
 
 async def _check_rabbitmq():
+    connection = None
     try:
         amqp_user_name = os.getenv("AMQP_USERNAME", "guest")
         amqp_password = os.getenv("AMQP_PASSWORD", "guest")
-        await aio_pika.connect(login=amqp_user_name, password=amqp_password)
+        connection = await aio_pika.connect(login=amqp_user_name, password=amqp_password)
+        connection.connect()
     except ConnectionRefusedError:
-        Logger.error("rabbitmq-service disable", REST_SERVICE_STANDALONE)
+        Logger.error("rabbitmq-service disable", ICON_RPCSERVER_CLI)
         exit(0)
+    finally:
+        if connection:
+            await connection.close()
 
 
 async def _run(conf: 'IconConfig'):
