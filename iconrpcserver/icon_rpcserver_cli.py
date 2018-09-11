@@ -25,7 +25,7 @@ from iconcommons.logger import Logger
 from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
 
-REST_SERVICE_STANDALONE = "RestServerStandAlone"
+ICON_RPCSERVER_CLI = "IconRpcServerCli"
 
 
 class ExitCode(IntEnum):
@@ -104,14 +104,14 @@ def main():
 def start(conf: 'IconConfig') -> int:
     if not _is_running_icon_service(conf):
         start_process(conf)
-    Logger.info(f'start_command done!', REST_SERVICE_STANDALONE)
+    Logger.info(f'start_command done!', ICON_RPCSERVER_CLI)
     return ExitCode.SUCCEEDED
 
 
 def stop(conf: 'IconConfig') -> int:
     if _is_running_icon_service(conf):
         stop_process(conf)
-    Logger.info(f'stop_command done!', REST_SERVICE_STANDALONE)
+    Logger.info(f'stop_command done!', ICON_RPCSERVER_CLI)
     return ExitCode.SUCCEEDED
 
 
@@ -147,7 +147,7 @@ def start_process(conf: 'IconConfig'):
 def stop_process(conf: 'IconConfig'):
     command = f'lsof -i :{conf[ConfigKey.PORT]} -t | xargs kill'
     subprocess.run(command, stdout=subprocess.PIPE, shell=True)
-    Logger.info(f'stop_process_rest_app!', REST_SERVICE_STANDALONE)
+    Logger.info(f'stop_process_rest_app!', ICON_RPCSERVER_CLI)
 
 
 def _is_running_icon_service(conf: 'IconConfig') -> bool:
@@ -155,7 +155,7 @@ def _is_running_icon_service(conf: 'IconConfig') -> bool:
 
 
 def _check_service_running(conf: 'IconConfig') -> bool:
-    Logger.info(f'check_serve_rest_app!', REST_SERVICE_STANDALONE)
+    Logger.info(f'check_serve_rest_app!', ICON_RPCSERVER_CLI)
     return find_procs_by_params(conf[ConfigKey.PORT])
 
 
