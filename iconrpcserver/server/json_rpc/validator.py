@@ -142,6 +142,7 @@ icx_getLastBlock: dict = {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
         "id": {"type": "number"},
+        "params": {"type": "object"}
     },
     "additionalProperties": False,
     "required": ["jsonrpc", "method", "id"]
