@@ -17,8 +17,8 @@ import logging
 import aiohttp
 from jsonrpcclient import exceptions, config
 from jsonrpcclient.aiohttp_client import AsyncClient, async_timeout
-from jsonrpcserver import status
 from past.builtins import basestring
+from jsonrpcserver import status
 
 from iconrpcserver.server.json_rpc import GenericJsonRpcServerError, JsonError
 from ..default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion
@@ -75,10 +75,10 @@ class CustomAiohttpClient(AsyncClient):
         return None
 
 
-async def redirect_request_to_rs(message, rs_target, version=ApiVersion.v3.name):
+async def redirect_request_to_rs(message, rs_target, version=ApiVersion.v3.name, channel=""):
     method_name = "icx_sendTransaction"
     subscribe_use_https = StubCollection().conf[ConfigKey.SUBSCRIBE_USE_HTTPS]
-    rs_url = f"{'https' if subscribe_use_https else 'http'}://{rs_target}/api/{version}"
+    rs_url = f"{'https' if subscribe_use_https else 'http'}://{rs_target}/api/{version}/{channel}"
     async with aiohttp.ClientSession() as session:
         result = await CustomAiohttpClient(session, rs_url).request(method_name, message)
 
@@ -140,3 +140,16 @@ async def get_block_by_params(channel_name=None, block_height=None, block_hash="
         del result['block']['commit_state']
 
     return block_hash, result
+
+
+def get_icon_stub_by_channel_name(channel_name):
+    try:
+        icon_stub = StubCollection().icon_score_stubs[channel_name]
+    except KeyError:
+        raise GenericJsonRpcServerError(
+            code=JsonError.INVALID_REQUEST,
+            message="Invalid channel name",
+            http_status=status.HTTP_BAD_REQUEST
+        )
+    else:
+        return icon_stub

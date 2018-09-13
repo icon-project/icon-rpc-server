@@ -11,15 +11,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from iconrpcserver.default_conf import ConfigKey
-from iconrpcserver.utils.message_queue.stub_collection import StubCollection
-
-
-def get_channel_name(req):
-    try:
-        channel_name = req['context']['channel_name']
-    except:
-        return StubCollection().conf[ConfigKey.CHANNEL]
-    else:
-        del req['context']
-        return channel_name
