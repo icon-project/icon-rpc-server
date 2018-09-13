@@ -116,7 +116,16 @@ async def get_block_by_params(channel_name=None, block_height=None, block_hash="
     block_data_filter = "prev_block_hash, height, block_hash, merkle_tree_root_hash," \
                         " time_stamp, peer_id, signature"
     tx_data_filter = "icx_origin_data"
-    channel_stub = StubCollection().channel_stubs[channel_name]
+
+    try:
+        channel_stub = StubCollection().channel_stubs[channel_name]
+    except KeyError:
+        raise GenericJsonRpcServerError(
+            code=JsonError.INVALID_REQUEST,
+            message="Invalid channel name",
+            http_status=status.HTTP_BAD_REQUEST
+        )
+
     response_code, block_hash, block_data_json, tx_data_json_list = \
         await channel_stub.async_task().get_block(
             block_height=block_height,
