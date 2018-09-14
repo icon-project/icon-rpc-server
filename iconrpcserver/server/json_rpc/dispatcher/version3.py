@@ -30,7 +30,7 @@ from ...json_rpc import exception
 from ....utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
 from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params, get_icon_stub_by_channel_name
 from ....utils.message_queue.stub_collection import StubCollection
-from ....default_conf.icon_rpcserver_constant import NodeType
+from ....default_conf.icon_rpcserver_constant import NodeType, ConfigKey
 
 config.log_requests = False
 config.log_responses = False
@@ -47,7 +47,8 @@ class Version3Dispatcher:
     @staticmethod
     async def dispatch(request, channel_name=None):
         req = request.json
-        Version3Dispatcher.channel = channel_name
+        Version3Dispatcher.channel = channel_name if channel_name is not None \
+            else StubCollection().conf[ConfigKey.CHANNEL]
         Logger.info(f'rest_server_v3 request with {req}', REST_SERVER_V3)
 
         try:
