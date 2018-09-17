@@ -28,7 +28,7 @@ icx_sendTransaction_v2: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
             "properties": {
@@ -57,7 +57,7 @@ icx_getTransactionResult_v2: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
             "properties": {
@@ -78,7 +78,7 @@ icx_getBalance_v2: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
             "properties": {
@@ -99,7 +99,7 @@ icx_getBlockByHeight_v2: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
             "properties": {
@@ -120,7 +120,7 @@ icx_getBlockByHash_v2: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
             "properties": {
@@ -141,7 +141,7 @@ icx_getLastBlock: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
     },
     "additionalProperties": False,
     "required": ["jsonrpc", "method", "id"]
@@ -154,7 +154,7 @@ icx_getTransactionByAddress_v2: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
             "properties": {
@@ -176,7 +176,7 @@ icx_getTotalSupply: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
     },
     "additionalProperties": False,
     "required": ["jsonrpc", "method", "id"]
@@ -205,7 +205,7 @@ icx_getBlockByHeight_v3: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
             "properties": {
@@ -226,7 +226,7 @@ icx_getBlockByHash_v3: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
             "properties": {
@@ -247,7 +247,7 @@ icx_call_v3: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string", "enum": ["icx_call"]},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
             "properties": {
@@ -279,7 +279,7 @@ icx_getBalance_v3: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
             "properties": {
@@ -300,7 +300,7 @@ icx_getScoreApi_v3: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
             "properties": {
@@ -321,7 +321,7 @@ icx_getTransactionResult_v3: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
             "properties": {
@@ -342,7 +342,7 @@ icx_getTransactionByHash_v3: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
             "properties": {
@@ -363,7 +363,7 @@ ise_getStatus_v3: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
             "properties": {
@@ -388,7 +388,7 @@ icx_sendTransaction_v3: dict = {
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
-        "id": {"type": "number"},
+        "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
             "properties": {
