@@ -86,6 +86,17 @@ class Version3Dispatcher:
 
     @staticmethod
     @methods.add
+    async def icx_estimateStep(**kwargs):
+        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
+        score_stub = StubCollection().icon_score_stubs[channel_name]
+
+        method = 'icx_estimateStep'
+        request = make_request(method, kwargs)
+        response = await score_stub.async_task().query(request)
+        return response_to_json_query(response)
+
+    @staticmethod
+    @methods.add
     async def icx_getScoreApi(**kwargs):
         channel = kwargs['context']['channel']
         method = 'icx_getScoreApi'
