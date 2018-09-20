@@ -475,7 +475,7 @@ Number of ICX coins.
         + type : parameter type (`int`, `str`, `bytes`, `bool`, `Address`)
         + indexed : `0x1` if the parameter is indexed (when this is `eventlog`)
     - outputs : return value
-        + type : return value type (`int`, `str`, `bytes`, `bool`, `Address`)
+        + type : return value type (`int`, `str`, `bytes`, `bool`, `Address`, `dict`, `list`)
     - readonly : `0x1` if this is declared as `external(readonly=True)`
     - payable : `0x1` if this has `payable` decorator
 
