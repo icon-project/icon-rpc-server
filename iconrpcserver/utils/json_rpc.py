@@ -112,6 +112,7 @@ async def get_block_v2_by_params(block_height=None, block_hash="", with_commit_s
 
 
 async def get_block_by_params(channel_name=None, block_height=None, block_hash="", with_commit_state=False):
+    channel_name = StubCollection().conf[ConfigKey.CHANNEL] if channel_name is None else channel_name
     block_data_filter = "prev_block_hash, height, block_hash, merkle_tree_root_hash," \
                         " time_stamp, peer_id, signature"
     tx_data_filter = "icx_origin_data"

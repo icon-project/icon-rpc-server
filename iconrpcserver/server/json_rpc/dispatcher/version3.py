@@ -84,7 +84,7 @@ class Version3Dispatcher:
     @methods.add
     async def icx_sendTransaction(**kwargs):
         if RestProperty().node_type == NodeType.CitizenNode:
-            return await redirect_request_to_rs(kwargs, RestProperty().rs_target)
+            return await redirect_request_to_rs(kwargs, RestProperty().rs_target, channel=Version3Dispatcher.channel)
 
         method = 'icx_sendTransaction'
         request = make_request(method, kwargs)
