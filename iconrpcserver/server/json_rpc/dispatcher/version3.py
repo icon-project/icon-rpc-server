@@ -28,9 +28,9 @@ from ....protos import message_code
 from ...rest_server import RestProperty
 from ...json_rpc import exception
 from ....utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
-from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params
+from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params, get_icon_stub_by_channel_name
 from ....utils.message_queue.stub_collection import StubCollection
-from ....default_conf.icon_rpcserver_constant import ConfigKey, NodeType
+from ....default_conf.icon_rpcserver_constant import NodeType, ConfigKey
 
 config.log_requests = False
 config.log_responses = False
@@ -42,10 +42,13 @@ REST_SERVER_V3 = 'REST_SERVER_V3'
 
 class Version3Dispatcher:
     HASH_KEY_DICT = ['hash', 'blockHash', 'txHash', 'prevBlockHash']
+    channel = None
 
     @staticmethod
-    async def dispatch(request):
+    async def dispatch(request, channel_name=None):
         req = request.json
+        Version3Dispatcher.channel = channel_name if channel_name is not None \
+            else StubCollection().conf[ConfigKey.CHANNEL]
         Logger.info(f'rest_server_v3 request with {req}', REST_SERVER_V3)
 
         try:
@@ -61,22 +64,18 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_call(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
-        score_stub = StubCollection().icon_score_stubs[channel_name]
-
         method = 'icx_call'
         request = make_request(method, kwargs)
+        score_stub = get_icon_stub_by_channel_name(Version3Dispatcher.channel)
         response = await score_stub.async_task().query(request)
         return response_to_json_query(response)
 
     @staticmethod
     @methods.add
     async def icx_getScoreApi(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
-        score_stub = StubCollection().icon_score_stubs[channel_name]
-
         method = 'icx_getScoreApi'
         request = make_request(method, kwargs)
+        score_stub = get_icon_stub_by_channel_name(Version3Dispatcher.channel)
         response = await score_stub.async_task().query(request)
 
         return response_to_json_query(response)
@@ -85,18 +84,17 @@ class Version3Dispatcher:
     @methods.add
     async def icx_sendTransaction(**kwargs):
         if RestProperty().node_type == NodeType.CitizenNode:
-            return await redirect_request_to_rs(kwargs, RestProperty().rs_target)
+            return await redirect_request_to_rs(kwargs, RestProperty().rs_target, channel=Version3Dispatcher.channel)
 
         method = 'icx_sendTransaction'
         request = make_request(method, kwargs)
-        channel = StubCollection().conf[ConfigKey.CHANNEL]
-        icon_stub = StubCollection().icon_score_stubs[channel]
+        score_stub = get_icon_stub_by_channel_name(Version3Dispatcher.channel)
+        icon_stub = score_stub
         response = await icon_stub.async_task().validate_transaction(request)
         # Error Check
         response_to_json_query(response)
 
-        channel_name = channel
-        channel_stub = StubCollection().channel_stubs[channel_name]
+        channel_stub = StubCollection().channel_stubs[Version3Dispatcher.channel]
         response_code, tx_hash = await channel_stub.async_task().create_icx_tx(kwargs)
 
         if response_code != message_code.Response.success:
@@ -119,8 +117,7 @@ class Version3Dispatcher:
     @methods.add
     async def icx_getTransactionResult(**kwargs):
         request = convert_params(kwargs, ParamType.get_tx_request)
-        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
-        channel_stub = StubCollection().channel_stubs[channel_name]
+        channel_stub = StubCollection().channel_stubs[Version3Dispatcher.channel]
         verify_result = dict()
 
         tx_hash = request["txHash"]
@@ -155,8 +152,7 @@ class Version3Dispatcher:
     async def icx_getTransactionByHash(**kwargs):
         request = convert_params(kwargs, ParamType.get_tx_request)
 
-        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
-        channel_stub = StubCollection().channel_stubs[channel_name]
+        channel_stub = StubCollection().channel_stubs[Version3Dispatcher.channel]
 
         response_code, tx_info = await channel_stub.async_task().get_tx_info(request["txHash"])
         if response_code == message_code.Response.fail_invalid_key_error:
@@ -178,11 +174,10 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getBalance(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
-        score_stub = StubCollection().icon_score_stubs[channel_name]
 
         method = 'icx_getBalance'
         request = make_request(method, kwargs)
+        score_stub = get_icon_stub_by_channel_name(Version3Dispatcher.channel)
         response = await score_stub.async_task().query(request)
 
         return response_to_json_query(response)
@@ -190,11 +185,10 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getTotalSupply(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
-        score_stub = StubCollection().icon_score_stubs[channel_name]
 
         method = 'icx_getTotalSupply'
         request = make_request(method, kwargs)
+        score_stub = get_icon_stub_by_channel_name(Version3Dispatcher.channel)
         response = await score_stub.async_task().query(request)
 
         return response_to_json_query(response)
@@ -202,7 +196,8 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getLastBlock(**kwargs):
-        block_hash, result = await get_block_by_params(block_height=-1)
+        block_hash, result = await get_block_by_params(block_height=-1,
+                                                       channel_name=Version3Dispatcher.channel)
         response = convert_params(result['block'], ParamType.get_block_response)
 
         return response_to_json_query(response)
@@ -211,8 +206,8 @@ class Version3Dispatcher:
     @methods.add
     async def icx_getBlockByHash(**kwargs):
         request = convert_params(kwargs, ParamType.get_block_by_hash_request)
-
-        block_hash, result = await get_block_by_params(block_hash=request['hash'])
+        block_hash, result = await get_block_by_params(block_hash=request['hash'],
+                                                       channel_name=Version3Dispatcher.channel)
 
         response_code = result['response_code']
         if response_code != message_code.Response.success:
@@ -230,7 +225,8 @@ class Version3Dispatcher:
     async def icx_getBlockByHeight(**kwargs):
         request = convert_params(kwargs, ParamType.get_block_by_height_request)
 
-        block_hash, result = await get_block_by_params(block_height=request['height'])
+        block_hash, result = await get_block_by_params(block_height=request['height'],
+                                                       channel_name=Version3Dispatcher.channel)
 
         response_code = result['response_code']
         if response_code != message_code.Response.success:
@@ -246,18 +242,16 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getLastTransaction(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
         return ""
 
     @staticmethod
     @methods.add
     async def ise_getStatus(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
-        score_stub = StubCollection().icon_score_stubs[channel_name]
 
         method = 'ise_getStatus'
         request = make_request(method, kwargs)
+        score_stub = get_icon_stub_by_channel_name(Version3Dispatcher.channel)
         response = await score_stub.async_task().query(request)
         error = response.get('error')
         if error is None:

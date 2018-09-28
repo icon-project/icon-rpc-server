@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import IntEnum
 from earlgrey import MessageQueueStub, message_queue_task
 from typing import TYPE_CHECKING, Tuple
 from . import exit_process
