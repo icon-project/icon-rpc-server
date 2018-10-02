@@ -81,5 +81,7 @@ class NodeDispatcher:
     @methods.add
     async def node_GetBlockByHeight(**kwargs):
         request = convert_params(kwargs, ParamType.get_block_by_height_request)
-        block_hash, response = await get_block_by_params(block_height=request['height'], with_commit_state=True)
+        channel = kwargs.get('channel', None)
+        block_hash, response = await get_block_by_params(channel_name=channel, block_height=request['height'],
+                                                         with_commit_state=True)
         return response
