@@ -104,6 +104,7 @@ icx_getBlockByHeight_v2: dict = {
             "type": "object",
             "properties": {
                 "height": {"type": "string", "format": "int_10"},
+                "channel": {"type": "string"},
             },
             "additionalProperties": False,
             "required": ["height"]
