@@ -49,7 +49,9 @@ class Version3Dispatcher:
         req = request.json
         Version3Dispatcher.channel = channel_name if channel_name is not None \
             else StubCollection().conf[ConfigKey.CHANNEL]
+        client_ip = request.remote_addr if request.remote_addr else request.ip
         Logger.info(f'rest_server_v3 request with {req}', DISPATCH_V3_TAG)
+        Logger.info(f"{client_ip} requested {req} on {request.url}")
 
         try:
             Version3Dispatcher.DISPATCH_PROTOCOL = Version3Dispatcher.get_dispatch_protocol_from_url(request.url)
