@@ -44,7 +44,6 @@ PEER_QUEUE_NAME_FORMAT = "Peer.{amqp_key}"
 CHANNEL_QUEUE_NAME_FORMAT = "Channel.{channel_name}.{amqp_key}"
 ICON_SCORE_QUEUE_NAME_FORMAT = "IconScore.{channel_name}.{amqp_key}"
 
-
 class ConfigKey:
     CONFIG = 'config'
     CHANNEL = 'channel'
@@ -59,10 +58,14 @@ class ConfigKey:
     DEFAULT_SSL_KEY_PATH = 'defaultSslKeyPath'
     DEFAULT_SSL_TRUST_CERT_PATH = 'defaultSslTrustCertPath'
     IP_LOCAL = 'ipLocal'
-    SUBSCRIBE_USE_HTTPS = 'subscribeUseHttps'
     GRPC_TIMEOUT = 'grpcTimeout'
     GRPC_RETRY = 'grpcRetry'
     REST_ADDITIONAL_TIMEOUT = 'restAdditionalTimeout'
     SCORE_QUERY_TIMEOUT = 'scoreQueryTimeout'
     TBEARS_MODE = 'tbearsMode'
+    REDIRECT_PROTOCOL = 'REDIRECT_PROTOCOL'
 
+
+ICON_RPC_SERVER_LOG_TAG = 'IconService'
+DISPATCH_V2_TAG = f'{ICON_RPC_SERVER_LOG_TAG}_dispatch_v2'
+DISPATCH_V3_TAG = f'{ICON_RPC_SERVER_LOG_TAG}_dispatch_v3'

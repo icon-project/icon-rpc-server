@@ -33,7 +33,6 @@ default_rpcserver_config = \
         ConfigKey.DEFAULT_SSL_KEY_PATH: 'resources/ssl_test_cert/key.pem',
         ConfigKey.DEFAULT_SSL_TRUST_CERT_PATH: 'resources/ssl_test_ca/cert.pem',
         ConfigKey.IP_LOCAL: '127.0.0.1',
-        ConfigKey.SUBSCRIBE_USE_HTTPS: False,
         ConfigKey.GRPC_TIMEOUT: 30,
         ConfigKey.GRPC_RETRY: 5,
         ConfigKey.REST_ADDITIONAL_TIMEOUT: 30,
