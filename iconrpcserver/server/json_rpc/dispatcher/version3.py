@@ -15,18 +15,19 @@
 
 import json
 from typing import Any, Optional
+from urllib.parse import urlsplit
 
+from iconcommons.logger import Logger
 from jsonrpcserver import config, status
 from jsonrpcserver.aio import AsyncMethods
 from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
-from iconcommons.logger import Logger
-
-from ....server.json_rpc.validator import validate_jsonschema_v3
-from ....protos import message_code
-from ...rest_server import RestProperty
 from ...json_rpc import exception
+from ...rest_server import RestProperty
+from ....default_conf.icon_rpcserver_constant import DISPATCH_V3_TAG
+from ....protos import message_code
+from ....server.json_rpc.validator import validate_jsonschema_v3
 from ....utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
 from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params, get_icon_stub_by_channel_name
 from ....utils.message_queue.stub_collection import StubCollection
@@ -37,29 +38,38 @@ config.log_responses = False
 
 methods = AsyncMethods()
 
-REST_SERVER_V3 = 'REST_SERVER_V3'
-
 
 class Version3Dispatcher:
     HASH_KEY_DICT = ['hash', 'blockHash', 'txHash', 'prevBlockHash']
     channel = None
+    DISPATCH_PROTOCOL = 'http'
 
     @staticmethod
     async def dispatch(request, channel_name=None):
         req = request.json
         Version3Dispatcher.channel = channel_name if channel_name is not None \
             else StubCollection().conf[ConfigKey.CHANNEL]
-        Logger.info(f'rest_server_v3 request with {req}', REST_SERVER_V3)
+        client_ip = request.remote_addr if request.remote_addr else request.ip
+        Logger.info(f'rest_server_v3 request with {req}', DISPATCH_V3_TAG)
+        Logger.info(f"{client_ip} requested {req} on {request.url}")
 
         try:
+            Version3Dispatcher.DISPATCH_PROTOCOL = Version3Dispatcher.get_dispatch_protocol_from_url(request.url)
+            Logger.debug(f'Dispatch Protocol: {Version3Dispatcher.DISPATCH_PROTOCOL}')
             validate_jsonschema_v3(request=req)
         except exception.GenericJsonRpcServerError as e:
+            response = ExceptionResponse(e, request_id=req.get('id', 0))
+        except Exception as e:
             response = ExceptionResponse(e, request_id=req.get('id', 0))
         else:
             response = await methods.dispatch(req)
 
-        Logger.info(f'rest_server_v3 with response {response}', REST_SERVER_V3)
+        Logger.info(f'rest_server_v3 with response {response}', DISPATCH_V3_TAG)
         return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
+
+    @staticmethod
+    def get_dispatch_protocol_from_url(url: str) -> str:
+        return urlsplit(url).scheme
 
     @staticmethod
     @methods.add
@@ -84,7 +94,9 @@ class Version3Dispatcher:
     @methods.add
     async def icx_sendTransaction(**kwargs):
         if RestProperty().node_type == NodeType.CitizenNode:
-            return await redirect_request_to_rs(kwargs, RestProperty().rs_target, channel=Version3Dispatcher.channel)
+            return await redirect_request_to_rs(Version3Dispatcher.DISPATCH_PROTOCOL,
+                                                kwargs, RestProperty().rs_target,
+                                                channel=Version3Dispatcher.channel)
 
         method = 'icx_sendTransaction'
         request = make_request(method, kwargs)
