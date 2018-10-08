@@ -91,7 +91,9 @@ class Version3Dispatcher:
     @methods.add
     async def icx_call(**kwargs):
         origin_params = kwargs[JSON_KEY]
-        json_params = origin_params[PARAMS_KEY]
+        json_params = origin_params.get(PARAMS_KEY)
+        if json_params is None:
+            json_params = {}
         channel = kwargs[CHANNEL_KEY]
 
         method = 'icx_call'
@@ -104,7 +106,9 @@ class Version3Dispatcher:
     @methods.add
     async def icx_getScoreApi(**kwargs):
         origin_params = kwargs[JSON_KEY]
-        json_params = origin_params[PARAMS_KEY]
+        json_params = origin_params.get(PARAMS_KEY)
+        if json_params is None:
+            json_params = {}
         channel = kwargs[CHANNEL_KEY]
 
         method = 'icx_getScoreApi'
@@ -118,7 +122,9 @@ class Version3Dispatcher:
     @methods.add
     async def icx_sendTransaction(**kwargs):
         origin_params = kwargs[JSON_KEY]
-        json_params = origin_params[PARAMS_KEY]
+        json_params = origin_params.get(PARAMS_KEY)
+        if json_params is None:
+            json_params = {}
         channel = kwargs[CHANNEL_KEY]
         url = kwargs[URL_KEY]
 
@@ -161,7 +167,9 @@ class Version3Dispatcher:
     @methods.add
     async def icx_getTransactionResult(**kwargs):
         origin_params = kwargs[JSON_KEY]
-        json_params = origin_params[PARAMS_KEY]
+        json_params = origin_params.get(PARAMS_KEY)
+        if json_params is None:
+            json_params = {}
         channel = kwargs[CHANNEL_KEY]
 
         request = convert_params(json_params, ParamType.get_tx_request)
@@ -199,7 +207,9 @@ class Version3Dispatcher:
     @methods.add
     async def icx_getTransactionByHash(**kwargs):
         origin_params = kwargs[JSON_KEY]
-        json_params = origin_params[PARAMS_KEY]
+        json_params = origin_params.get(PARAMS_KEY)
+        if json_params is None:
+            json_params = {}
         channel = kwargs[CHANNEL_KEY]
 
         request = convert_params(json_params, ParamType.get_tx_request)
@@ -227,7 +237,9 @@ class Version3Dispatcher:
     @methods.add
     async def icx_getBalance(**kwargs):
         origin_params = kwargs[JSON_KEY]
-        json_params = origin_params[PARAMS_KEY]
+        json_params = origin_params.get(PARAMS_KEY)
+        if json_params is None:
+            json_params = {}
         channel = kwargs[CHANNEL_KEY]
 
         method = 'icx_getBalance'
@@ -241,7 +253,9 @@ class Version3Dispatcher:
     @methods.add
     async def icx_getTotalSupply(**kwargs):
         origin_params = kwargs[JSON_KEY]
-        json_params = origin_params[PARAMS_KEY]
+        json_params = origin_params.get(PARAMS_KEY)
+        if json_params is None:
+            json_params = {}
         channel = kwargs[CHANNEL_KEY]
 
         method = 'icx_getTotalSupply'
@@ -266,7 +280,9 @@ class Version3Dispatcher:
     @methods.add
     async def icx_getBlockByHash(**kwargs):
         origin_params = kwargs[JSON_KEY]
-        json_params = origin_params[PARAMS_KEY]
+        json_params = origin_params.get(PARAMS_KEY)
+        if json_params is None:
+            json_params = {}
         channel = kwargs[CHANNEL_KEY]
 
         request = convert_params(json_params, ParamType.get_block_by_hash_request)
@@ -288,7 +304,9 @@ class Version3Dispatcher:
     @methods.add
     async def icx_getBlockByHeight(**kwargs):
         origin_params = kwargs[JSON_KEY]
-        json_params = origin_params[PARAMS_KEY]
+        json_params = origin_params.get(PARAMS_KEY)
+        if json_params is None:
+            json_params = {}
         channel = kwargs[CHANNEL_KEY]
 
         request = convert_params(json_params, ParamType.get_block_by_height_request)
@@ -315,7 +333,9 @@ class Version3Dispatcher:
     @methods.add
     async def ise_getStatus(**kwargs):
         origin_params = kwargs[JSON_KEY]
-        json_params = origin_params[PARAMS_KEY]
+        json_params = origin_params.get(PARAMS_KEY)
+        if json_params is None:
+            json_params = {}
         channel = kwargs[CHANNEL_KEY]
 
         method = 'ise_getStatus'

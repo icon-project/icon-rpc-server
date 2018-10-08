@@ -86,7 +86,9 @@ class Version2Dispatcher:
     @methods.add
     async def icx_sendTransaction(**kwargs):
         origin_params = kwargs[JSON_KEY]
-        json_params = origin_params[PARAMS_KEY]
+        json_params = origin_params.get(PARAMS_KEY)
+        if json_params is None:
+            json_params = {}
         url = kwargs[URL_KEY]
 
         dispatch_protocol = Version2Dispatcher.get_dispatch_protocol_from_url(url)
@@ -119,7 +121,9 @@ class Version2Dispatcher:
     @methods.add
     async def icx_getTransactionResult(**kwargs):
         origin_params = kwargs[JSON_KEY]
-        json_params = origin_params[PARAMS_KEY]
+        json_params = origin_params.get(PARAMS_KEY)
+        if json_params is None:
+            json_params = {}
 
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
         channel_stub = StubCollection().channel_stubs[channel_name]
@@ -171,7 +175,9 @@ class Version2Dispatcher:
     @methods.add
     async def icx_getBalance(**kwargs):
         origin_params = kwargs[JSON_KEY]
-        json_params = origin_params[PARAMS_KEY]
+        json_params = origin_params.get(PARAMS_KEY)
+        if json_params is None:
+            json_params = {}
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
         method = 'icx_getBalance'
@@ -185,7 +191,9 @@ class Version2Dispatcher:
     @methods.add
     async def icx_getTotalSupply(**kwargs):
         origin_params = kwargs[JSON_KEY]
-        json_params = origin_params[PARAMS_KEY]
+        json_params = origin_params.get(PARAMS_KEY)
+        if json_params is None:
+            json_params = {}
 
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
@@ -206,7 +214,10 @@ class Version2Dispatcher:
     @methods.add
     async def icx_getBlockByHash(**kwargs):
         origin_params = kwargs[JSON_KEY]
-        json_params = origin_params[PARAMS_KEY]
+        json_params = origin_params.get(PARAMS_KEY)
+        if json_params is None:
+            json_params = {}
+
         block_hash, response = await get_block_v2_by_params(block_hash=json_params["hash"])
         return response
 
@@ -215,7 +226,9 @@ class Version2Dispatcher:
     async def icx_getBlockByHeight(**kwargs):
         try:
             origin_params = kwargs[JSON_KEY]
-            json_params = origin_params[PARAMS_KEY]
+            json_params = origin_params.get(PARAMS_KEY)
+            if json_params is None:
+                json_params = {}
 
             block_height = int(json_params["height"])
         except Exception as e:
@@ -239,7 +252,9 @@ class Version2Dispatcher:
     @methods.add
     async def icx_getTransactionByAddress(**kwargs):
         origin_params = kwargs[JSON_KEY]
-        json_params = origin_params[PARAMS_KEY]
+        json_params = origin_params.get(PARAMS_KEY)
+        if json_params is None:
+            json_params = {}
 
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
