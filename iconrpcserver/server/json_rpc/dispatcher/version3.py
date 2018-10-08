@@ -38,32 +38,48 @@ config.log_responses = False
 
 methods = AsyncMethods()
 
+JSONRPC_KEY = 'jsonrpc'
+METHOD_KEY = 'method'
+PARAMS_KEY = 'params'
+ID_KEY = 'id'
+CHANNEL_KEY = 'channel_key'
+JSON_KEY = 'json_key'
+URL_KEY = 'url_key'
+
 
 class Version3Dispatcher:
     HASH_KEY_DICT = ['hash', 'blockHash', 'txHash', 'prevBlockHash']
-    channel = None
-    DISPATCH_PROTOCOL = 'http'
 
     @staticmethod
     async def dispatch(request, channel_name=None):
-        req = request.json
-        Version3Dispatcher.channel = channel_name if channel_name is not None \
+        req_json = request.json
+        url = request.url
+        channel = channel_name if channel_name is not None \
             else StubCollection().conf[ConfigKey.CHANNEL]
-        client_ip = request.remote_addr if request.remote_addr else request.ip
-        Logger.info(f'rest_server_v3 request with {req}', DISPATCH_V3_TAG)
-        Logger.info(f"{client_ip} requested {req} on {request.url}")
+
+        request_dict = {
+            JSONRPC_KEY: req_json[JSONRPC_KEY],
+            METHOD_KEY: req_json[METHOD_KEY],
+            PARAMS_KEY: {
+                CHANNEL_KEY: channel,
+                JSON_KEY: req_json,
+                URL_KEY: url
+            },
+            ID_KEY: req_json[ID_KEY]
+        }
 
         try:
-            Version3Dispatcher.DISPATCH_PROTOCOL = Version3Dispatcher.get_dispatch_protocol_from_url(request.url)
-            Logger.debug(f'Dispatch Protocol: {Version3Dispatcher.DISPATCH_PROTOCOL}')
-            validate_jsonschema_v3(request=req)
-        except exception.GenericJsonRpcServerError as e:
-            response = ExceptionResponse(e, request_id=req.get('id', 0))
-        except Exception as e:
-            response = ExceptionResponse(e, request_id=req.get('id', 0))
-        else:
-            response = await methods.dispatch(req)
+            client_ip = request.remote_addr if request.remote_addr else request.ip
+            Logger.info(f'rest_server_v3 request with {req_json}', DISPATCH_V3_TAG)
+            Logger.info(f"{client_ip} requested {req_json} on {url}")
 
+            validate_jsonschema_v3(request=req_json)
+        except exception.GenericJsonRpcServerError as e:
+            response = ExceptionResponse(e, request_id=req_json.get('id', 0))
+        except Exception as e:
+            response = ExceptionResponse(e, request_id=req_json.get('id', 0))
+        else:
+            response = await methods.dispatch(request_dict)
         Logger.info(f'rest_server_v3 with response {response}', DISPATCH_V3_TAG)
         return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
 
@@ -74,18 +90,26 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_call(**kwargs):
+        origin_params = kwargs[JSON_KEY]
+        json_params = origin_params[PARAMS_KEY]
+        channel = kwargs[CHANNEL_KEY]
+
         method = 'icx_call'
-        request = make_request(method, kwargs)
-        score_stub = get_icon_stub_by_channel_name(Version3Dispatcher.channel)
+        request = make_request(method, json_params)
+        score_stub = get_icon_stub_by_channel_name(channel)
         response = await score_stub.async_task().query(request)
         return response_to_json_query(response)
 
     @staticmethod
     @methods.add
     async def icx_getScoreApi(**kwargs):
+        origin_params = kwargs[JSON_KEY]
+        json_params = origin_params[PARAMS_KEY]
+        channel = kwargs[CHANNEL_KEY]
+
         method = 'icx_getScoreApi'
-        request = make_request(method, kwargs)
-        score_stub = get_icon_stub_by_channel_name(Version3Dispatcher.channel)
+        request = make_request(method, json_params)
+        score_stub = get_icon_stub_by_channel_name(channel)
         response = await score_stub.async_task().query(request)
 
         return response_to_json_query(response)
@@ -93,21 +117,29 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_sendTransaction(**kwargs):
+        origin_params = kwargs[JSON_KEY]
+        json_params = origin_params[PARAMS_KEY]
+        channel = kwargs[CHANNEL_KEY]
+        url = kwargs[URL_KEY]
+
+        dispatch_protocol = Version3Dispatcher.get_dispatch_protocol_from_url(url)
+        Logger.debug(f'Dispatch Protocol: {dispatch_protocol}')
+
         if RestProperty().node_type == NodeType.CitizenNode:
-            return await redirect_request_to_rs(Version3Dispatcher.DISPATCH_PROTOCOL,
-                                                kwargs, RestProperty().rs_target,
-                                                channel=Version3Dispatcher.channel)
+            return await redirect_request_to_rs(dispatch_protocol,
+                                                json_params, RestProperty().rs_target,
+                                                channel=channel)
 
         method = 'icx_sendTransaction'
-        request = make_request(method, kwargs)
-        score_stub = get_icon_stub_by_channel_name(Version3Dispatcher.channel)
+        request = make_request(method, json_params)
+        score_stub = get_icon_stub_by_channel_name(channel)
         icon_stub = score_stub
         response = await icon_stub.async_task().validate_transaction(request)
         # Error Check
         response_to_json_query(response)
 
-        channel_stub = StubCollection().channel_stubs[Version3Dispatcher.channel]
-        response_code, tx_hash = await channel_stub.async_task().create_icx_tx(kwargs)
+        channel_stub = StubCollection().channel_stubs[channel]
+        response_code, tx_hash = await channel_stub.async_task().create_icx_tx(json_params)
 
         if response_code != message_code.Response.success:
             raise exception.GenericJsonRpcServerError(
@@ -128,8 +160,12 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getTransactionResult(**kwargs):
-        request = convert_params(kwargs, ParamType.get_tx_request)
-        channel_stub = StubCollection().channel_stubs[Version3Dispatcher.channel]
+        origin_params = kwargs[JSON_KEY]
+        json_params = origin_params[PARAMS_KEY]
+        channel = kwargs[CHANNEL_KEY]
+
+        request = convert_params(json_params, ParamType.get_tx_request)
+        channel_stub = StubCollection().channel_stubs[channel]
         verify_result = dict()
 
         tx_hash = request["txHash"]
@@ -162,9 +198,13 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getTransactionByHash(**kwargs):
-        request = convert_params(kwargs, ParamType.get_tx_request)
+        origin_params = kwargs[JSON_KEY]
+        json_params = origin_params[PARAMS_KEY]
+        channel = kwargs[CHANNEL_KEY]
 
-        channel_stub = StubCollection().channel_stubs[Version3Dispatcher.channel]
+        request = convert_params(json_params, ParamType.get_tx_request)
+
+        channel_stub = StubCollection().channel_stubs[channel]
 
         response_code, tx_info = await channel_stub.async_task().get_tx_info(request["txHash"])
         if response_code == message_code.Response.fail_invalid_key_error:
@@ -186,10 +226,13 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getBalance(**kwargs):
+        origin_params = kwargs[JSON_KEY]
+        json_params = origin_params[PARAMS_KEY]
+        channel = kwargs[CHANNEL_KEY]
 
         method = 'icx_getBalance'
-        request = make_request(method, kwargs)
-        score_stub = get_icon_stub_by_channel_name(Version3Dispatcher.channel)
+        request = make_request(method, json_params)
+        score_stub = get_icon_stub_by_channel_name(channel)
         response = await score_stub.async_task().query(request)
 
         return response_to_json_query(response)
@@ -197,10 +240,13 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getTotalSupply(**kwargs):
+        origin_params = kwargs[JSON_KEY]
+        json_params = origin_params[PARAMS_KEY]
+        channel = kwargs[CHANNEL_KEY]
 
         method = 'icx_getTotalSupply'
-        request = make_request(method, kwargs)
-        score_stub = get_icon_stub_by_channel_name(Version3Dispatcher.channel)
+        request = make_request(method, json_params)
+        score_stub = get_icon_stub_by_channel_name(channel)
         response = await score_stub.async_task().query(request)
 
         return response_to_json_query(response)
@@ -208,8 +254,10 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getLastBlock(**kwargs):
+        channel = kwargs[CHANNEL_KEY]
+
         block_hash, result = await get_block_by_params(block_height=-1,
-                                                       channel_name=Version3Dispatcher.channel)
+                                                       channel_name=channel)
         response = convert_params(result['block'], ParamType.get_block_response)
 
         return response_to_json_query(response)
@@ -217,9 +265,13 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getBlockByHash(**kwargs):
-        request = convert_params(kwargs, ParamType.get_block_by_hash_request)
+        origin_params = kwargs[JSON_KEY]
+        json_params = origin_params[PARAMS_KEY]
+        channel = kwargs[CHANNEL_KEY]
+
+        request = convert_params(json_params, ParamType.get_block_by_hash_request)
         block_hash, result = await get_block_by_params(block_hash=request['hash'],
-                                                       channel_name=Version3Dispatcher.channel)
+                                                       channel_name=channel)
 
         response_code = result['response_code']
         if response_code != message_code.Response.success:
@@ -235,11 +287,13 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getBlockByHeight(**kwargs):
-        request = convert_params(kwargs, ParamType.get_block_by_height_request)
+        origin_params = kwargs[JSON_KEY]
+        json_params = origin_params[PARAMS_KEY]
+        channel = kwargs[CHANNEL_KEY]
 
+        request = convert_params(json_params, ParamType.get_block_by_height_request)
         block_hash, result = await get_block_by_params(block_height=request['height'],
-                                                       channel_name=Version3Dispatcher.channel)
-
+                                                       channel_name=channel)
         response_code = result['response_code']
         if response_code != message_code.Response.success:
             raise exception.GenericJsonRpcServerError(
@@ -260,10 +314,13 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def ise_getStatus(**kwargs):
+        origin_params = kwargs[JSON_KEY]
+        json_params = origin_params[PARAMS_KEY]
+        channel = kwargs[CHANNEL_KEY]
 
         method = 'ise_getStatus'
-        request = make_request(method, kwargs)
-        score_stub = get_icon_stub_by_channel_name(Version3Dispatcher.channel)
+        request = make_request(method, json_params)
+        score_stub = get_icon_stub_by_channel_name(channel)
         response = await score_stub.async_task().query(request)
         error = response.get('error')
         if error is None:
