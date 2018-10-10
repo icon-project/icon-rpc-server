@@ -133,7 +133,7 @@ async def get_block_by_params(channel_name=None, block_height=None, block_hash="
     tx_data_filter = "icx_origin_data"
 
     try:
-        channel_stub = StubCollection().channel_stubs[channel_name]
+        channel_stub = get_channel_stub_by_channel_name(channel_name)
     except KeyError:
         raise GenericJsonRpcServerError(
             code=JsonError.INVALID_REQUEST,
@@ -177,3 +177,16 @@ def get_icon_stub_by_channel_name(channel_name):
         )
     else:
         return icon_stub
+
+
+def get_channel_stub_by_channel_name(channel_name):
+    try:
+        channel_stub = StubCollection().channel_stubs[channel_name]
+    except KeyError:
+        raise GenericJsonRpcServerError(
+            code=JsonError.INVALID_REQUEST,
+            message="Invalid channel name",
+            http_status=status.HTTP_BAD_REQUEST
+        )
+    else:
+        return channel_stub
