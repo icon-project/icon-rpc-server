@@ -57,9 +57,12 @@ class NodeDispatcher:
     @staticmethod
     @methods.add
     async def node_Subscribe(**kwargs):
-        channel_name = kwargs['context']['channel']
-        channel = channel_name if channel_name else kwargs['channel']
-        del kwargs['context']
+        try:
+            channel = kwargs['context']['channel']
+            del kwargs['context']
+        except KeyError:
+            channel = kwargs['channel']
+
         peer_target = kwargs['peer_target']
         channel_stub = get_channel_stub_by_channel_name(channel)
         response_code = await channel_stub.async_task().add_audience_subscriber(peer_target=peer_target)
@@ -69,9 +72,11 @@ class NodeDispatcher:
     @staticmethod
     @methods.add
     async def node_Unsubscribe(**kwargs):
-        channel_name = kwargs['context']['channel']
-        channel = channel_name if channel_name else kwargs['channel']
-        del kwargs['context']
+        try:
+            channel = kwargs['context']['channel']
+            del kwargs['context']
+        except KeyError:
+            channel = kwargs['channel']
         peer_target = kwargs['peer_target']
         channel_stub = get_channel_stub_by_channel_name(channel)
         response_code = await channel_stub.async_task().remove_audience_subscriber(peer_target=peer_target)
@@ -81,9 +86,11 @@ class NodeDispatcher:
     @staticmethod
     @methods.add
     async def node_AnnounceConfirmedBlock(**kwargs):
-        channel_name = kwargs['context']['channel']
-        channel = channel_name if channel_name else kwargs['channel']
-        del kwargs['context']
+        try:
+            channel = kwargs['context']['channel']
+            del kwargs['context']
+        except KeyError:
+            channel = kwargs['channel']
         block, commit_state = kwargs['block'], kwargs.get('commit_state', "{}")
         channel_stub = get_channel_stub_by_channel_name(channel)
         response_code = await channel_stub.async_task().announce_confirmed_block(block.encode('utf-8'), commit_state)
@@ -93,9 +100,11 @@ class NodeDispatcher:
     @staticmethod
     @methods.add
     async def node_GetBlockByHeight(**kwargs):
-        channel_name = kwargs['context']['channel']
-        channel = channel_name if channel_name else kwargs.get("channel", None)
-        del kwargs['context']
+        try:
+            channel = kwargs['context']['channel']
+            del kwargs['context']
+        except KeyError:
+            channel = kwargs.get("channel", None)
         request = convert_params(kwargs, ParamType.get_block_by_height_request)
         block_hash, response = await get_block_by_params(channel_name=channel, block_height=request['height'],
                                                          with_commit_state=True)
