@@ -100,10 +100,16 @@ class Version3Dispatcher:
         channel = kwargs['context']['channel']
         url = kwargs['context']['url']
         del kwargs['context']
-        dispatch_protocol = Version3Dispatcher.get_dispatch_protocol_from_url(url)
-        Logger.debug(f'Dispatch Protocol: {dispatch_protocol}')
 
         if RestProperty().node_type == NodeType.CitizenNode:
+            dispatch_protocol = Version3Dispatcher.get_dispatch_protocol_from_url(url)
+            Logger.debug(f'Dispatch Protocol: {dispatch_protocol}')
+            redirect_protocol = StubCollection().conf.get(ConfigKey.REDIRECT_PROTOCOL)
+            Logger.debug(f'Redirect Protocol: {redirect_protocol}')
+            if redirect_protocol:
+                dispatch_protocol = redirect_protocol
+            Logger.debug(f'Protocol: {dispatch_protocol}')
+
             return await redirect_request_to_rs(dispatch_protocol,
                                                 kwargs, RestProperty().rs_target,
                                                 channel=channel)
