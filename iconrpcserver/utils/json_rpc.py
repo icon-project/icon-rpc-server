@@ -27,6 +27,8 @@ from ..protos import message_code
 from ..utils.icon_service.converter_v2 import convert_params, ParamType
 from ..utils.message_queue.stub_collection import StubCollection
 
+from iconcommons.logger import Logger
+
 
 class CustomAiohttpClient(AsyncClient):
     def __init__(self, session, endpoint):
@@ -78,14 +80,22 @@ class CustomAiohttpClient(AsyncClient):
 
 async def redirect_request_to_rs(protocal, message, rs_target, version=ApiVersion.v3.name, channel=""):
     method_name = "icx_sendTransaction"
-    redirect_protocol = StubCollection().conf.get(ConfigKey.REDIRECT_PROTOCOL)
-    if redirect_protocol:
-        rs_url = f"{redirect_protocol}://{rs_target}/api/{version}/{channel}"
-    else:
-        rs_url = f"{protocal}://{rs_target}/api/{version}/{channel}"
+
+    # TODO have to support multichannel
+    # rs_url = f"{protocal}://{rs_target}/api/{version}/{channel}"
+    rs_url = f"{protocal}://{rs_target}/api/{version}"
+    Logger.debug(f'rs_url: {rs_url}')
 
     async with aiohttp.ClientSession() as session:
+        Logger.debug(f"redirect_request : "
+                     f"message[{message}], "
+                     f"rs_target[{rs_target}], "
+                     f"version[{version}], "
+                     f"channel[{channel}],"
+                     f"method[{method_name}]")
         result = await CustomAiohttpClient(session, rs_url).request(method_name, message)
+        Logger.debug(f"redirect_result : "
+                     f"result[{result}]")
 
     return result
 
