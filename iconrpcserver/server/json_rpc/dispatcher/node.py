@@ -60,6 +60,7 @@ class NodeDispatcher:
         try:
             channel = kwargs['context']['channel']
             del kwargs['context']
+            channel = channel if channel is not None else kwargs['channel']
         except KeyError:
             channel = kwargs['channel']
 
@@ -75,6 +76,7 @@ class NodeDispatcher:
         try:
             channel = kwargs['context']['channel']
             del kwargs['context']
+            channel = channel if channel is not None else kwargs['channel']
         except KeyError:
             channel = kwargs['channel']
         peer_target = kwargs['peer_target']
@@ -89,6 +91,7 @@ class NodeDispatcher:
         try:
             channel = kwargs['context']['channel']
             del kwargs['context']
+            channel = channel if channel is not None else kwargs['channel']
         except KeyError:
             channel = kwargs['channel']
         block, commit_state = kwargs['block'], kwargs.get('commit_state', "{}")
@@ -103,6 +106,7 @@ class NodeDispatcher:
         try:
             channel = kwargs['context']['channel']
             del kwargs['context']
+            channel = channel if channel is not None else kwargs['channel']
         except KeyError:
             channel = kwargs.get("channel", None)
         request = convert_params(kwargs, ParamType.get_block_by_height_request)
