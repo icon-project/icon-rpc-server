@@ -15,7 +15,7 @@
 
 import json
 import re
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, urlparse
 
 from iconcommons.logger import Logger
 from jsonrpcserver import config
@@ -73,6 +73,7 @@ class Version2Dispatcher:
     @methods.add
     async def icx_sendTransaction(**kwargs):
         url = kwargs['context']['url']
+        path = urlparse(url).path
         del kwargs['context']
 
         if RestProperty().node_type == NodeType.CitizenNode:
@@ -84,7 +85,8 @@ class Version2Dispatcher:
                 dispatch_protocol = redirect_protocol
             Logger.debug(f'Protocol: {dispatch_protocol}')
 
-            return await redirect_request_to_rs(dispatch_protocol, kwargs, RestProperty().rs_target, ApiVersion.v2.name)
+            return await redirect_request_to_rs(dispatch_protocol, kwargs, RestProperty().rs_target, path,
+                                                ApiVersion.v2.name)
 
         request = make_request("icx_sendTransaction", kwargs, ParamType.send_tx)
         channel = StubCollection().conf[ConfigKey.CHANNEL]
