@@ -106,7 +106,7 @@ class NodeDispatcher:
         try:
             channel = kwargs['context']['channel']
             del kwargs['context']
-            channel = channel if channel is not None else kwargs['channel']
+            channel = channel if channel is not None else kwargs.get('channel', None)
         except KeyError:
             channel = kwargs.get("channel", None)
         request = convert_params(kwargs, ParamType.get_block_by_height_request)

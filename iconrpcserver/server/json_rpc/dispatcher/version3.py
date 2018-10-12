@@ -15,7 +15,7 @@
 
 import json
 from typing import Any, Optional
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, urlparse
 
 from iconcommons.logger import Logger
 from jsonrpcserver import config, status
@@ -52,7 +52,7 @@ class Version3Dispatcher:
 
         context = {
             "url": url,
-            "channel": channel
+            "channel": channel,
         }
 
         try:
@@ -100,6 +100,7 @@ class Version3Dispatcher:
     async def icx_sendTransaction(**kwargs):
         channel = kwargs['context']['channel']
         url = kwargs['context']['url']
+        path = urlparse(url).path
         del kwargs['context']
 
         if RestProperty().node_type == NodeType.CitizenNode:
@@ -112,7 +113,7 @@ class Version3Dispatcher:
             Logger.debug(f'Protocol: {dispatch_protocol}')
 
             return await redirect_request_to_rs(dispatch_protocol,
-                                                kwargs, RestProperty().rs_target)
+                                                kwargs, RestProperty().rs_target, path=path)
 
         method = 'icx_sendTransaction'
         request = make_request(method, kwargs)

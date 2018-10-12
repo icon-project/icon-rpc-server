@@ -78,10 +78,10 @@ class CustomAiohttpClient(AsyncClient):
         return None
 
 
-async def redirect_request_to_rs(protocal, message, rs_target, version=ApiVersion.v3.name):
+async def redirect_request_to_rs(protocal, message, rs_target, path, version=ApiVersion.v3.name):
     method_name = "icx_sendTransaction"
 
-    rs_url = f"{protocal}://{rs_target}/api/{version}"
+    rs_url = f"{protocal}://{rs_target}/{path}"
     Logger.debug(f'rs_url: {rs_url}')
 
     async with aiohttp.ClientSession() as session:
