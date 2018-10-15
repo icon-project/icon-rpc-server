@@ -15,7 +15,7 @@
 
 import json
 from typing import Any, Optional
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, urlparse
 
 from iconcommons.logger import Logger
 from jsonrpcserver import config, status
@@ -29,7 +29,8 @@ from ....default_conf.icon_rpcserver_constant import DISPATCH_V3_TAG
 from ....protos import message_code
 from ....server.json_rpc.validator import validate_jsonschema_v3
 from ....utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
-from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params, get_icon_stub_by_channel_name
+from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params, get_icon_stub_by_channel_name, \
+    get_channel_stub_by_channel_name
 from ....utils.message_queue.stub_collection import StubCollection
 from ....default_conf.icon_rpcserver_constant import NodeType, ConfigKey
 
@@ -51,7 +52,7 @@ class Version3Dispatcher:
 
         context = {
             "url": url,
-            "channel": channel
+            "channel": channel,
         }
 
         try:
@@ -99,6 +100,7 @@ class Version3Dispatcher:
     async def icx_sendTransaction(**kwargs):
         channel = kwargs['context']['channel']
         url = kwargs['context']['url']
+        path = urlparse(url).path
         del kwargs['context']
 
         if RestProperty().node_type == NodeType.CitizenNode:
@@ -111,8 +113,7 @@ class Version3Dispatcher:
             Logger.debug(f'Protocol: {dispatch_protocol}')
 
             return await redirect_request_to_rs(dispatch_protocol,
-                                                kwargs, RestProperty().rs_target,
-                                                channel=channel)
+                                                kwargs, RestProperty().rs_target, path=path[1:])
 
         method = 'icx_sendTransaction'
         request = make_request(method, kwargs)

@@ -78,12 +78,10 @@ class CustomAiohttpClient(AsyncClient):
         return None
 
 
-async def redirect_request_to_rs(protocal, message, rs_target, version=ApiVersion.v3.name, channel=""):
+async def redirect_request_to_rs(protocal, message, rs_target, path, version=ApiVersion.v3.name):
     method_name = "icx_sendTransaction"
 
-    # TODO have to support multichannel
-    # rs_url = f"{protocal}://{rs_target}/api/{version}/{channel}"
-    rs_url = f"{protocal}://{rs_target}/api/{version}"
+    rs_url = f"{protocal}://{rs_target}/{path}"
     Logger.debug(f'rs_url: {rs_url}')
 
     async with aiohttp.ClientSession() as session:
@@ -91,7 +89,6 @@ async def redirect_request_to_rs(protocal, message, rs_target, version=ApiVersio
                      f"message[{message}], "
                      f"rs_target[{rs_target}], "
                      f"version[{version}], "
-                     f"channel[{channel}],"
                      f"method[{method_name}]")
         result = await CustomAiohttpClient(session, rs_url).request(method_name, message)
         Logger.debug(f"redirect_result : "
@@ -133,7 +130,7 @@ async def get_block_by_params(channel_name=None, block_height=None, block_hash="
     tx_data_filter = "icx_origin_data"
 
     try:
-        channel_stub = StubCollection().channel_stubs[channel_name]
+        channel_stub = get_channel_stub_by_channel_name(channel_name)
     except KeyError:
         raise GenericJsonRpcServerError(
             code=JsonError.INVALID_REQUEST,
@@ -177,3 +174,16 @@ def get_icon_stub_by_channel_name(channel_name):
         )
     else:
         return icon_stub
+
+
+def get_channel_stub_by_channel_name(channel_name):
+    try:
+        channel_stub = StubCollection().channel_stubs[channel_name]
+    except KeyError:
+        raise GenericJsonRpcServerError(
+            code=JsonError.INVALID_REQUEST,
+            message="Invalid channel name",
+            http_status=status.HTTP_BAD_REQUEST
+        )
+    else:
+        return channel_stub

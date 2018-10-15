@@ -82,7 +82,8 @@ class ServerComponents(metaclass=SingletonMetaClass):
         return self.__ssl_context
 
     def set_resource(self):
-        self.__app.add_route(NodeDispatcher.dispatch, '/api/node/', methods=['POST'])
+        self.__app.add_route(NodeDispatcher.dispatch, '/api/node/<channel_name>', methods=['POST'])
+        self.__app.add_route(NodeDispatcher.dispatch, '/api/node/', methods=['POST'], strict_slashes=False)
 
         self.__app.add_route(Version2Dispatcher.dispatch, '/api/v2', methods=['POST'])
         self.__app.add_route(Version3Dispatcher.dispatch, '/api/v3/<channel_name>', methods=['POST'])

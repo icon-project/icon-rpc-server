@@ -19,7 +19,7 @@ from sanic import response
 
 from ....protos import message_code
 from ....utils.icon_service import ParamType, convert_params
-from ....utils.json_rpc import get_block_by_params
+from ....utils.json_rpc import get_block_by_params, get_channel_stub_by_channel_name
 from ....utils.message_queue.stub_collection import StubCollection
 
 methods = AsyncMethods()
@@ -27,7 +27,7 @@ methods = AsyncMethods()
 
 class NodeDispatcher:
     @staticmethod
-    async def dispatch(request):
+    async def dispatch(request, channel_name=None):
         req = json.loads(request.body.decode())
         req["params"] = req.get("params", {})
 
@@ -39,7 +39,11 @@ class NodeDispatcher:
         if "node_" not in req["params"]["method"]:
             return response.text("no support method!")
 
-        dispatch_response = await methods.dispatch(req)
+        context = {
+            "channel": channel_name
+        }
+
+        dispatch_response = await methods.dispatch(req, context=context)
         return response.json(dispatch_response, status=dispatch_response.http_status)
 
     @staticmethod
@@ -53,8 +57,15 @@ class NodeDispatcher:
     @staticmethod
     @methods.add
     async def node_Subscribe(**kwargs):
-        channel, peer_target = kwargs['channel'], kwargs['peer_target']
-        channel_stub = StubCollection().channel_stubs[channel]
+        try:
+            channel = kwargs['context']['channel']
+            del kwargs['context']
+            channel = channel if channel is not None else kwargs['channel']
+        except KeyError:
+            channel = kwargs['channel']
+
+        peer_target = kwargs['peer_target']
+        channel_stub = get_channel_stub_by_channel_name(channel)
         response_code = await channel_stub.async_task().add_audience_subscriber(peer_target=peer_target)
         return {"response_code": response_code,
                 "message": message_code.get_response_msg(response_code)}
@@ -62,8 +73,14 @@ class NodeDispatcher:
     @staticmethod
     @methods.add
     async def node_Unsubscribe(**kwargs):
-        channel, peer_target = kwargs['channel'], kwargs['peer_target']
-        channel_stub = StubCollection().channel_stubs[channel]
+        try:
+            channel = kwargs['context']['channel']
+            del kwargs['context']
+            channel = channel if channel is not None else kwargs['channel']
+        except KeyError:
+            channel = kwargs['channel']
+        peer_target = kwargs['peer_target']
+        channel_stub = get_channel_stub_by_channel_name(channel)
         response_code = await channel_stub.async_task().remove_audience_subscriber(peer_target=peer_target)
         return {"response_code": response_code,
                 "message": message_code.get_response_msg(response_code)}
@@ -71,8 +88,14 @@ class NodeDispatcher:
     @staticmethod
     @methods.add
     async def node_AnnounceConfirmedBlock(**kwargs):
-        channel, block, commit_state = kwargs['channel'], kwargs['block'], kwargs.get('commit_state', "{}")
-        channel_stub = StubCollection().channel_stubs[channel]
+        try:
+            channel = kwargs['context']['channel']
+            del kwargs['context']
+            channel = channel if channel is not None else kwargs['channel']
+        except KeyError:
+            channel = kwargs['channel']
+        block, commit_state = kwargs['block'], kwargs.get('commit_state', "{}")
+        channel_stub = get_channel_stub_by_channel_name(channel)
         response_code = await channel_stub.async_task().announce_confirmed_block(block.encode('utf-8'), commit_state)
         return {"response_code": response_code,
                 "message": message_code.get_response_msg(response_code)}
@@ -80,8 +103,13 @@ class NodeDispatcher:
     @staticmethod
     @methods.add
     async def node_GetBlockByHeight(**kwargs):
+        try:
+            channel = kwargs['context']['channel']
+            del kwargs['context']
+            channel = channel if channel is not None else kwargs.get('channel', None)
+        except KeyError:
+            channel = kwargs.get("channel", None)
         request = convert_params(kwargs, ParamType.get_block_by_height_request)
-        channel = kwargs.get('channel', None)
         block_hash, response = await get_block_by_params(channel_name=channel, block_height=request['height'],
                                                          with_commit_state=True)
         return response
