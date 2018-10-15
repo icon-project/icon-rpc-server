@@ -85,7 +85,7 @@ class Version2Dispatcher:
                 dispatch_protocol = redirect_protocol
             Logger.debug(f'Protocol: {dispatch_protocol}')
 
-            return await redirect_request_to_rs(dispatch_protocol, kwargs, RestProperty().rs_target, path,
+            return await redirect_request_to_rs(dispatch_protocol, kwargs, RestProperty().rs_target, path[1:],
                                                 ApiVersion.v2.name)
 
         request = make_request("icx_sendTransaction", kwargs, ParamType.send_tx)

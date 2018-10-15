@@ -113,7 +113,7 @@ class Version3Dispatcher:
             Logger.debug(f'Protocol: {dispatch_protocol}')
 
             return await redirect_request_to_rs(dispatch_protocol,
-                                                kwargs, RestProperty().rs_target, path=path)
+                                                kwargs, RestProperty().rs_target, path=path[1:])
 
         method = 'icx_sendTransaction'
         request = make_request(method, kwargs)
