@@ -89,7 +89,7 @@ def main():
     conf.update_conf(dict(vars(args)))
 
     # set env config
-    redirect_protocol = os.getenv("REDIRECT_PROTOCOL")
+    redirect_protocol = os.getenv(ConfigKey.REDIRECT_PROTOCOL)
     if redirect_protocol:
         conf.update_conf({ConfigKey.REDIRECT_PROTOCOL: redirect_protocol})
 
