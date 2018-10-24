@@ -862,7 +862,7 @@ This function causes state transition.
 |:----|:----------|:----:|:-----|
 | version | [T_INT](#T_INT) | required | Protocol version ("0x3" for V3) |
 | from | [T_ADDR_EOA](#T_ADDR_EOA) | required | EOA address that created the transaction |
-| to | [T_ADDR_EOA](#T_ADDR_EOA) or [T_ADDR_SCORE](#T_ADDR_SCORE) | optional | EOA address to receive coins, or SCORE address to execute the transaction. |
+| to | [T_ADDR_EOA](#T_ADDR_EOA) or [T_ADDR_SCORE](#T_ADDR_SCORE) | required | EOA address to receive coins, or SCORE address to execute the transaction. |
 | value | [T_INT](#T_INT) | optional | Amount of ICX coins in loop to transfer. When ommitted, assumes 0. (1 icx = 1 ^ 18 loop) |
 | stepLimit |[T_INT](#T_INT) | required | Maximum step allowance that can be used by the transaction. |
 | timestamp | [T_INT](#T_INT) | required | Transaction creation time. timestamp is in microsecond. |
