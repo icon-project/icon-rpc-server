@@ -15,7 +15,7 @@ requires = [
     "jsonschema",
     "requests==2.19.1",
     "jsonrpcserver==3.5.3",
-    "sanic==0.7.0",
+    "sanic==0.8.3",
     "gunicorn == 19.7.1",
     "grpcio == 1.3.5",
     "grpcio-tools == 1.3.5",
@@ -23,7 +23,7 @@ requires = [
     "aiohttp == 3.0.9",
     "jsonrpcclient == 2.6.0",
     "secp256k1==0.13.2",
-    "sanic-cors==0.9.4"
+    "sanic-cors==0.9.6"
 ]
 
 setup_options = {
