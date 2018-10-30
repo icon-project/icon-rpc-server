@@ -534,8 +534,7 @@ def validate_jsonschema(request: object, schemas: dict = SCHEMA_V3):
     # get schema for 'method'
     schema: dict = None
     method = request.get('method', None)
-    print("method", method)
-    print("schemas", schemas)
+
     if method and isinstance(method, str):
         schema = schemas.get(method, None)
     if schema is None:
