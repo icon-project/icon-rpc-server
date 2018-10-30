@@ -29,6 +29,7 @@ from .rest_property import RestProperty
 from .json_rpc.dispatcher.node import NodeDispatcher
 from .json_rpc.dispatcher.version2 import Version2Dispatcher
 from .json_rpc.dispatcher.version3 import Version3Dispatcher
+from .json_rpc.dispatcher.version3d import Version3DebugDispatcher
 from ..utils.message_queue.stub_collection import StubCollection
 from sanic_cors import CORS
 
@@ -88,6 +89,9 @@ class ServerComponents(metaclass=SingletonMetaClass):
         self.__app.add_route(Version2Dispatcher.dispatch, '/api/v2', methods=['POST'])
         self.__app.add_route(Version3Dispatcher.dispatch, '/api/v3/<channel_name>', methods=['POST'])
         self.__app.add_route(Version3Dispatcher.dispatch, '/api/v3/', methods=['POST'], strict_slashes=False)
+
+        self.__app.add_route(Version3DebugDispatcher.dispatch, '/debug/v3/<channel_name>', methods=['POST'])
+        self.__app.add_route(Version3DebugDispatcher.dispatch, '/debug/v3/', methods=['POST'], strict_slashes=False)
 
         self.__app.add_route(Disable.as_view(), '/api/v1', methods=['POST', 'GET'])
         self.__app.add_route(Status.as_view(), '/api/v1/status/peer')

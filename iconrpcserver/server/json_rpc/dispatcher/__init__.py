@@ -16,3 +16,4 @@ from .node import *
 from .version2 import *
 from .version2 import *
 from .version3 import *
+from .version3d import *

@@ -29,8 +29,7 @@ from ....default_conf.icon_rpcserver_constant import DISPATCH_V3_TAG
 from ....protos import message_code
 from ....server.json_rpc.validator import validate_jsonschema_v3
 from ....utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
-from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params, get_icon_stub_by_channel_name, \
-    get_channel_stub_by_channel_name
+from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params, get_icon_stub_by_channel_name
 from ....utils.message_queue.stub_collection import StubCollection
 from ....default_conf.icon_rpcserver_constant import NodeType, ConfigKey
 
@@ -81,17 +80,6 @@ class Version3Dispatcher:
         method = 'icx_call'
         request = make_request(method, kwargs)
         score_stub = get_icon_stub_by_channel_name(channel)
-        response = await score_stub.async_task().query(request)
-        return response_to_json_query(response)
-
-    @staticmethod
-    @methods.add
-    async def icx_estimateStep(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
-        score_stub = StubCollection().icon_score_stubs[channel_name]
-
-        method = 'icx_estimateStep'
-        request = make_request(method, kwargs)
         response = await score_stub.async_task().query(request)
         return response_to_json_query(response)
 
