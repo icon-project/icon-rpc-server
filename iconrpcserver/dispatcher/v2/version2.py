@@ -23,14 +23,14 @@ from jsonrpcserver.aio import AsyncMethods
 from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
-from ...json_rpc import exception
-from ...rest_property import RestProperty
-from ....default_conf.icon_rpcserver_constant import ConfigKey, NodeType, ApiVersion, DISPATCH_V2_TAG
-from ....protos import message_code
-from ....server.json_rpc.validator import validate_jsonschema_v2
-from ....utils.icon_service import make_request, response_to_json_query, ParamType
-from ....utils.json_rpc import redirect_request_to_rs, get_block_v2_by_params
-from ....utils.message_queue.stub_collection import StubCollection
+from iconrpcserver.dispatcher import GenericJsonRpcServerError
+from iconrpcserver.server.rest_property import RestProperty
+from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, NodeType, ApiVersion, DISPATCH_V2_TAG
+from iconrpcserver.protos import message_code
+from iconrpcserver.dispatcher import validate_jsonschema_v2
+from iconrpcserver.utils.icon_service import make_request, response_to_json_query, ParamType
+from iconrpcserver.utils.json_rpc import redirect_request_to_rs, get_block_v2_by_params
+from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
 config.log_requests = False
 config.log_responses = False
@@ -58,7 +58,7 @@ class Version2Dispatcher:
             Logger.info(f"{client_ip} requested {req} on {url}")
 
             validate_jsonschema_v2(request=req)
-        except exception.GenericJsonRpcServerError as e:
+        except GenericJsonRpcServerError as e:
             response = ExceptionResponse(e, request_id=req.get('id', 0))
         else:
             response = await methods.dispatch(req, context=context)

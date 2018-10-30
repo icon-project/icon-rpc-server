@@ -23,7 +23,7 @@ def check_error_response(result: Any):
 
 
 def response_to_json_query(response, is_convert: bool = False):
-    from ...server.json_rpc import GenericJsonRpcServerError
+    from iconrpcserver.dispatcher import GenericJsonRpcServerError
     if check_error_response(response):
         response = response['error']
         raise GenericJsonRpcServerError(
