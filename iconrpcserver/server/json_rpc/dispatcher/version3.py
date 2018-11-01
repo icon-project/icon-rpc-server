@@ -34,6 +34,8 @@ from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params, get_
 from ....utils.message_queue.stub_collection import StubCollection
 from ....default_conf.icon_rpcserver_constant import NodeType, ConfigKey
 
+from ..icon.v3_func import IconFunctionV3
+
 config.log_requests = False
 config.log_responses = False
 
@@ -53,6 +55,7 @@ class Version3Dispatcher:
         context = {
             "url": url,
             "channel": channel,
+            "method": req_json["method"]
         }
 
         try:
@@ -77,23 +80,12 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_call(**kwargs):
-        channel = kwargs['context']['channel']
-        method = 'icx_call'
-        request = make_request(method, kwargs)
-        score_stub = get_icon_stub_by_channel_name(channel)
-        response = await score_stub.async_task().query(request)
-        return response_to_json_query(response)
+        return Version3Dispatcher._call_icon_query(**kwargs)
 
     @staticmethod
     @methods.add
     async def icx_getScoreApi(**kwargs):
-        channel = kwargs['context']['channel']
-        method = 'icx_getScoreApi'
-        request = make_request(method, kwargs)
-        score_stub = get_icon_stub_by_channel_name(channel)
-        response = await score_stub.async_task().query(request)
-
-        return response_to_json_query(response)
+        return Version3Dispatcher._call_icon_query(**kwargs)
 
     @staticmethod
     @methods.add
@@ -204,25 +196,12 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def icx_getBalance(**kwargs):
-        channel = kwargs['context']['channel']
-        method = 'icx_getBalance'
-        request = make_request(method, kwargs)
-        score_stub = get_icon_stub_by_channel_name(channel)
-        response = await score_stub.async_task().query(request)
-
-        return response_to_json_query(response)
+        return Version3Dispatcher._call_icon_query(**kwargs)
 
     @staticmethod
     @methods.add
     async def icx_getTotalSupply(**kwargs):
-        channel = kwargs['context']['channel']
-
-        method = 'icx_getTotalSupply'
-        request = make_request(method, kwargs)
-        score_stub = get_icon_stub_by_channel_name(channel)
-        response = await score_stub.async_task().query(request)
-
-        return response_to_json_query(response)
+        return Version3Dispatcher._call_icon_query(**kwargs)
 
     @staticmethod
     @methods.add
@@ -281,26 +260,22 @@ class Version3Dispatcher:
     @staticmethod
     @methods.add
     async def ise_getStatus(**kwargs):
-        channel = kwargs['context']['channel']
-        method = 'ise_getStatus'
-        request = make_request(method, kwargs)
-        score_stub = get_icon_stub_by_channel_name(channel)
-        response = await score_stub.async_task().query(request)
-        error = response.get('error')
-        if error is None:
-            Version3Dispatcher._hash_convert(None, response)
-        return response_to_json_query(response)
+        return Version3Dispatcher._call_icon_query(**kwargs)
 
     @staticmethod
-    def _hash_convert(key: Optional[str], response: Any):
-        if key is None:
-            result = response
-        else:
-            result = response[key]
-        if isinstance(result, dict):
-            for key in result:
-                Version3Dispatcher._hash_convert(key, result)
-        elif key in Version3Dispatcher.HASH_KEY_DICT:
-            if isinstance(result, str):
-                if not result.startswith('0x'):
-                    response[key] = f'0x{result}'
+    async def _call_icon_query(**kwargs):
+        channel = kwargs['context']['channel']
+        method = kwargs['context']['method']
+
+        request = make_request(method, kwargs)
+
+        # before query
+        IconFunctionV3.before_query(method, request)
+
+        score_stub = get_icon_stub_by_channel_name(channel)
+        response = await score_stub.async_task().query(request)
+
+        # after query
+        IconFunctionV3.after_query(method, response)
+
+        return response_to_json_query(response)
