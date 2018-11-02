@@ -46,15 +46,19 @@ class ChannelInnerTask:
         pass
 
     @message_queue_task
-    async def add_audience_subscriber(self, peer_target):
-        pass
-
-    @message_queue_task
-    async def remove_audience_subscriber(self, peer_target):
-        pass
-
-    @message_queue_task
     async def announce_confirmed_block(self, serialized_block, commit_state):
+        pass
+
+    @message_queue_task
+    async def announce_new_block(self, subscriber_block_height: int):
+        pass
+
+    @message_queue_task
+    async def register_subscriber(self, remote_address):
+        pass
+
+    @message_queue_task
+    async def unregister_subscriber(self, remote_address):
         pass
 
 
