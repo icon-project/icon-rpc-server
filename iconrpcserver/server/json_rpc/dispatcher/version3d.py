@@ -68,9 +68,9 @@ class Version3DebugDispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_estimateStep(**kwargs):
+    async def debug_estimateStep(**kwargs):
         channel = kwargs['context']['channel']
-        method = 'icx_estimateStep'
+        method = 'debug_estimateStep'
         request = make_request(method, kwargs)
         score_stub = get_icon_stub_by_channel_name(channel)
         response = await score_stub.async_task().query(request)

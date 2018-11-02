@@ -440,7 +440,7 @@ icx_sendTransaction_v3: dict = {
 
 }
 
-icx_estimateStep_v3: dict = {
+debug_estimateStep_v3: dict = {
     "title": "icx_estimateStep",
     "id": "https://repo.theloop.co.kr/theloop/LoopChain/wikis/doc/loopchain-json-rpc-v3#icx_estimateStep",
     "type": "object",
@@ -505,7 +505,7 @@ SCHEMA_V3: dict = {
     "icx_getTransactionResult": icx_getTransactionResult_v3,
     "icx_getTransactionByHash": icx_getTransactionByHash_v3,
     "icx_sendTransaction": icx_sendTransaction_v3,
-    "icx_estimateStep": icx_estimateStep_v3,
+    "debug_estimateStep": debug_estimateStep_v3,
     "ise_getStatus": ise_getStatus_v3
 }
 
