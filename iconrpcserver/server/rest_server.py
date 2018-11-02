@@ -26,9 +26,9 @@ from ..default_conf.icon_rpcserver_constant import ConfigKey, NodeType, SSLAuthT
 from ..components import SingletonMetaClass
 from .peer_service_stub import PeerServiceStub
 from .rest_property import RestProperty
-from .json_rpc.dispatcher.node import NodeDispatcher
-from .json_rpc.dispatcher.version2 import Version2Dispatcher
-from .json_rpc.dispatcher.version3 import Version3Dispatcher
+from iconrpcserver.dispatcher.default import NodeDispatcher
+from iconrpcserver.dispatcher.v2 import Version2Dispatcher
+from iconrpcserver.dispatcher.v3 import Version3Dispatcher
 from ..utils.message_queue.stub_collection import StubCollection
 from sanic_cors import CORS
 
