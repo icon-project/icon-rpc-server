@@ -19,7 +19,7 @@ from jsonschema import Draft4Validator, FormatChecker
 from jsonschema.exceptions import ValidationError
 import re
 
-from iconrpcserver.server.json_rpc.exception import GenericJsonRpcServerError, JsonError
+from .exception import GenericJsonRpcServerError, JsonError
 
 icx_sendTransaction_v2: dict = {
     "title": "icx_sendTransaction",

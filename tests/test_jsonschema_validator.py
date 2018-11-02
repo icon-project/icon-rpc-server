@@ -17,8 +17,8 @@
 import unittest
 from typing import Union
 
-from iconrpcserver.server.json_rpc.exception import GenericJsonRpcServerError
-from iconrpcserver.server.json_rpc.validator import validate_jsonschema_v2, validate_jsonschema_v3
+from iconrpcserver.dispatcher import GenericJsonRpcServerError
+from iconrpcserver.dispatcher import validate_jsonschema_v2, validate_jsonschema_v3
 from tests import create_address, create_tx_hash
 
 
@@ -562,7 +562,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
             self.fail('raise exception!')
 
     def test_format_checker(self):
-        from iconrpcserver.server.json_rpc import validator
+        from iconrpcserver.dispatcher import validator
         # address
         inputs = [
             (create_address(data=b'test', is_eoa=True), True, "EOA address"),

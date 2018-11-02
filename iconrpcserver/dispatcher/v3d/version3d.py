@@ -20,13 +20,14 @@ from jsonrpcserver.aio import AsyncMethods
 from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
-from ...json_rpc import exception
-from ....default_conf.icon_rpcserver_constant import DISPATCH_V3D_TAG
-from ....server.json_rpc.validator import validate_jsonschema_v3
-from ....utils.icon_service import make_request, response_to_json_query
-from ....utils.message_queue.stub_collection import StubCollection
-from ....default_conf.icon_rpcserver_constant import ConfigKey
-from ....utils.json_rpc import get_icon_stub_by_channel_name
+
+from iconrpcserver.dispatcher import GenericJsonRpcServerError
+from iconrpcserver.dispatcher import validate_jsonschema_v3
+from iconrpcserver.utils.icon_service import make_request, response_to_json_query
+from iconrpcserver.utils.json_rpc import get_icon_stub_by_channel_name
+from iconrpcserver.utils.message_queue.stub_collection import StubCollection
+from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, DISPATCH_V3D_TAG
+
 
 config.log_requests = False
 config.log_responses = False
@@ -53,17 +54,17 @@ class Version3DebugDispatcher:
 
         try:
             client_ip = request.remote_addr if request.remote_addr else request.ip
-            Logger.info(f'rest_server_v3 request with {req_json}', DISPATCH_V3D_TAG)
+            Logger.info(f'rest_server_v3d request with {req_json}', DISPATCH_V3D_TAG)
             Logger.info(f"{client_ip} requested {req_json} on {url}")
 
             validate_jsonschema_v3(request=req_json)
-        except exception.GenericJsonRpcServerError as e:
+        except GenericJsonRpcServerError as e:
             response = ExceptionResponse(e, request_id=req_json.get('id', 0))
         except Exception as e:
             response = ExceptionResponse(e, request_id=req_json.get('id', 0))
         else:
             response = await methods.dispatch(req_json, context=context)
-        Logger.info(f'rest_server_v3 with response {response}', DISPATCH_V3D_TAG)
+        Logger.info(f'rest_server_v3d with response {response}', DISPATCH_V3D_TAG)
         return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
 
     @staticmethod

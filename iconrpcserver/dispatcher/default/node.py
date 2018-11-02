@@ -17,10 +17,10 @@ import json
 from jsonrpcserver.aio import AsyncMethods
 from sanic import response
 
-from ....protos import message_code
-from ....utils.icon_service import ParamType, convert_params
-from ....utils.json_rpc import get_block_by_params, get_channel_stub_by_channel_name
-from ....utils.message_queue.stub_collection import StubCollection
+from iconrpcserver.protos import message_code
+from iconrpcserver.utils.icon_service import ParamType, convert_params
+from iconrpcserver.utils.json_rpc import get_block_by_params, get_channel_stub_by_channel_name
+from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
 methods = AsyncMethods()
 
