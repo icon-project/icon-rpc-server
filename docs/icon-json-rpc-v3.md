@@ -1088,7 +1088,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 ## debug_estimateStep
 
-* Generates and returns an estimates step cost of how much step is necessary to allow the transaction to complete as not being added to the blockchain. Note that the estimate may be more than the actual amount of a step cost used by the transaction for several reasons including node performance.
+* Generates and returns an estimated step of how much step is necessary to allow the transaction to complete. The transaction will not be added to the blockchain. Note that the estimate may be more than the actual amount of step used by the transaction for several reasons including node performance.
 
 ### Parameters
 
