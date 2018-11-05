@@ -685,3 +685,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
         for case in case_list:
             if func(case[0]) != case[1]:
                 self.fail(f'error case : [{func.__name__}] {case[2]}')
+
+
+if __name__ == "__main__":
+    unittest.main()

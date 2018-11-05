@@ -24,7 +24,7 @@ from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
 from iconrpcserver.dispatcher import GenericJsonRpcServerError, JsonError
-from iconrpcserver.server.rest_server import RestProperty
+from iconrpcserver.server.rest_property import RestProperty
 from iconrpcserver.default_conf.icon_rpcserver_constant import DISPATCH_V3_TAG
 from iconrpcserver.protos import message_code
 from iconrpcserver.dispatcher import validate_jsonschema_v3
