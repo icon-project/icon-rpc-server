@@ -29,9 +29,9 @@ from .rest_property import RestProperty
 from iconrpcserver.dispatcher.default import NodeDispatcher
 from iconrpcserver.dispatcher.v2.version2 import Version2Dispatcher
 from iconrpcserver.dispatcher.v3.version3 import Version3Dispatcher
+from iconrpcserver.dispatcher.v3d import Version3DebugDispatcher
 from ..utils.message_queue.stub_collection import StubCollection
 from sanic_cors import CORS
-
 from iconcommons.logger import Logger
 
 
@@ -88,6 +88,9 @@ class ServerComponents(metaclass=SingletonMetaClass):
         self.__app.add_route(Version2Dispatcher.dispatch, '/api/v2', methods=['POST'])
         self.__app.add_route(Version3Dispatcher.dispatch, '/api/v3/<channel_name>', methods=['POST'])
         self.__app.add_route(Version3Dispatcher.dispatch, '/api/v3/', methods=['POST'], strict_slashes=False)
+
+        self.__app.add_route(Version3DebugDispatcher.dispatch, '/api/debug/v3/<channel_name>', methods=['POST'])
+        self.__app.add_route(Version3DebugDispatcher.dispatch, '/api/debug/v3/', methods=['POST'], strict_slashes=False)
 
         self.__app.add_route(Disable.as_view(), '/api/v1', methods=['POST', 'GET'])
         self.__app.add_route(Status.as_view(), '/api/v1/status/peer')

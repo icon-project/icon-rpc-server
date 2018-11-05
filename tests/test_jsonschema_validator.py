@@ -544,7 +544,6 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
 
         # remove non-required key and test
         params = full_data['params']
-        params.pop('to')
         self.check_valid(full_data=full_data)
 
         # check full_data['params']
