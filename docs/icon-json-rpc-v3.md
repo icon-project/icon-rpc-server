@@ -1108,7 +1108,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 ### Returns
 
-* The amount of an estimated step cost in loop
+* The amount of an estimated step in loop
 
 ### Example
 
