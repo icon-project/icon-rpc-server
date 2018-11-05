@@ -1092,7 +1092,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 ### Parameters
 
-* The transaction's information not to have stepLimit and signature keys
+* The transaction information not to have stepLimit and signature
 
 | KEY       | VALUE type                                                 | Required | Description                                                  |
 | :-------- | :--------------------------------------------------------- | :------: | :----------------------------------------------------------- |
