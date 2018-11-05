@@ -486,7 +486,7 @@ debug_estimateStep_v3: dict = {
                 }
             },
             "additionalProperties": False,
-            "required": ["version", "from", "to"]
+            "required": ["version", "from", "to","timestamp"]
         }
     },
     "additionalProperties": False,
