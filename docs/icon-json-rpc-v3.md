@@ -118,9 +118,9 @@ Below table shows the default error messages for the error code. Actual message 
     * v3: "dataType"
 * Removed tx_hash from the icx_sendTransaction message.
 
-# JSON-RPC Methods
+# JSON-RPC APIs
 
-## Main APIs 
+## Main API
 
 API path : `<scheme>://<host>/api/v3`
 
@@ -135,18 +135,19 @@ API path : `<scheme>://<host>/api/v3`
 * [icx_getTransactionByHash](#icx_gettransactionbyhash)
 * [icx_sendTransaction](#icx_sendtransaction)
 
-## Debug APIs
+## Debug API
 
 API path : `<scheme>://<host>/api/debug/v3` 
 
 * [debug_estimateStep](#debug_estimatestep)
 
-## Other APIs 
+## Other API
 
 API path : `<scheme>://<host>/api/v3`
 
 * [ise_getStatus](#ise_getstatus)
 
+# JSON-RPC Methods
 
 ## icx_getLastBlock
 
@@ -1108,7 +1109,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 ### Returns
 
-* The amount of an estimated step in loop
+* The amount of an estimated step
 
 ### Example
 
