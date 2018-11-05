@@ -27,8 +27,8 @@ from ..components import SingletonMetaClass
 from .peer_service_stub import PeerServiceStub
 from .rest_property import RestProperty
 from iconrpcserver.dispatcher.default import NodeDispatcher
-from iconrpcserver.dispatcher.v2.version2 import Version2Dispatcher
-from iconrpcserver.dispatcher.v3.version3 import Version3Dispatcher
+from iconrpcserver.dispatcher.v2 import Version2Dispatcher
+from iconrpcserver.dispatcher.v3 import Version3Dispatcher
 from iconrpcserver.dispatcher.v3d import Version3DebugDispatcher
 from ..utils.message_queue.stub_collection import StubCollection
 from sanic_cors import CORS
