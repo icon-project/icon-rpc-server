@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import argparse
+import os
 import subprocess
 import sys
 from enum import IntEnum
@@ -88,6 +89,12 @@ def main():
     conf = IconConfig(conf_path, default_rpcserver_config)
     conf.load()
     conf.update_conf(dict(vars(args)))
+
+    # set env config
+    redirect_protocol = os.getenv(ConfigKey.REDIRECT_PROTOCOL)
+    if redirect_protocol:
+        conf.update_conf({ConfigKey.REDIRECT_PROTOCOL: redirect_protocol})
+
     Logger.load_config(conf)
 
     command = args.command[0]

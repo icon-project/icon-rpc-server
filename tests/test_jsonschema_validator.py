@@ -17,8 +17,8 @@
 import unittest
 from typing import Union
 
-from iconrpcserver.server.json_rpc.exception import GenericJsonRpcServerError
-from iconrpcserver.server.json_rpc.validator import validate_jsonschema_v2, validate_jsonschema_v3
+from iconrpcserver.dispatcher import GenericJsonRpcServerError
+from iconrpcserver.dispatcher import validate_jsonschema_v2, validate_jsonschema_v3
 from tests import create_address, create_tx_hash
 
 
@@ -544,7 +544,6 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
 
         # remove non-required key and test
         params = full_data['params']
-        params.pop('to')
         self.check_valid(full_data=full_data)
 
         # check full_data['params']
@@ -563,7 +562,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
             self.fail('raise exception!')
 
     def test_format_checker(self):
-        from iconrpcserver.server.json_rpc import validator
+        from iconrpcserver.dispatcher import validator
         # address
         inputs = [
             (create_address(data=b'test', is_eoa=True), True, "EOA address"),
@@ -686,3 +685,7 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
         for case in case_list:
             if func(case[0]) != case[1]:
                 self.fail(f'error case : [{func.__name__}] {case[2]}')
+
+
+if __name__ == "__main__":
+    unittest.main()

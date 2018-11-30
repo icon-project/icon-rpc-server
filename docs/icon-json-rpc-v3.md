@@ -118,7 +118,11 @@ Below table shows the default error messages for the error code. Actual message 
     * v3: "dataType"
 * Removed tx_hash from the icx_sendTransaction message.
 
-# JSON-RPC Methods
+# JSON-RPC APIs
+
+## Main API
+
+API path : `<scheme>://<host>/api/v3`
 
 * [icx_getLastBlock](#icx_getlastblock)
 * [icx_getBlockByHeight](#icx_getblockbyheight)
@@ -129,8 +133,21 @@ Below table shows the default error messages for the error code. Actual message 
 * [icx_getTotalSupply](#icx_gettotalsupply)
 * [icx_getTransactionResult](#icx_gettransactionresult)
 * [icx_getTransactionByHash](#icx_gettransactionbyhash)
-* [ise_getStatus](#ise_getstatus)
 * [icx_sendTransaction](#icx_sendtransaction)
+
+## Debug API
+
+API path : `<scheme>://<host>/api/debug/v3` 
+
+* [debug_estimateStep](#debug_estimatestep)
+
+## Other API
+
+API path : `<scheme>://<host>/api/v3`
+
+* [ise_getStatus](#ise_getstatus)
+
+# JSON-RPC Methods
 
 ## icx_getLastBlock
 
@@ -862,7 +879,7 @@ This function causes state transition.
 |:----|:----------|:----:|:-----|
 | version | [T_INT](#T_INT) | required | Protocol version ("0x3" for V3) |
 | from | [T_ADDR_EOA](#T_ADDR_EOA) | required | EOA address that created the transaction |
-| to | [T_ADDR_EOA](#T_ADDR_EOA) or [T_ADDR_SCORE](#T_ADDR_SCORE) | optional | EOA address to receive coins, or SCORE address to execute the transaction. |
+| to | [T_ADDR_EOA](#T_ADDR_EOA) or [T_ADDR_SCORE](#T_ADDR_SCORE) | required | EOA address to receive coins, or SCORE address to execute the transaction. |
 | value | [T_INT](#T_INT) | optional | Amount of ICX coins in loop to transfer. When ommitted, assumes 0. (1 icx = 1 ^ 18 loop) |
 | stepLimit |[T_INT](#T_INT) | required | Maximum step allowance that can be used by the transaction. |
 | timestamp | [T_INT](#T_INT) | required | Transaction creation time. timestamp is in microsecond. |
@@ -1066,6 +1083,67 @@ It is used when transfering a message, and `data` has a HEX string.
     "error": {
         "code": -32601,
         "message": "Method not found"
+    }
+}
+```
+
+## debug_estimateStep
+
+* Generates and returns an estimated step of how much step is necessary to allow the transaction to complete. The transaction will not be added to the blockchain. Note that the estimate may be more than the actual amount of step used by the transaction for several reasons including node performance.
+
+### Parameters
+
+* The transaction information not to have stepLimit and signature
+
+| KEY       | VALUE type                                                 | Required | Description                                                  |
+| :-------- | :--------------------------------------------------------- | :------: | :----------------------------------------------------------- |
+| version   | [T_INT](#T_INT)                                            | required | Protocol version ("0x3" for V3)                              |
+| from      | [T_ADDR_EOA](#T_ADDR_EOA)                                  | required | EOA address that created the transaction                     |
+| to        | [T_ADDR_EOA](#T_ADDR_EOA) or [T_ADDR_SCORE](#T_ADDR_SCORE) | required | EOA address to receive coins, or SCORE address to execute the transaction. |
+| value     | [T_INT](#T_INT)                                            | optional | Amount of ICX coins in loop to transfer. When ommitted, assumes 0. (1 icx = 1 ^ 18 loop) |
+| timestamp | [T_INT](#T_INT)                                            | required | Transaction creation time. timestamp is in microsecond.      |
+| nid       | [T_INT](#T_INT)                                            | required | Network ID ("0x1" for Mainnet, "0x2" for Testnet, etc)       |
+| nonce     | [T_INT](#T_INT)                                            | optional | An arbitrary number used to prevent transaction hash collision. |
+| dataType  | [T_DATA_TYPE](#T_DATA_TYPE)                                | optional | Type of data. (call, deploy, or message)                     |
+| data      | T_DICT or String                                           | optional | The content of data varies depending on the dataType. See [Parameters - data](#sendtxparameterdata). |
+
+### Returns
+
+* The amount of an estimated step
+
+### Example
+
+```json
+// Request
+{
+    "jsonrpc": "2.0",
+    "method": "debug_estimateStep",
+    "id": 1234,
+    "params": {
+        "version": "0x3",
+        "from": "hxbe258ceb872e08851f1f59694dac2558708ece11",
+        "to": "hx5bfdb090f43a808005ffc27c25b213145e80b7cd",
+        "value": "0xde0b6b3a7640000",
+        "timestamp": "0x563a6cf330136",
+        "nid": "0x3",
+        "nonce": "0x1"
+    }
+}
+
+// Response - success
+{
+    "jsonrpc": "2.0",
+    "id": 1234,
+    "result": "0x109eb0"
+}
+
+// Response - error
+{
+    "jsonrpc": "2.0",
+    "id": 1234,
+    "error": {
+        "code": -32602,
+        "message": "JSON schema validation error: 'version' is a required property"
     }
 }
 ```

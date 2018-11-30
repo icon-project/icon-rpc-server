@@ -19,7 +19,7 @@ from jsonschema import Draft4Validator, FormatChecker
 from jsonschema.exceptions import ValidationError
 import re
 
-from iconrpcserver.server.json_rpc.exception import GenericJsonRpcServerError, JsonError
+from .exception import GenericJsonRpcServerError, JsonError
 
 icx_sendTransaction_v2: dict = {
     "title": "icx_sendTransaction",
@@ -432,7 +432,61 @@ icx_sendTransaction_v3: dict = {
                 }
             },
             "additionalProperties": False,
-            "required": ["version", "from", "stepLimit", "timestamp", "nid", "signature"]
+            "required": ["version", "from", "to", "stepLimit", "timestamp", "nid", "signature"]
+        }
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id", "params"]
+
+}
+
+debug_estimateStep_v3: dict = {
+    "title": "icx_estimateStep",
+    "id": "https://repo.theloop.co.kr/theloop/LoopChain/wikis/doc/loopchain-json-rpc-v3#icx_estimateStep",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": "number"},
+        "params": {
+            "type": "object",
+            "properties": {
+                "version": {"type": "string", "format": "int_16"},
+                "from": {"type": "string", "format": "address_eoa"},
+                "to": {"type": "string", "format": "address"},
+                "value": {"type": "string", "format": "int_16"},
+                "message": {"type": "string"},
+                "timestamp": {"type": "string", "format": "int_16"},
+                "nid": {"type": "string", "format": "int_16"},
+                "nonce": {"type": "string", "format": "int_16"},
+                "dataType": {"type": "string", "enum": ["call", "deploy", "message"]},
+                "data": {
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "properties": {
+                                "method": {"type": "string"},
+                                "params": {"type": "object"}
+                            },
+                            "additionalProperties": False,
+                            "required": ["method"]
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "contentType": {"type": "string", "enum": ["application/zip", "application/tbears"]},
+                                "content": {"type": "string"},  # tbears get string content
+                                "params": {"type": "object"}
+                            },
+                            "additionalProperties": False,
+                            "required": ["contentType", "content"]
+                        },
+                        {"type": "string"}
+                    ],
+                }
+            },
+            "additionalProperties": False,
+            "required": ["version", "from", "to","timestamp"]
         }
     },
     "additionalProperties": False,
@@ -453,6 +507,22 @@ SCHEMA_V3: dict = {
     "icx_sendTransaction": icx_sendTransaction_v3,
     "ise_getStatus": ise_getStatus_v3
 }
+
+# TODO change to this thing that include debug_estimatestep when iconservice update to 1.2
+# SCHEMA_V3: dict = {
+#     "icx_getLastBlock": icx_getLastBlock,
+#     "icx_getBlockByHeight": icx_getBlockByHeight_v3,
+#     "icx_getBlockByHash": icx_getBlockByHash_v3,
+#     "icx_call": icx_call_v3,
+#     "icx_getBalance": icx_getBalance_v3,
+#     "icx_getScoreApi": icx_getScoreApi_v3,
+#     "icx_getTotalSupply": icx_getTotalSupply,
+#     "icx_getTransactionResult": icx_getTransactionResult_v3,
+#     "icx_getTransactionByHash": icx_getTransactionByHash_v3,
+#     "icx_sendTransaction": icx_sendTransaction_v3,
+#     "debug_estimateStep": debug_estimateStep_v3,
+#     "ise_getStatus": ise_getStatus_v3
+# }
 
 
 def validate_jsonschema_v3(request: object):
@@ -479,6 +549,7 @@ def validate_jsonschema(request: object, schemas: dict = SCHEMA_V3):
     # get schema for 'method'
     schema: dict = None
     method = request.get('method', None)
+
     if method and isinstance(method, str):
         schema = schemas.get(method, None)
     if schema is None:

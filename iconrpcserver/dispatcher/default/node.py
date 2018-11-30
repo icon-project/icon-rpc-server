@@ -17,10 +17,10 @@ import json
 from jsonrpcserver.aio import AsyncMethods
 from sanic import response
 
-from ....protos import message_code
-from ....utils.icon_service import ParamType, convert_params
-from ....utils.json_rpc import get_block_by_params, get_channel_stub_by_channel_name
-from ....utils.message_queue.stub_collection import StubCollection
+from iconrpcserver.protos import message_code
+from iconrpcserver.utils.icon_service import ParamType, convert_params
+from iconrpcserver.utils.json_rpc import get_block_by_params, get_channel_stub_by_channel_name
+from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
 methods = AsyncMethods()
 
@@ -47,43 +47,31 @@ class NodeDispatcher:
         return response.json(dispatch_response, status=dispatch_response.http_status)
 
     @staticmethod
+    async def websocket_dispatch(request, ws, channel_name=None):
+        request = json.loads(await ws.recv())
+        channel_stub = get_channel_stub_by_channel_name(channel_name)
+        approved = await channel_stub.async_task().register_subscriber(remote_address=ws.remote_address)
+
+        if not approved:
+            message = {'error': 'This peer can no longer take more subscribe requests.'}
+            return await ws.send(json.dumps(message))
+
+        try:
+            height = request.get('height')
+            while True:
+                new_block_json = await channel_stub.async_task().announce_new_block(subscriber_block_height=height)
+                await ws.send(new_block_json)
+                height += 1
+        finally:
+            await channel_stub.async_task().unregister_subscriber(remote_address=ws.remote_address)
+
+    @staticmethod
     @methods.add
     async def node_GetChannelInfos(**kwargs):
         channel_infos = await StubCollection().peer_stub.async_task().get_channel_infos()
 
         channel_infos = {"channel_infos": channel_infos}
         return channel_infos
-
-    @staticmethod
-    @methods.add
-    async def node_Subscribe(**kwargs):
-        try:
-            channel = kwargs['context']['channel']
-            del kwargs['context']
-            channel = channel if channel is not None else kwargs['channel']
-        except KeyError:
-            channel = kwargs['channel']
-
-        peer_target = kwargs['peer_target']
-        channel_stub = get_channel_stub_by_channel_name(channel)
-        response_code = await channel_stub.async_task().add_audience_subscriber(peer_target=peer_target)
-        return {"response_code": response_code,
-                "message": message_code.get_response_msg(response_code)}
-
-    @staticmethod
-    @methods.add
-    async def node_Unsubscribe(**kwargs):
-        try:
-            channel = kwargs['context']['channel']
-            del kwargs['context']
-            channel = channel if channel is not None else kwargs['channel']
-        except KeyError:
-            channel = kwargs['channel']
-        peer_target = kwargs['peer_target']
-        channel_stub = get_channel_stub_by_channel_name(channel)
-        response_code = await channel_stub.async_task().remove_audience_subscriber(peer_target=peer_target)
-        return {"response_code": response_code,
-                "message": message_code.get_response_msg(response_code)}
 
     @staticmethod
     @methods.add

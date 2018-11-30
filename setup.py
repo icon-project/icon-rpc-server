@@ -9,22 +9,8 @@ if version is None:
 	with open(os.path.join('.', 'VERSION')) as version_file:
 		version = version_file.read().strip()
 
-requires = [
-    "earlgrey",
-    "iconcommons",
-    "jsonschema",
-    "requests==2.19.1",
-    "jsonrpcserver==3.5.3",
-    "sanic==0.7.0",
-    "gunicorn == 19.7.1",
-    "grpcio == 1.3.5",
-    "grpcio-tools == 1.3.5",
-    "protobuf == 3.5.1",
-    "aiohttp == 3.0.9",
-    "jsonrpcclient == 2.6.0",
-    "secp256k1==0.13.2",
-    "sanic-cors==0.9.4"
-]
+with open('requirements.txt') as requirements:
+    requires = list(requirements)
 
 setup_options = {
     'name': 'iconrpcserver',

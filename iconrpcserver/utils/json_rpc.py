@@ -21,7 +21,7 @@ from jsonrpcclient.aiohttp_client import AsyncClient, async_timeout
 from past.builtins import basestring
 from jsonrpcserver import status
 
-from iconrpcserver.server.json_rpc import GenericJsonRpcServerError, JsonError
+from iconrpcserver.dispatcher import GenericJsonRpcServerError, JsonError
 from ..default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion
 from ..protos import message_code
 from ..utils.icon_service.converter_v2 import convert_params, ParamType

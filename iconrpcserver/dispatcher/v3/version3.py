@@ -23,16 +23,15 @@ from jsonrpcserver.aio import AsyncMethods
 from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
-from ...json_rpc import exception
-from ...rest_server import RestProperty
-from ....default_conf.icon_rpcserver_constant import DISPATCH_V3_TAG
-from ....protos import message_code
-from ....server.json_rpc.validator import validate_jsonschema_v3
-from ....utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
-from ....utils.json_rpc import redirect_request_to_rs, get_block_by_params, get_icon_stub_by_channel_name, \
-    get_channel_stub_by_channel_name
-from ....utils.message_queue.stub_collection import StubCollection
-from ....default_conf.icon_rpcserver_constant import NodeType, ConfigKey
+from iconrpcserver.dispatcher import GenericJsonRpcServerError, JsonError
+from iconrpcserver.server.rest_property import RestProperty
+from iconrpcserver.default_conf.icon_rpcserver_constant import DISPATCH_V3_TAG
+from iconrpcserver.protos import message_code
+from iconrpcserver.dispatcher import validate_jsonschema_v3
+from iconrpcserver.utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
+from iconrpcserver.utils.json_rpc import redirect_request_to_rs, get_block_by_params, get_icon_stub_by_channel_name
+from iconrpcserver.utils.message_queue.stub_collection import StubCollection
+from iconrpcserver.default_conf.icon_rpcserver_constant import NodeType, ConfigKey
 
 config.log_requests = False
 config.log_responses = False
@@ -61,7 +60,7 @@ class Version3Dispatcher:
             Logger.info(f"{client_ip} requested {req_json} on {url}")
 
             validate_jsonschema_v3(request=req_json)
-        except exception.GenericJsonRpcServerError as e:
+        except GenericJsonRpcServerError as e:
             response = ExceptionResponse(e, request_id=req_json.get('id', 0))
         except Exception as e:
             response = ExceptionResponse(e, request_id=req_json.get('id', 0))
@@ -127,15 +126,15 @@ class Version3Dispatcher:
         response_code, tx_hash = await channel_stub.async_task().create_icx_tx(kwargs)
 
         if response_code != message_code.Response.success:
-            raise exception.GenericJsonRpcServerError(
-                code=exception.JsonError.INVALID_REQUEST,
+            raise GenericJsonRpcServerError(
+                code=JsonError.INVALID_REQUEST,
                 message=message_code.responseCodeMap[response_code][1],
                 http_status=status.HTTP_BAD_REQUEST
             )
 
         if tx_hash is None:
-            raise exception.GenericJsonRpcServerError(
-                code=exception.JsonError.INVALID_REQUEST,
+            raise GenericJsonRpcServerError(
+                code=JsonError.INVALID_REQUEST,
                 message='txHash is None',
                 http_status=status.HTTP_BAD_REQUEST
             )
@@ -154,15 +153,15 @@ class Version3Dispatcher:
         response_code, result = await channel_stub.async_task().get_invoke_result(tx_hash)
 
         if response_code == message_code.Response.fail_tx_not_invoked:
-            raise exception.GenericJsonRpcServerError(
-                code=exception.JsonError.INVALID_PARAMS,
+            raise GenericJsonRpcServerError(
+                code=JsonError.INVALID_PARAMS,
                 message=message_code.responseCodeMap[response_code][1],
                 http_status=status.HTTP_BAD_REQUEST
             )
         elif response_code == message_code.Response.fail_invalid_key_error or \
             response_code == message_code.Response.fail:
-            raise exception.GenericJsonRpcServerError(
-                code=exception.JsonError.INVALID_PARAMS,
+            raise GenericJsonRpcServerError(
+                code=JsonError.INVALID_PARAMS,
                 message='Invalid params txHash',
                 http_status=status.HTTP_BAD_REQUEST
             )
@@ -186,8 +185,8 @@ class Version3Dispatcher:
 
         response_code, tx_info = await channel_stub.async_task().get_tx_info(request["txHash"])
         if response_code == message_code.Response.fail_invalid_key_error:
-            raise exception.GenericJsonRpcServerError(
-                code=exception.JsonError.INVALID_PARAMS,
+            raise GenericJsonRpcServerError(
+                code=JsonError.INVALID_PARAMS,
                 message='Invalid params txHash',
                 http_status=status.HTTP_BAD_REQUEST
             )
@@ -245,8 +244,8 @@ class Version3Dispatcher:
 
         response_code = result['response_code']
         if response_code != message_code.Response.success:
-            raise exception.GenericJsonRpcServerError(
-                code=exception.JsonError.INVALID_PARAMS,
+            raise GenericJsonRpcServerError(
+                code=JsonError.INVALID_PARAMS,
                 message=message_code.responseCodeMap[response_code][1],
                 http_status=status.HTTP_BAD_REQUEST
             )
@@ -263,8 +262,8 @@ class Version3Dispatcher:
                                                        channel_name=channel)
         response_code = result['response_code']
         if response_code != message_code.Response.success:
-            raise exception.GenericJsonRpcServerError(
-                code=exception.JsonError.INVALID_PARAMS,
+            raise GenericJsonRpcServerError(
+                code=JsonError.INVALID_PARAMS,
                 message=message_code.responseCodeMap[response_code][1],
                 http_status=status.HTTP_BAD_REQUEST
             )
