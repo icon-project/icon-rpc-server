@@ -505,9 +505,24 @@ SCHEMA_V3: dict = {
     "icx_getTransactionResult": icx_getTransactionResult_v3,
     "icx_getTransactionByHash": icx_getTransactionByHash_v3,
     "icx_sendTransaction": icx_sendTransaction_v3,
-    "debug_estimateStep": debug_estimateStep_v3,
     "ise_getStatus": ise_getStatus_v3
 }
+
+# TODO change to this thing that include debug_estimatestep when iconservice update to 1.2
+# SCHEMA_V3: dict = {
+#     "icx_getLastBlock": icx_getLastBlock,
+#     "icx_getBlockByHeight": icx_getBlockByHeight_v3,
+#     "icx_getBlockByHash": icx_getBlockByHash_v3,
+#     "icx_call": icx_call_v3,
+#     "icx_getBalance": icx_getBalance_v3,
+#     "icx_getScoreApi": icx_getScoreApi_v3,
+#     "icx_getTotalSupply": icx_getTotalSupply,
+#     "icx_getTransactionResult": icx_getTransactionResult_v3,
+#     "icx_getTransactionByHash": icx_getTransactionByHash_v3,
+#     "icx_sendTransaction": icx_sendTransaction_v3,
+#     "debug_estimateStep": debug_estimateStep_v3,
+#     "ise_getStatus": ise_getStatus_v3
+# }
 
 
 def validate_jsonschema_v3(request: object):
