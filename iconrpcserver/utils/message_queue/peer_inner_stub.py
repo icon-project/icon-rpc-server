@@ -30,6 +30,9 @@ class PeerInnerTask:
     async def get_channel_info_detail(self, channel_name):
         pass
 
+    @message_queue_task
+    async def get_peer_info(self):
+        pass
 
 class PeerInnerStub(MessageQueueStub[PeerInnerTask]):
     TaskType = PeerInnerTask

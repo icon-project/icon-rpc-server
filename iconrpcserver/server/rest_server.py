@@ -98,6 +98,8 @@ class ServerComponents(metaclass=SingletonMetaClass):
 
         self.__app.add_websocket_route(NodeDispatcher.websocket_dispatch, '/api/node/<channel_name>')
 
+        self.__app.add_route(PeerDispatcher.as_view(), '/api/peer', methods=['GET'])
+
     def ready(self):
         StubCollection().amqp_target = ServerComponents.conf[ConfigKey.AMQP_TARGET]
         StubCollection().amqp_key = ServerComponents.conf[ConfigKey.AMQP_KEY]
@@ -160,3 +162,9 @@ class Disable(HTTPMethodView):
 
     async def post(self, request):
         return response.text("This api version not support any more!")
+
+
+class PeerDispatcher(HTTPMethodView):
+    async def get(self, request):
+        peer_info = await StubCollection().peer_stub.async_task().get_peer_info()
+        return response.json(peer_info)
