@@ -1089,11 +1089,11 @@ It is used when transfering a message, and `data` has a HEX string.
 
 ## debug_estimateStep
 
-* Generates and returns an estimated step of how much step is necessary to allow the transaction to complete. The transaction will not be added to the blockchain. Note that the estimate may be more than the actual amount of step used by the transaction for several reasons including node performance.
+* Generates and returns an estimated step of how much step is necessary to allow the transaction to complete. The transaction will not be added to the blockchain. Note that the estimation can be larger than the actual amount of step to be used by the transaction for several reasons such as node performance.
 
 ### Parameters
 
-* The transaction information not to have stepLimit and signature
+* The transaction information without stepLimit and signature
 
 | KEY       | VALUE type                                                 | Required | Description                                                  |
 | :-------- | :--------------------------------------------------------- | :------: | :----------------------------------------------------------- |
