@@ -14,6 +14,7 @@
 
 import json
 
+from iconcommons.logger import Logger
 from jsonrpcserver.aio import AsyncMethods
 from sanic import response
 
@@ -56,13 +57,15 @@ class NodeDispatcher:
             message = {'error': 'This peer can no longer take more subscribe requests.'}
             return await ws.send(json.dumps(message))
 
+        Logger.debug(f"register subscriber address: {ws.remote_address}")
         try:
             height = request.get('height')
-            while True:
+            while ws.open:
                 new_block_json = await channel_stub.async_task().announce_new_block(subscriber_block_height=height)
                 await ws.send(new_block_json)
                 height += 1
         finally:
+            Logger.debug(f"unregister subscriber: {ws.remote_address}")
             await channel_stub.async_task().unregister_subscriber(remote_address=ws.remote_address)
 
     @staticmethod
