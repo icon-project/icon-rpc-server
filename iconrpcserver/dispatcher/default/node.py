@@ -25,6 +25,8 @@ from iconrpcserver.protos import message_code
 from iconrpcserver.utils.icon_service import ParamType, convert_params
 from iconrpcserver.utils.json_rpc import get_block_by_params, get_channel_stub_by_channel_name
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
+from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
+
 
 methods = AsyncMethods()
 ws_methods = AsyncMethods()
@@ -147,7 +149,8 @@ class NodeDispatcher:
                     if is_registered:
                         request = Request("node_ws_PublishHeartbeat")
                         await ws.send(json.dumps(request))
-                        await asyncio.sleep(30)
+                        heartbeat_time = StubCollection().conf[ConfigKey.WS_HEARTBEAT_TIME]
+                        await asyncio.sleep(heartbeat_time)
                         continue
 
                     raise RuntimeError("Unregistered")
