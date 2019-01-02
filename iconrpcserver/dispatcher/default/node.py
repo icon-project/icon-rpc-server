@@ -50,23 +50,23 @@ class NodeDispatcher:
     @staticmethod
     async def websocket_dispatch(request, ws, channel_name=None):
         request = json.loads(await ws.recv())
+        height, peer_id = request.get('height'), request.get('peer_id')
         channel_stub = get_channel_stub_by_channel_name(channel_name)
-        approved = await channel_stub.async_task().register_subscriber(remote_address=ws.remote_address)
+        approved = await channel_stub.async_task().register_subscriber(peer_id=peer_id)
 
         if not approved:
             message = {'error': 'This peer can no longer take more subscribe requests.'}
             return await ws.send(json.dumps(message))
 
-        Logger.debug(f"register subscriber address: {ws.remote_address}")
+        Logger.debug(f"register subscriber: {peer_id}")
         try:
-            height = request.get('height')
             while ws.open:
                 new_block_json = await channel_stub.async_task().announce_new_block(subscriber_block_height=height)
                 await ws.send(new_block_json)
                 height += 1
         finally:
-            Logger.debug(f"unregister subscriber: {ws.remote_address}")
-            await channel_stub.async_task().unregister_subscriber(remote_address=ws.remote_address)
+            Logger.debug(f"unregister subscriber: {peer_id}")
+            await channel_stub.async_task().unregister_subscriber(peer_id=peer_id)
 
     @staticmethod
     @methods.add

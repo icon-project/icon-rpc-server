@@ -54,11 +54,11 @@ class ChannelInnerTask:
         pass
 
     @message_queue_task
-    async def register_subscriber(self, remote_address):
+    async def register_subscriber(self, peer_id):
         pass
 
     @message_queue_task
-    async def unregister_subscriber(self, remote_address):
+    async def unregister_subscriber(self, peer_id):
         pass
 
 
