@@ -61,6 +61,10 @@ class ChannelInnerTask:
     async def unregister_subscriber(self, peer_id):
         pass
 
+    @message_queue_task
+    async def is_registered_subscriber(self, peer_id):
+        pass
+
 
 class ChannelInnerStub(MessageQueueStub[ChannelInnerTask]):
     TaskType = ChannelInnerTask

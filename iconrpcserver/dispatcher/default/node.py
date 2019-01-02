@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.'
 
+import asyncio
 import json
+import traceback
 
 from iconcommons.logger import Logger
 from jsonrpcserver.aio import AsyncMethods
+from jsonrpcclient.request import Request
 from sanic import response
 
 from iconrpcserver.protos import message_code
@@ -24,6 +27,7 @@ from iconrpcserver.utils.json_rpc import get_block_by_params, get_channel_stub_b
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
 methods = AsyncMethods()
+ws_methods = AsyncMethods()
 
 
 class NodeDispatcher:
@@ -49,24 +53,14 @@ class NodeDispatcher:
 
     @staticmethod
     async def websocket_dispatch(request, ws, channel_name=None):
-        request = json.loads(await ws.recv())
-        height, peer_id = request.get('height'), request.get('peer_id')
-        channel_stub = get_channel_stub_by_channel_name(channel_name)
-        approved = await channel_stub.async_task().register_subscriber(peer_id=peer_id)
-
-        if not approved:
-            message = {'error': 'This peer can no longer take more subscribe requests.'}
-            return await ws.send(json.dumps(message))
-
-        Logger.debug(f"register subscriber: {peer_id}")
-        try:
-            while ws.open:
-                new_block_json = await channel_stub.async_task().announce_new_block(subscriber_block_height=height)
-                await ws.send(new_block_json)
-                height += 1
-        finally:
-            Logger.debug(f"unregister subscriber: {peer_id}")
-            await channel_stub.async_task().unregister_subscriber(peer_id=peer_id)
+        request = await ws.recv()
+        request = json.loads(request)
+        context = {
+            "channel": channel_name,
+            "peer_id": request.get("peer_id"),
+            "ws": ws
+        }
+        await ws_methods.dispatch(request, context=context)
 
     @staticmethod
     @methods.add
@@ -104,3 +98,90 @@ class NodeDispatcher:
         block_hash, response = await get_block_by_params(channel_name=channel, block_height=request['height'],
                                                          with_commit_state=True)
         return response
+
+    @staticmethod
+    @ws_methods.add
+    async def node_ws_Subscribe(**kwargs):
+        context = kwargs.pop('context')
+        channel_name = context["channel"]
+        ws = context["ws"]
+
+        height = kwargs['height']
+        peer_id = kwargs['peer_id']
+
+        await NodeDispatcher.channel_register(ws, channel_name, peer_id)
+
+        futures = [
+            NodeDispatcher.publish_heartbeat(ws, channel_name, peer_id),
+            NodeDispatcher.publish_new_block(ws, channel_name, height)
+        ]
+
+        await asyncio.wait(futures, return_when=asyncio.FIRST_EXCEPTION)
+        await NodeDispatcher.channel_unregister(ws, channel_name, peer_id)
+
+    @staticmethod
+    async def channel_register(ws, channel_name: str, peer_id: str):
+        channel_stub = get_channel_stub_by_channel_name(channel_name)
+        approved = await channel_stub.async_task().register_subscriber(peer_id=peer_id)
+
+        if not approved:
+            raise RuntimeError("This peer can no longer take more subscribe requests.")
+
+        Logger.debug(f"register subscriber: {peer_id}")
+
+    @staticmethod
+    async def channel_unregister(ws, channel_name: str, peer_id: str):
+        channel_stub = get_channel_stub_by_channel_name(channel_name)
+        await channel_stub.async_task().unregister_subscriber(peer_id=peer_id)
+
+        Logger.debug(f"unregister subscriber: {peer_id}")
+
+    @staticmethod
+    async def publish_heartbeat(ws, channel_name, peer_id):
+        async def _publish_heartbeat():
+            channel_stub = get_channel_stub_by_channel_name(channel_name)
+            exception = None
+            while ws.open:
+                try:
+                    is_registered = channel_stub.async_task().is_registered_subscriber(peer_id=peer_id)
+                    if is_registered:
+                        request = Request("node_ws_PublishHeartbeat")
+                        await ws.send(json.dumps(request))
+                        await asyncio.sleep(30)
+                        continue
+
+                    raise RuntimeError("Unregistered")
+
+                except Exception as e:
+                    exception = e
+                    traceback.print_exc()
+                    break
+
+            if not exception:
+                exception = ConnectionError("Connection closed.")
+
+            request = Request("node_ws_PublishHeartbeat",
+                              error=str(exception))
+            await ws.send(json.dumps(request))
+            raise exception
+
+        await asyncio.ensure_future(_publish_heartbeat())
+
+    @staticmethod
+    async def publish_new_block(ws, channel_name, height):
+        async def _publish_new_block():
+            nonlocal height
+
+            channel_stub = get_channel_stub_by_channel_name(channel_name)
+            try:
+                while ws.open:
+                    new_block_json = await channel_stub.async_task().announce_new_block(subscriber_block_height=height)
+                    request = Request("node_ws_PublishNewBlock", block=new_block_json)
+
+                    await ws.send(json.dumps(request))
+                    height += 1
+            except Exception as e:
+                traceback.print_exc()
+                raise e
+
+        await asyncio.ensure_future(_publish_new_block())
