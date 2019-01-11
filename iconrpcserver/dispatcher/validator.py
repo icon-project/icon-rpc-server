@@ -82,7 +82,7 @@ icx_getBalance_v2: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "address": {"type": "string"},
+                "address": {"type": "string", "format": "address"},
             },
             "additionalProperties": False,
             "required": ["address"]
@@ -286,7 +286,7 @@ icx_getBalance_v3: dict = {
         "params": {
             "type": "object",
             "properties": {
-                "address": {"type": "string"}
+                "address": {"type": "string", "format": "address"}
             },
             "additionalProperties": False,
             "required": ["address"]
@@ -564,8 +564,19 @@ def validate_jsonschema(request: object, schemas: dict = SCHEMA_V3):
     try:
         validator.validate(request)
     except ValidationError as e:
+        print(f"{e.schema_path}, || {e.path}")
+        if e.schema_path[-1] == "additionalProperties":
+            if len(e.path) == 0:
+                message = f"There is an invalid key in 1st depth"
+            else:
+                message = f"There is an invalid key in '{e.path[-1]}'"
+        elif len(e.path) > 0:
+            message = f"'{e.path[-1]}' has an invalid value"
+        else:
+            message = f"Invalid request"
+
         raise GenericJsonRpcServerError(code=JsonError.INVALID_PARAMS,
-                                        message=f"JSON schema validation error: {e.message}",
+                                        message=f"JSON schema validation error: {message}",
                                         http_status=status.HTTP_BAD_REQUEST)
 
 
