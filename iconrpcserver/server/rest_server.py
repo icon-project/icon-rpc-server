@@ -41,6 +41,7 @@ class ServerComponents(metaclass=SingletonMetaClass):
     def __init__(self):
         self.__app = Sanic(__name__, log_config=self._make_log_config())
         self.__app.config.KEEP_ALIVE = False
+        self.__app.config.REQUEST_MAX_SIZE = ServerComponents.conf[ConfigKey.REQUEST_MAX_SIZE]
         CORS(self.__app)
 
         # Decide whether to create context or not according to whether SSL is applied
