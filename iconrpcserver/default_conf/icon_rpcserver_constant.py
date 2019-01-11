@@ -66,6 +66,7 @@ class ConfigKey:
     TBEARS_MODE = 'tbearsMode'
     REDIRECT_PROTOCOL = 'REDIRECT_PROTOCOL'
     WS_HEARTBEAT_TIME = 'wsHeartBeatTime'
+    REQUEST_MAX_SIZE = "requestMaxSize"
 
 
 ICON_RPC_SERVER_LOG_TAG = 'IconService'
