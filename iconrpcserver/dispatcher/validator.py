@@ -564,7 +564,6 @@ def validate_jsonschema(request: object, schemas: dict = SCHEMA_V3):
     try:
         validator.validate(request)
     except ValidationError as e:
-        print(f"{e.schema_path}, || {e.path}")
         if e.schema_path[-1] == "additionalProperties":
             if len(e.path) == 0:
                 message = f"There is an invalid key in 1st depth"
@@ -573,7 +572,7 @@ def validate_jsonschema(request: object, schemas: dict = SCHEMA_V3):
         elif len(e.path) > 0:
             message = f"'{e.path[-1]}' has an invalid value"
         else:
-            message = f"Invalid request"
+            message = f"Invalid params"
 
         raise GenericJsonRpcServerError(code=JsonError.INVALID_PARAMS,
                                         message=f"JSON schema validation error: {message}",
