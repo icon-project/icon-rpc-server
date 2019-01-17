@@ -96,7 +96,7 @@ def main():
     Logger.load_config(conf)
     Logger.print_config(conf, ICON_RPCSERVER_CLI)
 
-    _run_async(_check_rabbitmq())
+    _run_async(_check_rabbitmq(conf[ConfigKey.AMQP_TARGET]))
     _run_async(_run(conf))
 
 
@@ -106,16 +106,16 @@ def _run_async(async_func):
 
 
 def run_in_foreground(conf: 'IconConfig'):
-    _run_async(_check_rabbitmq())
+    _run_async(_check_rabbitmq(conf[ConfigKey.AMQP_TARGET]))
     _run_async(_run(conf))
 
 
-async def _check_rabbitmq():
+async def _check_rabbitmq(amqp_target: str):
     connection = None
     try:
         amqp_user_name = os.getenv("AMQP_USERNAME", "guest")
         amqp_password = os.getenv("AMQP_PASSWORD", "guest")
-        connection = await aio_pika.connect(login=amqp_user_name, password=amqp_password)
+        connection = await aio_pika.connect(host=amqp_target, login=amqp_user_name, password=amqp_password)
         connection.connect()
     except ConnectionRefusedError:
         Logger.error("rabbitmq-service disable", ICON_RPCSERVER_CLI)
