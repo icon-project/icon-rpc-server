@@ -16,9 +16,10 @@ from typing import Dict
 
 from ...components.singleton import SingletonMetaClass
 from .peer_inner_stub import PeerInnerStub
-from .channel_inner_stub import ChannelInnerStub
+from .channel_inner_stub import ChannelInnerStub, ChannelTxCreatorInnerStub
 from .icon_score_inner_stub import IconScoreInnerStub
-from ...default_conf.icon_rpcserver_constant import PEER_QUEUE_NAME_FORMAT, CHANNEL_QUEUE_NAME_FORMAT,\
+from ...default_conf.icon_rpcserver_constant import PEER_QUEUE_NAME_FORMAT, \
+    CHANNEL_QUEUE_NAME_FORMAT, CHANNEL_TX_CREATOR_QUEUE_NAME_FORMAT, \
     ICON_SCORE_QUEUE_NAME_FORMAT
 from iconcommons.logger import Logger
 
@@ -31,6 +32,7 @@ class StubCollection(metaclass=SingletonMetaClass):
 
         self.peer_stub: PeerInnerStub = None
         self.channel_stubs: Dict[str, ChannelInnerStub] = {}
+        self.channel_tx_creator_stubs: Dict[str, ChannelTxCreatorInnerStub] = {}
         self.icon_score_stubs: Dict[str, IconScoreInnerStub] = {}
 
     async def create_peer_stub(self):
@@ -48,6 +50,16 @@ class StubCollection(metaclass=SingletonMetaClass):
         self.channel_stubs[channel_name] = stub
 
         Logger.debug(f"ChannelTasks : {channel_name}, Queue : {queue_name}")
+        return stub
+
+    async def create_channel_tx_creator_stub(self, channel_name):
+        Logger.debug(f"create_channel_tx_creator_stub")
+        queue_name = CHANNEL_TX_CREATOR_QUEUE_NAME_FORMAT.format(channel_name=channel_name, amqp_key=self.amqp_key)
+        stub = ChannelTxCreatorInnerStub(self.amqp_target, queue_name)
+        await stub.connect()
+        self.channel_tx_creator_stubs[channel_name] = stub
+
+        Logger.debug(f"ChannelTxCreatorTasks : {channel_name}, Queue : {queue_name}")
         return stub
 
     async def create_icon_score_stub(self, channel_name):

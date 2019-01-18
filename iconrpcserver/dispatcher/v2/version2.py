@@ -96,8 +96,8 @@ class Version2Dispatcher:
         response_to_json_query(response)
 
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
-        channel_inner_tasks = StubCollection().channel_stubs[channel_name]
-        response_code, tx_hash = await channel_inner_tasks.async_task().create_icx_tx(kwargs)
+        channel_tx_creator_stub = StubCollection().channel_tx_creator_stubs[channel_name]
+        response_code, tx_hash = await channel_tx_creator_stub.async_task().create_icx_tx(kwargs)
 
         response_data = {'response_code': response_code}
         if response_code != message_code.Response.success:
