@@ -22,10 +22,6 @@ if TYPE_CHECKING:
 
 class ChannelInnerTask:
     @message_queue_task
-    async def create_icx_tx(self, kwargs) -> Tuple[int, str]:
-        pass
-
-    @message_queue_task
     async def get_invoke_result(self, tx_hash) -> Tuple[int, str]:
         pass
 
@@ -68,6 +64,19 @@ class ChannelInnerTask:
 
 class ChannelInnerStub(MessageQueueStub[ChannelInnerTask]):
     TaskType = ChannelInnerTask
+
+    def _callback_connection_lost_callback(self, connection: 'RobustConnection'):
+        exit_process()
+
+
+class ChannelTxCreatorInnerTask:
+    @message_queue_task
+    async def create_icx_tx(self, kwargs) -> Tuple[int, str]:
+        pass
+
+
+class ChannelTxCreatorInnerStub(MessageQueueStub[ChannelTxCreatorInnerTask]):
+    TaskType = ChannelTxCreatorInnerTask
 
     def _callback_connection_lost_callback(self, connection: 'RobustConnection'):
         exit_process()

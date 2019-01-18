@@ -110,6 +110,7 @@ class ServerComponents(metaclass=SingletonMetaClass):
             if self.conf.get(ConfigKey.TBEARS_MODE, False):
                 channel_name = self.conf.get(ConfigKey.CHANNEL, 'loopchain_default')
                 await StubCollection().create_channel_stub(channel_name)
+                await StubCollection().create_channel_tx_creator_stub(channel_name)
                 await StubCollection().create_icon_score_stub(channel_name)
 
                 RestProperty().node_type = NodeType.CommunityNode
@@ -120,6 +121,7 @@ class ServerComponents(metaclass=SingletonMetaClass):
                 channel_name = None
                 for channel_name, channel_info in channels_info.items():
                     await StubCollection().create_channel_stub(channel_name)
+                    await StubCollection().create_channel_tx_creator_stub(channel_name)
                     await StubCollection().create_icon_score_stub(channel_name)
                 results = await StubCollection().peer_stub.async_task().get_channel_info_detail(channel_name)
                 RestProperty().node_type = NodeType(results[6])
