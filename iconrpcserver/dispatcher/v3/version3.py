@@ -122,8 +122,8 @@ class Version3Dispatcher:
         # Error Check
         response_to_json_query(response)
 
-        channel_stub = StubCollection().channel_stubs[channel]
-        response_code, tx_hash = await channel_stub.async_task().create_icx_tx(kwargs)
+        channel_tx_creator_stub = StubCollection().channel_tx_creator_stubs[channel]
+        response_code, tx_hash = await channel_tx_creator_stub.async_task().create_icx_tx(kwargs)
 
         if response_code != message_code.Response.success:
             raise GenericJsonRpcServerError(
