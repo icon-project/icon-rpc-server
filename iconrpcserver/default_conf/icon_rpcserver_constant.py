@@ -42,6 +42,7 @@ class ApiVersion(IntFlag):
 
 PEER_QUEUE_NAME_FORMAT = "Peer.{amqp_key}"
 CHANNEL_QUEUE_NAME_FORMAT = "Channel.{channel_name}.{amqp_key}"
+CHANNEL_TX_CREATOR_QUEUE_NAME_FORMAT = "ChannelTxCreator.{channel_name}.{amqp_key}"
 ICON_SCORE_QUEUE_NAME_FORMAT = "IconScore.{channel_name}.{amqp_key}"
 
 
