@@ -94,6 +94,11 @@ def main():
     redirect_protocol = os.getenv(ConfigKey.REDIRECT_PROTOCOL)
     if redirect_protocol:
         conf.update_conf({ConfigKey.REDIRECT_PROTOCOL: redirect_protocol})
+    else:
+        low_camel_case_key = ConfigKey.REDIRECT_PROTOCOL
+        redirect_protocol = conf.get(low_camel_case_key)
+        if redirect_protocol is not None:
+            conf.update_conf({ConfigKey.REDIRECT_PROTOCOL: redirect_protocol})
 
     Logger.load_config(conf)
 
