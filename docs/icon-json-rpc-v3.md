@@ -7,7 +7,7 @@ This document explains JSON-RPC APIs (version 3) available to interact with ICON
 
 * Follows [JSON-RPC 2.0 Specification](http://www.jsonrpc.org/specification).
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -122,7 +122,7 @@ Below table shows the default error messages for the error code. Actual message 
 
 ## Main API
 
-API path : `<scheme>://<host>/api/v3`
+API path : `<scheme>://<host>/api/v3` or `<scheme>://<host>/api/v3/<channel_name>`
 
 * [icx_getLastBlock](#icx_getlastblock)
 * [icx_getBlockByHeight](#icx_getblockbyheight)
@@ -137,9 +137,17 @@ API path : `<scheme>://<host>/api/v3`
 
 ## Debug API
 
-API path : `<scheme>://<host>/api/debug/v3` 
+API path : `<scheme>://<host>/api/debug/v3`
 
 * [debug_estimateStep](#debug_estimatestep)
+
+## Rep API
+
+API path : `<scheme>://<host>/api/v3` or `<scheme>://<host>/api/v3/<channel_name>`
+
+* [rep_getList](#rep_getList)
+* [rep_getListByHeight](#rep_getListByHeight)
+* [rep_getListByRepRootHash](#rep_getListByRepRootHash)
 
 ## Other API
 
@@ -161,7 +169,7 @@ Block data
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -202,7 +210,7 @@ Block data
         ],
         "block_hash": "1fcf7c34dc875681761bdaa5d75d770e78e8166b5c4f06c226c53300cbe85f57",
         "height": 3,
-        "peer_id": "e07212ee-fe4b-11e7-8c7b-acbc32865d5f",
+        "peer_id": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe",
         "signature": "MEQCICT8mTIL6pRwMWsJjSBHcl4QYiSgG8+0H3U32+05mO9HAiBOhIfBdHNm71WpAZYwJWwQbPVVXFJ8clXGKT3ScDWcvw=="
     }
 }
@@ -223,7 +231,7 @@ Block data
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -267,7 +275,7 @@ Block data
         ],
         "block_hash": "1fcf7c34dc875681761bdaa5d75d770e78e8166b5c4f06c226c53300cbe85f57",
         "height": 3,
-        "peer_id": "e07212ee-fe4b-11e7-8c7b-acbc32865d5f",
+        "peer_id": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe",
         "signature": "MEQCICT8mTIL6pRwMWsJjSBHcl4QYiSgG8+0H3U32+05mO9HAiBOhIfBdHNm71WpAZYwJWwQbPVVXFJ8clXGKT3ScDWcvw=="
     }
 }
@@ -298,7 +306,7 @@ Block data
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -342,7 +350,7 @@ Block data
         ],
         "block_hash": "1fcf7c34dc875681761bdaa5d75d770e78e8166b5c4f06c226c53300cbe85f57",
         "height": 3,
-        "peer_id": "e07212ee-fe4b-11e7-8c7b-acbc32865d5f",
+        "peer_id": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe",
         "signature": "MEQCICT8mTIL6pRwMWsJjSBHcl4QYiSgG8+0H3U32+05mO9HAiBOhIfBdHNm71WpAZYwJWwQbPVVXFJ8clXGKT3ScDWcvw=="
     }
 }
@@ -380,7 +388,7 @@ Values returned by the executed SCORE function.
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -443,7 +451,7 @@ Number of ICX coins.
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -498,7 +506,7 @@ Number of ICX coins.
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -578,7 +586,7 @@ Total number of ICX coins issued.
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -624,7 +632,7 @@ Total number of ICX coins issued.
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -740,7 +748,7 @@ Total number of ICX coins issued.
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -827,7 +835,7 @@ T_DICT(String)
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -924,7 +932,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 #### Coin transfer
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -946,7 +954,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 #### SCORE function call
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -975,7 +983,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 #### SCORE install
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -1006,7 +1014,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 #### SCORE update
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -1035,7 +1043,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 #### Message transfer
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -1058,7 +1066,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 #### Responses
 
-```json
+```javascript
 // Response - success
 {
     "jsonrpc": "2.0",
@@ -1113,7 +1121,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -1144,6 +1152,180 @@ It is used when transfering a message, and `data` has a HEX string.
     "error": {
         "code": -32602,
         "message": "JSON schema validation error: 'version' is a required property"
+    }
+}
+```
+
+## rep_getList
+
+* Get all list of Representatives and information about terms & RepRootHash
+
+### Parameters
+
+None
+
+### Returns
+
+* The list of Representatives of last block
+
+### Example
+
+```javascript
+// Request
+{
+    "jsonrpc" : "2.0",
+    "method": "rep_getList",
+    "id": 1234
+}
+
+// Response - success
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "startTermHeight": "0x0",
+        "endTermHeight": "0x0",
+        "repRootHash": "0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238",
+        "rep": [
+            {
+                "id": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe"
+            },
+            {
+                "id": "hx9f049228bade72bc0a3490061b824f16bbb74589"
+            },
+            {
+                "id": "hx6435405122df9fe5187d659588beccdf7aee8557"
+            },
+            {
+                "id": "hx475bfec4178f3abc88c959faa2e6384e6b409c8f"
+            }
+        ]
+    },
+    "id": 1234
+}
+```
+
+## rep_getListByHeight
+
+* Get all list of Representatives and information about terms & RepRootHash
+
+### Parameters
+
+| KEY    | VALUE type      | Required | Description               |
+|:-------|:----------------|:---------|:--------------------------|
+| height | [T_INT](#T_INT) | required | Integer of a block height |
+
+### Returns
+
+* The list of Representatives of given block height.
+
+### Example
+
+```javascript
+// Request
+{
+    "jsonrpc" : "2.0",
+    "method": "rep_getListByHeight",
+    "id": 1234,
+    "params": {
+        "height": "0x3"
+    }
+}
+
+// Response - success
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "startTermHeight": "0x0",
+        "endTermHeight": "0x0",
+        "repRootHash": "0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238",
+        "rep": [
+            {
+                "id": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe"
+            },
+            {
+                "id": "hx9f049228bade72bc0a3490061b824f16bbb74589"
+            },
+            {
+                "id": "hx6435405122df9fe5187d659588beccdf7aee8557"
+            },
+            {
+                "id": "hx475bfec4178f3abc88c959faa2e6384e6b409c8f"
+            }
+        ]
+    },
+    "id": 1234
+}
+
+// Response - error
+{
+    "jsonrpc": "2.0",
+    "id": 1234,
+    "error": {
+        "code": -32602,
+        "message": "Invalid params height"
+    }
+}
+```
+
+## rep_getListByRepRootHash
+
+* Get all list of Representatives and information about terms & RepRootHash
+
+### Parameters
+
+| KEY         | VALUE type        | Required | Description                  |
+|:------------|:------------------|:---------|:-----------------------------|
+| repRootHash | [T_HASH](#T_HASH) | required | root hash of representatives |
+
+### Returns
+
+* The list of Representatives of given RepRootHash.
+
+### Example
+
+```javascript
+// Request
+{
+    "jsonrpc" : "2.0",
+    "method": "rep_getListByRepRootHash",
+    "id": 1234,
+    "params": {
+        "repRootHash": "0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238"
+    }
+}
+
+// Response - success
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "startTermHeight": "0x0",
+        "endTermHeight": "0x0",
+        "repRootHash": "0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238",
+        "rep": [
+            {
+                "id": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe"
+            },
+            {
+                "id": "hx9f049228bade72bc0a3490061b824f16bbb74589"
+            },
+            {
+                "id": "hx6435405122df9fe5187d659588beccdf7aee8557"
+            },
+            {
+                "id": "hx475bfec4178f3abc88c959faa2e6384e6b409c8f"
+            }
+        ]
+    },
+    "id": 1234
+}
+
+// Response - error
+{
+    "jsonrpc": "2.0",
+    "id": 1234,
+    "error": {
+        "code": -32602,
+        "message": "Invalid params repRootHash"
     }
 }
 ```
