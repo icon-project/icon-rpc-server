@@ -144,7 +144,7 @@ def start_process(conf: 'IconConfig'):
             continue
         custom_argv.append(k)
         custom_argv.append(str(v))
-    if conf[ConfigKey.TBEARS_MODE]:
+    if conf.get(ConfigKey.TBEARS_MODE, False):
         custom_argv.append('-tbears')
 
     is_foreground = conf.get('foreground', False)
