@@ -120,9 +120,11 @@ Below table shows the default error messages for the error code. Actual message 
 
 # JSON-RPC APIs
 
+> For multichannel requests, add `/<channel_name>` at the end of the API path.
+
 ## Main API
 
-API path : `<scheme>://<host>/api/v3` or `<scheme>://<host>/api/v3/<channel_name>`
+API path : `<scheme>://<host>/api/v3`
 
 * [icx_getLastBlock](#icx_getlastblock)
 * [icx_getBlockByHeight](#icx_getblockbyheight)
@@ -143,11 +145,9 @@ API path : `<scheme>://<host>/api/debug/v3`
 
 ## Rep API
 
-API path : `<scheme>://<host>/api/v3` or `<scheme>://<host>/api/v3/<channel_name>`
+API path : `<scheme>://<host>/api/rep/v3`
 
-* [rep_getList](#rep_getList)
-* [rep_getListByHeight](#rep_getListByHeight)
-* [rep_getListByRepRootHash](#rep_getListByRepRootHash)
+* [rep_getList](#rep_getlist)
 
 ## Other API
 
@@ -1201,132 +1201,6 @@ None
         ]
     },
     "id": 1234
-}
-```
-
-## rep_getListByHeight
-
-* Get all list of Representatives and information about terms & RepRootHash
-
-### Parameters
-
-| KEY    | VALUE type      | Required | Description               |
-|:-------|:----------------|:---------|:--------------------------|
-| height | [T_INT](#T_INT) | required | Integer of a block height |
-
-### Returns
-
-* The list of Representatives of given block height.
-
-### Example
-
-```javascript
-// Request
-{
-    "jsonrpc" : "2.0",
-    "method": "rep_getListByHeight",
-    "id": 1234,
-    "params": {
-        "height": "0x3"
-    }
-}
-
-// Response - success
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "startTermHeight": "0x0",
-        "endTermHeight": "0x0",
-        "repRootHash": "0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238",
-        "rep": [
-            {
-                "id": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe"
-            },
-            {
-                "id": "hx9f049228bade72bc0a3490061b824f16bbb74589"
-            },
-            {
-                "id": "hx6435405122df9fe5187d659588beccdf7aee8557"
-            },
-            {
-                "id": "hx475bfec4178f3abc88c959faa2e6384e6b409c8f"
-            }
-        ]
-    },
-    "id": 1234
-}
-
-// Response - error
-{
-    "jsonrpc": "2.0",
-    "id": 1234,
-    "error": {
-        "code": -32602,
-        "message": "Invalid params height"
-    }
-}
-```
-
-## rep_getListByRepRootHash
-
-* Get all list of Representatives and information about terms & RepRootHash
-
-### Parameters
-
-| KEY         | VALUE type        | Required | Description                  |
-|:------------|:------------------|:---------|:-----------------------------|
-| repRootHash | [T_HASH](#T_HASH) | required | root hash of representatives |
-
-### Returns
-
-* The list of Representatives of given RepRootHash.
-
-### Example
-
-```javascript
-// Request
-{
-    "jsonrpc" : "2.0",
-    "method": "rep_getListByRepRootHash",
-    "id": 1234,
-    "params": {
-        "repRootHash": "0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238"
-    }
-}
-
-// Response - success
-{
-    "jsonrpc": "2.0",
-    "result": {
-        "startTermHeight": "0x0",
-        "endTermHeight": "0x0",
-        "repRootHash": "0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238",
-        "rep": [
-            {
-                "id": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe"
-            },
-            {
-                "id": "hx9f049228bade72bc0a3490061b824f16bbb74589"
-            },
-            {
-                "id": "hx6435405122df9fe5187d659588beccdf7aee8557"
-            },
-            {
-                "id": "hx475bfec4178f3abc88c959faa2e6384e6b409c8f"
-            }
-        ]
-    },
-    "id": 1234
-}
-
-// Response - error
-{
-    "jsonrpc": "2.0",
-    "id": 1234,
-    "error": {
-        "code": -32602,
-        "message": "Invalid params repRootHash"
-    }
 }
 ```
 
