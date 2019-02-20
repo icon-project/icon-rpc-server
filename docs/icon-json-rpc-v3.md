@@ -7,7 +7,7 @@ This document explains JSON-RPC APIs (version 3) available to interact with ICON
 
 * Follows [JSON-RPC 2.0 Specification](http://www.jsonrpc.org/specification).
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -120,6 +120,8 @@ Below table shows the default error messages for the error code. Actual message 
 
 # JSON-RPC APIs
 
+> For multichannel requests, add `/<channel_name>` at the end of the API path.
+
 ## Main API
 
 API path : `<scheme>://<host>/api/v3`
@@ -137,7 +139,7 @@ API path : `<scheme>://<host>/api/v3`
 
 ## Debug API
 
-API path : `<scheme>://<host>/api/debug/v3` 
+API path : `<scheme>://<host>/api/debug/v3`
 
 * [debug_estimateStep](#debug_estimatestep)
 
@@ -146,6 +148,7 @@ API path : `<scheme>://<host>/api/debug/v3`
 API path : `<scheme>://<host>/api/v3`
 
 * [ise_getStatus](#ise_getstatus)
+* [rep_getList](#rep_getlist)
 
 # JSON-RPC Methods
 
@@ -161,7 +164,7 @@ Block data
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -202,7 +205,7 @@ Block data
         ],
         "block_hash": "1fcf7c34dc875681761bdaa5d75d770e78e8166b5c4f06c226c53300cbe85f57",
         "height": 3,
-        "peer_id": "e07212ee-fe4b-11e7-8c7b-acbc32865d5f",
+        "peer_id": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe",
         "signature": "MEQCICT8mTIL6pRwMWsJjSBHcl4QYiSgG8+0H3U32+05mO9HAiBOhIfBdHNm71WpAZYwJWwQbPVVXFJ8clXGKT3ScDWcvw=="
     }
 }
@@ -223,7 +226,7 @@ Block data
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -267,7 +270,7 @@ Block data
         ],
         "block_hash": "1fcf7c34dc875681761bdaa5d75d770e78e8166b5c4f06c226c53300cbe85f57",
         "height": 3,
-        "peer_id": "e07212ee-fe4b-11e7-8c7b-acbc32865d5f",
+        "peer_id": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe",
         "signature": "MEQCICT8mTIL6pRwMWsJjSBHcl4QYiSgG8+0H3U32+05mO9HAiBOhIfBdHNm71WpAZYwJWwQbPVVXFJ8clXGKT3ScDWcvw=="
     }
 }
@@ -298,7 +301,7 @@ Block data
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -342,7 +345,7 @@ Block data
         ],
         "block_hash": "1fcf7c34dc875681761bdaa5d75d770e78e8166b5c4f06c226c53300cbe85f57",
         "height": 3,
-        "peer_id": "e07212ee-fe4b-11e7-8c7b-acbc32865d5f",
+        "peer_id": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe",
         "signature": "MEQCICT8mTIL6pRwMWsJjSBHcl4QYiSgG8+0H3U32+05mO9HAiBOhIfBdHNm71WpAZYwJWwQbPVVXFJ8clXGKT3ScDWcvw=="
     }
 }
@@ -380,7 +383,7 @@ Values returned by the executed SCORE function.
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -443,7 +446,7 @@ Number of ICX coins.
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -498,7 +501,7 @@ Number of ICX coins.
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -578,7 +581,7 @@ Total number of ICX coins issued.
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -624,7 +627,7 @@ Total number of ICX coins issued.
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -740,7 +743,7 @@ Total number of ICX coins issued.
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -827,7 +830,7 @@ T_DICT(String)
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -924,7 +927,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 #### Coin transfer
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -946,7 +949,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 #### SCORE function call
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -975,7 +978,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 #### SCORE install
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -1006,7 +1009,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 #### SCORE update
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -1035,7 +1038,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 #### Message transfer
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -1058,7 +1061,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 #### Responses
 
-```json
+```javascript
 // Response - success
 {
     "jsonrpc": "2.0",
@@ -1113,7 +1116,7 @@ It is used when transfering a message, and `data` has a HEX string.
 
 ### Example
 
-```json
+```javascript
 // Request
 {
     "jsonrpc": "2.0",
@@ -1145,6 +1148,54 @@ It is used when transfering a message, and `data` has a HEX string.
         "code": -32602,
         "message": "JSON schema validation error: 'version' is a required property"
     }
+}
+```
+
+## rep_getList
+
+* Get all list of Representatives and information about terms & RepRootHash
+
+### Parameters
+
+None
+
+### Returns
+
+* The list of Representatives of last block
+
+### Example
+
+```javascript
+// Request
+{
+    "jsonrpc" : "2.0",
+    "method": "rep_getList",
+    "id": 1234
+}
+
+// Response - success
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "startTermHeight": "0x0",
+        "endTermHeight": "0x0",
+        "repHash": "0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238",
+        "rep": [
+            {
+                "id": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe"
+            },
+            {
+                "id": "hx9f049228bade72bc0a3490061b824f16bbb74589"
+            },
+            {
+                "id": "hx6435405122df9fe5187d659588beccdf7aee8557"
+            },
+            {
+                "id": "hx475bfec4178f3abc88c959faa2e6384e6b409c8f"
+            }
+        ]
+    },
+    "id": 1234
 }
 ```
 
