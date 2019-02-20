@@ -143,17 +143,12 @@ API path : `<scheme>://<host>/api/debug/v3`
 
 * [debug_estimateStep](#debug_estimatestep)
 
-## Rep API
-
-API path : `<scheme>://<host>/api/rep/v3`
-
-* [rep_getList](#rep_getlist)
-
 ## Other API
 
 API path : `<scheme>://<host>/api/v3`
 
 * [ise_getStatus](#ise_getstatus)
+* [rep_getList](#rep_getlist)
 
 # JSON-RPC Methods
 
@@ -1184,7 +1179,7 @@ None
     "result": {
         "startTermHeight": "0x0",
         "endTermHeight": "0x0",
-        "repRootHash": "0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238",
+        "repHash": "0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238",
         "rep": [
             {
                 "id": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe"
