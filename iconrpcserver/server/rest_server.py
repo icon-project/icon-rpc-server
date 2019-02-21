@@ -26,7 +26,7 @@ from ..default_conf.icon_rpcserver_constant import ConfigKey, NodeType, SSLAuthT
 from ..components import SingletonMetaClass
 from .peer_service_stub import PeerServiceStub
 from .rest_property import RestProperty
-from iconrpcserver.dispatcher.default import NodeDispatcher
+from iconrpcserver.dispatcher.default import NodeDispatcher, WSDispatcher
 from iconrpcserver.dispatcher.v2 import Version2Dispatcher
 from iconrpcserver.dispatcher.v3 import Version3Dispatcher
 from iconrpcserver.dispatcher.v3d import Version3DebugDispatcher
@@ -98,6 +98,7 @@ class ServerComponents(metaclass=SingletonMetaClass):
         self.__app.add_route(Avail.as_view(), '/api/v1/avail/peer')
 
         self.__app.add_websocket_route(NodeDispatcher.websocket_dispatch, '/api/node/<channel_name>')
+        self.__app.add_websocket_route(WSDispatcher.dispatch, '/api/ws/<channel_name>')
 
     def ready(self):
         StubCollection().amqp_target = ServerComponents.conf[ConfigKey.AMQP_TARGET]

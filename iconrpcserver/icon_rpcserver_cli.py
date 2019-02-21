@@ -94,6 +94,12 @@ def main():
     redirect_protocol = os.getenv(ConfigKey.REDIRECT_PROTOCOL)
     if redirect_protocol:
         conf.update_conf({ConfigKey.REDIRECT_PROTOCOL: redirect_protocol})
+    else:
+        from iconrpcserver.utils import to_low_camel_case
+        low_camel_case_key = to_low_camel_case(ConfigKey.REDIRECT_PROTOCOL)
+        redirect_protocol = conf.get(low_camel_case_key)
+        if redirect_protocol is not None:
+            conf.update_conf({ConfigKey.REDIRECT_PROTOCOL: redirect_protocol})
 
     Logger.load_config(conf)
 
@@ -138,7 +144,7 @@ def start_process(conf: 'IconConfig'):
             continue
         custom_argv.append(k)
         custom_argv.append(str(v))
-    if conf[ConfigKey.TBEARS_MODE]:
+    if conf.get(ConfigKey.TBEARS_MODE, False):
         custom_argv.append('-tbears')
 
     is_foreground = conf.get('foreground', False)

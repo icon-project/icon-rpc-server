@@ -11,3 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+
+def to_low_camel_case(snake_str: str) -> str:
+    str_array = snake_str.split('_')
+    tmp_str = str_array[0].swapcase() + ''.join(sub.title() for sub in str_array[1:])
+    return tmp_str
