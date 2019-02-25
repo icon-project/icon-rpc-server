@@ -418,6 +418,27 @@ icx_getTransactionByHash_v3: dict = {
     "required": ["jsonrpc", "method", "id", "params"]
 }
 
+icx_getTransactionProof_v3: dict = {
+    "title": "icx_getTransactionProof",
+    "id": "https://github.com/icon-project/icon-rpc-server/blob/master/docs/icon-json-rpc-v3.md#icx_gettransactionproof",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": ["number", "string"]},
+        "params": {
+            "type": "object",
+            "properties": {
+                "txHash": {"type": "string", "format": "hash"}
+            },
+            "additionalProperties": False,
+            "required": ["txHash"]
+        }
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id", "params"]
+}
+
 ise_getStatus_v3: dict = {
     "title": "ise_getStatus",
     "id": "https://github.com/icon-project/icon-rpc-server/blob/master/docs/icon-json-rpc-v3.md#ise_getstatus",
@@ -584,6 +605,7 @@ SCHEMA_V3: dict = {
     "icx_getTotalSupply": icx_getTotalSupply,
     "icx_getTransactionResult": icx_getTransactionResult_v3,
     "icx_getTransactionByHash": icx_getTransactionByHash_v3,
+    "icx_getTransactionProof": icx_getTransactionProof_v3,
     "icx_sendTransaction": icx_sendTransaction_v3,
     "debug_estimateStep": debug_estimateStep_v3,
     "ise_getStatus": ise_getStatus_v3,

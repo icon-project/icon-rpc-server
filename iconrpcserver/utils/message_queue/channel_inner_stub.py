@@ -51,6 +51,9 @@ class ChannelInnerTask:
     async def announce_new_block(self, subscriber_block_height: int) -> Tuple[str, bytes]:
         pass
 
+    async def get_tx_proof(self, tx_hash: str) -> list:
+        pass
+
     @message_queue_task
     async def get_citizens(self) -> List[Dict[str, str]]:
         pass

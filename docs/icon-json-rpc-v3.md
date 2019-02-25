@@ -814,6 +814,75 @@ Total number of ICX coins issued.
 }
 ```
 
+## icx_getTransactionProof
+
+* Returns the transaction proof requested by transaction hash.
+
+### Parameters
+
+| KEY | VALUE type | Description |
+|:----|:----------|:----- |
+| txHash | [T_HASH](#T_HASH) | Hash of the transaction |
+
+
+### Returns
+
+* T_LIST([T_PROOF_DATA](#T_PROOF_DATA)) : List of proof data.
+
+### Example
+
+```javascript
+// Request
+{
+    "jsonrpc" : "2.0",
+    "method": "icx_getTransactionProof",
+    "id": 1234,
+    "params": {
+        "txHash": "0x6c85809ead0e601de5e84f063ef3b7d7c504b95a404356af6094f26a39713eb1"
+    }
+}
+
+// Response - success
+{
+    "jsonrpc": "2.0",
+    "result": [
+        {
+            "left": "0xac1695c9d3ec0dedd7320d49e8b28bb76cb3f4332f99b396154d35cdb521efbc"
+        },
+        {
+            "right": "0xbb65b23173914f5618c4101b93a8a9e221814b3733dbd4cab6ae06f47982808e"
+        },
+        {
+            "right": "0xc845505ca7667bec30d03c67ba6cfa5a3829ed7d7f1250729bed5f780c31606e"
+        },
+        {
+            "left": "0x0a4ec933df08db2d6982b43b97b5c9564a27dd37ee844660e2613d2d183afce5"
+        },
+        {
+            "left": "0xac51d42744d093dfaff493de34cc1eff77e4f86989dabf53254f1acea40c6322"
+        },
+        {
+            "left": "0x757f4ab5a86f8a159f1dac9a7c50c2522b223c9b17fa6d5beeb0c1c20b4cc948"
+        },
+        {
+            "left": "0x3454646a681c036075b30eb1ca096057cc1a357d861e9ee4c8c8cb2ed6eaae26"
+        }
+    ],
+    "id": 1234
+}
+
+// Response - error
+{
+    "jsonrpc": "2.0",
+    "error": {
+        "code": -32602,
+        "message": "Tx does not exist."
+    },
+    "id": 1234
+}
+```
+
+
 ## ise_getStatus
 
 * Returns the status of iconservice
