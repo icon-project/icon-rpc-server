@@ -505,6 +505,51 @@ icx_proveTransaction_v3: dict = {
     "required": ["jsonrpc", "method", "id", "params"]
 }
 
+icx_proveReceipt_v3: dict = {
+    "title": "icx_proveReceipt",
+    "id": "https://github.com/icon-project/icon-rpc-server/blob/master/docs/icon-json-rpc-v3.md#icx_provetreceipt",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": ["number", "string"]},
+        "params": {
+            "type": "object",
+            "properties": {
+                "txHash": {"type": "string", "format": "hash"},
+                "proof": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "oneOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "left": {"type": "string", "format": "hash"},
+                                },
+                                "additionalProperties": False,
+                                "required": ["left"]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "right": {"type": "string", "format": "hash"},
+                                },
+                                "additionalProperties": False,
+                                "required": ["right"]
+                            }
+                        ],
+                    }
+                }
+            },
+            "additionalProperties": False,
+            "required": ["txHash", "proof"]
+        }
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id", "params"]
+}
+
 ise_getStatus_v3: dict = {
     "title": "ise_getStatus",
     "id": "https://github.com/icon-project/icon-rpc-server/blob/master/docs/icon-json-rpc-v3.md#ise_getstatus",
@@ -674,6 +719,7 @@ SCHEMA_V3: dict = {
     "icx_getTransactionProof": icx_getTransactionProof_v3,
     "icx_getReceiptProof": icx_getReceiptProof_v3,
     "icx_proveTransaction": icx_proveTransaction_v3,
+    "icx_proveReceipt": icx_proveReceipt_v3,
     "icx_sendTransaction": icx_sendTransaction_v3,
     "debug_estimateStep": debug_estimateStep_v3,
     "ise_getStatus": ise_getStatus_v3,

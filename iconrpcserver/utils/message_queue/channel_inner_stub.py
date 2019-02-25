@@ -64,6 +64,10 @@ class ChannelInnerTask:
         pass
 
     @message_queue_task
+    async def prove_receipt(self, tx_hash: str, proof: list) -> str:
+        pass
+
+    @message_queue_task
     async def get_citizens(self) -> List[Dict[str, str]]:
         pass
 
