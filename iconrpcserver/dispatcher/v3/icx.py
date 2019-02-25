@@ -257,6 +257,17 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
+    async def icx_proveTransaction(**kwargs):
+        channel = kwargs['context']['channel']
+        channel_stub = get_channel_stub_by_channel_name(channel)
+
+        tx_hash = kwargs['txHash']
+        proof = kwargs['proof']
+        response = await channel_stub.async_task().prove_tx(tx_hash, proof)
+        return response_to_json_query(response)
+
+    @staticmethod
+    @methods.add
     async def icx_getLastTransaction(**kwargs):
 
         return ""
