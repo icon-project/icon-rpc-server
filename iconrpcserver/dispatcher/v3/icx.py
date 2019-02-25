@@ -257,6 +257,16 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
+    async def icx_getReceiptProof(**kwargs):
+        channel = kwargs['context']['channel']
+        channel_stub = get_channel_stub_by_channel_name(channel)
+
+        tx_hash = kwargs['txHash']
+        response = await channel_stub.async_task().get_receipt_proof(tx_hash)
+        return response_to_json_query(response)
+
+    @staticmethod
+    @methods.add
     async def icx_proveTransaction(**kwargs):
         channel = kwargs['context']['channel']
         channel_stub = get_channel_stub_by_channel_name(channel)

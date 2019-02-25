@@ -56,6 +56,10 @@ class ChannelInnerTask:
         pass
 
     @message_queue_task
+    async def get_receipt_proof(self, tx_hash: str) -> list:
+        pass
+
+    @message_queue_task
     async def prove_tx(self, tx_hash: str, proof: list) -> str:
         pass
 
