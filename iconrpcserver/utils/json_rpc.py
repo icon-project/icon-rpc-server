@@ -138,7 +138,7 @@ async def get_block_by_params(channel_name=None, block_height=None, block_hash="
             http_status=status.HTTP_BAD_REQUEST
         )
 
-    response_code, block_hash, block_data_json, tx_data_json_list = \
+    response_code, block_hash, confirm_prev_block_info, block_data_json, tx_data_json_list = \
         await channel_stub.async_task().get_block(
             block_height=block_height,
             block_hash=block_hash,
@@ -154,7 +154,8 @@ async def get_block_by_params(channel_name=None, block_height=None, block_hash="
 
     result = {
         'response_code': response_code,
-        'block': block
+        'block': block,
+        'confirm_prev_block_info': True if confirm_prev_block_info else False
     }
 
     if 'commit_state' in result['block'] and not with_commit_state:
