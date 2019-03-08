@@ -85,7 +85,7 @@ class WSDispatcher:
             exception = None
             while ws.open:
                 try:
-                    is_registered = channel_stub.async_task().is_registered_subscriber(peer_id=peer_id)
+                    is_registered = await channel_stub.async_task().is_registered_subscriber(peer_id=peer_id)
                     if is_registered:
                         request = Request("node_ws_PublishHeartbeat")
                         await ws.send(json.dumps(request))
