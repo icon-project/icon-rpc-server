@@ -25,7 +25,10 @@ ICON RPC Server development and execution requires following environments.
 * OS: MacOS, Linux
     * Windows are not supported yet.
 * Python
-  * Make Virtual Env for Python 3.6.5+ (recommended version, 3.7 is not supported)
+  * Make Virtual Env for Python 3.6.5+ or 3.7.x (recommended version)
+
+    **We will support 3.7.x only in future. Please upgrade python version to 3.7.x.**
+
   * check your python version
     ```bash
     $ python3 -V
