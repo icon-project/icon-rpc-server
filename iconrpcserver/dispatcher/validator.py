@@ -14,10 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
+
 from jsonrpcserver import status
 from jsonschema import Draft4Validator, FormatChecker
 from jsonschema.exceptions import ValidationError
-import re
 
 from .exception import GenericJsonRpcServerError, JsonError
 
@@ -505,6 +506,7 @@ rep_getList_v3: dict = {
     }
 }
 
+
 SCHEMA_V3: dict = {
     "icx_getLastBlock": icx_getLastBlock,
     "icx_getBlockByHeight": icx_getBlockByHeight_v3,
@@ -516,26 +518,10 @@ SCHEMA_V3: dict = {
     "icx_getTransactionResult": icx_getTransactionResult_v3,
     "icx_getTransactionByHash": icx_getTransactionByHash_v3,
     "icx_sendTransaction": icx_sendTransaction_v3,
+    "debug_estimateStep": debug_estimateStep_v3,
     "ise_getStatus": ise_getStatus_v3,
     "rep_getList": rep_getList_v3
 }
-
-# TODO change to this thing that include debug_estimatestep when iconservice update to 1.2
-# SCHEMA_V3: dict = {
-#     "icx_getLastBlock": icx_getLastBlock,
-#     "icx_getBlockByHeight": icx_getBlockByHeight_v3,
-#     "icx_getBlockByHash": icx_getBlockByHash_v3,
-#     "icx_call": icx_call_v3,
-#     "icx_getBalance": icx_getBalance_v3,
-#     "icx_getScoreApi": icx_getScoreApi_v3,
-#     "icx_getTotalSupply": icx_getTotalSupply,
-#     "icx_getTransactionResult": icx_getTransactionResult_v3,
-#     "icx_getTransactionByHash": icx_getTransactionByHash_v3,
-#     "icx_sendTransaction": icx_sendTransaction_v3,
-#     "debug_estimateStep": debug_estimateStep_v3,
-#     "ise_getStatus": ise_getStatus_v3,
-#     "rep_getList": rep_getList_v3
-# }
 
 
 def validate_jsonschema_v3(request: object):
