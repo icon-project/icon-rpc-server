@@ -442,8 +442,8 @@ icx_sendTransaction_v3: dict = {
 }
 
 debug_estimateStep_v3: dict = {
-    "title": "icx_estimateStep",
-    "id": "https://repo.theloop.co.kr/theloop/LoopChain/wikis/doc/loopchain-json-rpc-v3#icx_estimateStep",
+    "title": "debug_estimateStep",
+    "id": "https://github.com/icon-project/icon-rpc-server/blob/master/docs/icon-json-rpc-v3.md#debug_estimateStep",
     "type": "object",
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
