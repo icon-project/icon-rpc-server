@@ -38,5 +38,5 @@ default_rpcserver_config = \
         ConfigKey.REST_ADDITIONAL_TIMEOUT: 30,
         ConfigKey.SCORE_QUERY_TIMEOUT: 120,
         ConfigKey.WS_HEARTBEAT_TIME: 30,
-        ConfigKey.REQUEST_MAX_SIZE: 512_000,
+        ConfigKey.REQUEST_MAX_SIZE: 2 * 1024 * 1024
     }
