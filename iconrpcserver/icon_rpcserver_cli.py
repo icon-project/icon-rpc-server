@@ -57,7 +57,7 @@ def main():
                         choices=['start', 'stop'],
                         help='rest type [start|stop]')
 
-    parser.add_argument("-p", type=str, dest=ConfigKey.PORT, default=None,
+    parser.add_argument("-p", type=int, dest=ConfigKey.PORT, default=None,
                         help="rest_proxy port")
     parser.add_argument("-c", type=str, dest=ConfigKey.CONFIG, default=None,
                         help="json configure file path")
