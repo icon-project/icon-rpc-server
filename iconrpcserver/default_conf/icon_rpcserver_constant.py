@@ -65,12 +65,13 @@ class ConfigKey:
     REST_ADDITIONAL_TIMEOUT = 'restAdditionalTimeout'
     SCORE_QUERY_TIMEOUT = 'scoreQueryTimeout'
     TBEARS_MODE = 'tbearsMode'
-    REDIRECT_PROTOCOL = 'REDIRECT_PROTOCOL'
+    REDIRECT_PROTOCOL = 'redirectProtocol'
     WS_HEARTBEAT_TIME = 'wsHeartBeatTime'
     REQUEST_MAX_SIZE = "requestMaxSize"
 
 
 ICON_RPC_SERVER_LOG_TAG = 'IconService'
+DISPATCH_NODE_TAG = f'{ICON_RPC_SERVER_LOG_TAG}_dispatch_node'
 DISPATCH_V2_TAG = f'{ICON_RPC_SERVER_LOG_TAG}_dispatch_v2'
 DISPATCH_V3_TAG = f'{ICON_RPC_SERVER_LOG_TAG}_dispatch_v3'
 DISPATCH_V3D_TAG = f'{ICON_RPC_SERVER_LOG_TAG}_dispatch_v3d'
