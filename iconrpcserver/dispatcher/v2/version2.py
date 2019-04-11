@@ -29,7 +29,7 @@ from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, NodeTy
 from iconrpcserver.protos import message_code
 from iconrpcserver.dispatcher import validate_jsonschema_v2
 from iconrpcserver.utils.icon_service import make_request, response_to_json_query, ParamType
-from iconrpcserver.utils.json_rpc import redirect_request_to_rs, get_block_v2_by_params
+from iconrpcserver.utils.json_rpc import relay_tx_request, get_block_v2_by_params
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
 config.log_requests = False
@@ -85,8 +85,8 @@ class Version2Dispatcher:
                 dispatch_protocol = redirect_protocol
             Logger.debug(f'Protocol: {dispatch_protocol}')
 
-            return await redirect_request_to_rs(dispatch_protocol, kwargs, RestProperty().rs_target, path[1:],
-                                                ApiVersion.v2.name)
+            return await relay_tx_request(dispatch_protocol, kwargs, RestProperty().rs_target, path[1:],
+                                          ApiVersion.v2.name)
 
         request = make_request("icx_sendTransaction", kwargs, ParamType.send_tx)
         channel = StubCollection().conf[ConfigKey.CHANNEL]

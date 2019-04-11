@@ -68,6 +68,7 @@ class ConfigKey:
     REDIRECT_PROTOCOL = 'redirectProtocol'
     WS_HEARTBEAT_TIME = 'wsHeartBeatTime'
     REQUEST_MAX_SIZE = "requestMaxSize"
+    RELAY_TARGET = "relayTarget"
 
 
 ICON_RPC_SERVER_LOG_TAG = 'IconService'

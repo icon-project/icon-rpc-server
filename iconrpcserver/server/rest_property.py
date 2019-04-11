@@ -19,3 +19,4 @@ class RestProperty(metaclass=SingletonMetaClass):
     def __init__(self):
         self.node_type = None
         self.rs_target = None
+        self.relay_target = None
