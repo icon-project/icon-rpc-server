@@ -17,16 +17,18 @@ import json
 import traceback
 
 from iconcommons.logger import Logger
-from jsonrpcserver.aio import AsyncMethods
 from jsonrpcclient.request import Request
-from sanic import response
+from jsonrpcserver.aio import AsyncMethods
+from jsonrpcserver.response import ExceptionResponse
 
+from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, DISPATCH_NODE_TAG
+from iconrpcserver.dispatcher import GenericJsonRpcServerError, validate_jsonschema_node
 from iconrpcserver.protos import message_code
 from iconrpcserver.utils.icon_service import ParamType, convert_params
 from iconrpcserver.utils.json_rpc import get_block_by_params, get_channel_stub_by_channel_name
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
-from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
-
+from iconrpcserver.utils import convert_upper_camel_method_to_lower_camel
+from sanic import response as sanic_response
 
 methods = AsyncMethods()
 ws_methods = AsyncMethods()
@@ -35,23 +37,33 @@ ws_methods = AsyncMethods()
 class NodeDispatcher:
     @staticmethod
     async def dispatch(request, channel_name=None):
-        req = json.loads(request.body.decode())
-        req["params"] = req.get("params", {})
+        req_json = request.json
+        url = request.url
+        channel = channel_name if channel_name else StubCollection().conf[ConfigKey.CHANNEL]
+        req_json['method'] = convert_upper_camel_method_to_lower_camel(req_json['method'])
 
-        if 'message' in req['params']:
-            req['params'] = req['params']['message']
-
-        req["params"]["method"] = request.json["method"]
-
-        if "node_" not in req["params"]["method"]:
-            return response.text("no support method!")
+        if 'params' in req_json and 'message' in req_json['params']:  # this will be removed after update.
+            req_json['params'] = req_json['params']['message']
 
         context = {
-            "channel": channel_name
+            'url': url,
+            'channel': channel
         }
 
-        dispatch_response = await methods.dispatch(req, context=context)
-        return response.json(dispatch_response, status=dispatch_response.http_status)
+        try:
+            client_ip = request.remote_addr if request.remote_addr else request.ip
+            Logger.info(f'rest_server_node request with {req_json}', DISPATCH_NODE_TAG)
+            Logger.info(f'{client_ip} requested {req_json} on {url}')
+
+            validate_jsonschema_node(request=req_json)
+        except GenericJsonRpcServerError as e:
+            response = ExceptionResponse(e, request_id=req_json.get('id', 0))
+        except Exception as e:
+            response = ExceptionResponse(e, request_id=req_json.get('id', 0))
+        else:
+            response = await methods.dispatch(req_json, context=context)
+        Logger.info(f'rest_server_node with response {response}', DISPATCH_NODE_TAG)
+        return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
 
     @staticmethod
     async def websocket_dispatch(request, ws, channel_name=None):
@@ -66,36 +78,24 @@ class NodeDispatcher:
 
     @staticmethod
     @methods.add
-    async def node_GetChannelInfos(**kwargs):
+    async def node_getChannelInfos(**kwargs):
         channel_infos = await StubCollection().peer_stub.async_task().get_channel_infos()
-
-        channel_infos = {"channel_infos": channel_infos}
-        return channel_infos
+        return {"channel_infos": channel_infos}
 
     @staticmethod
     @methods.add
-    async def node_AnnounceConfirmedBlock(**kwargs):
-        try:
-            channel = kwargs['context']['channel']
-            del kwargs['context']
-            channel = channel if channel is not None else kwargs['channel']
-        except KeyError:
-            channel = kwargs['channel']
+    async def node_announceConfirmedBlock(**kwargs):
+        channel = kwargs['context']['channel']
         block, commit_state = kwargs['block'], kwargs.get('commit_state', "{}")
         channel_stub = get_channel_stub_by_channel_name(channel)
-        response_code = await channel_stub.async_task().announce_confirmed_block(block.encode('utf-8'), commit_state)
+        response_code = await channel_stub.async_task().announce_confirmed_block(block, commit_state)
         return {"response_code": response_code,
                 "message": message_code.get_response_msg(response_code)}
 
     @staticmethod
     @methods.add
-    async def node_GetBlockByHeight(**kwargs):
-        try:
-            channel = kwargs['context']['channel']
-            del kwargs['context']
-            channel = channel if channel is not None else kwargs.get('channel', None)
-        except KeyError:
-            channel = kwargs.get("channel", None)
+    async def node_getBlockByHeight(**kwargs):
+        channel = kwargs['context']['channel']
         request = convert_params(kwargs, ParamType.get_block_by_height_request)
         block_hash, response = await get_block_by_params(channel_name=channel, block_height=request['height'],
                                                          with_commit_state=True)

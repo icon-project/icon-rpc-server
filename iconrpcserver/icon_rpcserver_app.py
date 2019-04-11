@@ -28,6 +28,7 @@ from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
 from iconrpcserver.icon_rpcserver_cli import ICON_RPCSERVER_CLI, ExitCode
 from iconrpcserver.server.peer_service_stub import PeerServiceStub
 from iconrpcserver.server.rest_server import ServerComponents
+from iconrpcserver.utils import camel_to_upper_snake
 
 
 class StandaloneApplication(gunicorn.app.base.BaseApplication):
@@ -87,20 +88,7 @@ def main():
     conf = IconConfig(conf_path, default_rpcserver_config)
     conf.load()
     conf.update_conf(dict(vars(args)))
-
-    # set env config
-    redirect_protocol = os.getenv(ConfigKey.REDIRECT_PROTOCOL)
-    if redirect_protocol:
-        conf.update_conf({ConfigKey.REDIRECT_PROTOCOL: redirect_protocol})
-    else:
-        from iconrpcserver.utils import to_low_camel_case
-        low_camel_case_key = to_low_camel_case(ConfigKey.REDIRECT_PROTOCOL)
-        redirect_protocol = conf.get(low_camel_case_key)
-        if redirect_protocol is not None:
-            conf.update_conf({ConfigKey.REDIRECT_PROTOCOL: redirect_protocol})
-
     Logger.load_config(conf)
-    Logger.print_config(conf, ICON_RPCSERVER_CLI)
 
     _run_async(_check_rabbitmq(conf[ConfigKey.AMQP_TARGET]))
     _run_async(_run(conf))
@@ -132,6 +120,12 @@ async def _check_rabbitmq(amqp_target: str):
 
 
 async def _run(conf: 'IconConfig'):
+    redirect_protocol_env = os.getenv(camel_to_upper_snake(ConfigKey.REDIRECT_PROTOCOL))
+    if redirect_protocol_env:
+        conf.update_conf({ConfigKey.REDIRECT_PROTOCOL: redirect_protocol_env})
+
+    Logger.print_config(conf, ICON_RPCSERVER_CLI)
+
     # Setup port and host values.
     host = '0.0.0.0'
 

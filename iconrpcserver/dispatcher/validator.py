@@ -22,6 +22,74 @@ from jsonschema.exceptions import ValidationError
 
 from .exception import GenericJsonRpcServerError, JsonError
 
+node_getChannelInfos: dict = {
+    "title": "node_getChannelInfos",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": ["number", "string"]},
+        "params": {"type": "object"},
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id"]
+}
+
+node_announceConfirmedBlock: dict = {
+    "title": "node_announceConfirmedBlock",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": ["number", "string"]},
+        "params": {
+            "type": "object",
+            "properties": {
+                "block_hash": {"type": "string"},
+                "channel": {"type": "string"},
+                "block": {"type": "string"},
+                "commit_state": {"type": "string"}
+            },
+            "additionalProperties": False,
+            "required": ["block", "commit_state"]
+        }
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id", "params"]
+}
+
+node_getBlockByHeight: dict = {
+    "title": "node_getBlockByHeight",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": ["number", "string"]},
+        "params": {
+            "type": "object",
+            "properties": {
+                "height": {"type": "string", "format": "int_10"},
+                "channel": {"type": "string"},
+            },
+            "additionalProperties": False,
+            "required": ["height"]
+        }
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id", "params"]
+}
+
+SCHEMA_NODE: dict = {
+    "node_getChannelInfos": node_getChannelInfos,
+    "node_announceConfirmedBlock": node_announceConfirmedBlock,
+    "node_getBlockByHeight": node_getBlockByHeight
+}
+
+
+def validate_jsonschema_node(request: object):
+    validate_jsonschema(request, SCHEMA_NODE)
+
+
 icx_sendTransaction_v2: dict = {
     "title": "icx_sendTransaction",
     "id": "https://github.com/icon-project/icx_JSON_RPC#icx_sendtransaction",
