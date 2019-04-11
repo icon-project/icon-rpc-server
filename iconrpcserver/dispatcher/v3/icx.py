@@ -24,7 +24,7 @@ from iconrpcserver.server.rest_property import RestProperty
 from iconrpcserver.protos import message_code
 from iconrpcserver.dispatcher.v3 import methods
 from iconrpcserver.utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
-from iconrpcserver.utils.json_rpc import redirect_request_to_rs, get_block_by_params, get_icon_stub_by_channel_name
+from iconrpcserver.utils.json_rpc import relay_tx_request, get_block_by_params, get_icon_stub_by_channel_name
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 from iconrpcserver.default_conf.icon_rpcserver_constant import NodeType, ConfigKey
 
@@ -72,8 +72,10 @@ class IcxDispatcher:
                 dispatch_protocol = redirect_protocol
             Logger.debug(f'Protocol: {dispatch_protocol}')
 
-            return await redirect_request_to_rs(dispatch_protocol,
-                                                kwargs, RestProperty().rs_target, path=path[1:])
+            relay_target = RestProperty().relay_target
+            relay_target = relay_target if relay_target is not None else RestProperty().rs_target
+
+            return await relay_tx_request(dispatch_protocol, kwargs, relay_target, path=path[1:])
 
         method = 'icx_sendTransaction'
         request = make_request(method, kwargs)

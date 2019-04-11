@@ -78,21 +78,20 @@ class CustomAiohttpClient(AsyncClient):
         return None
 
 
-async def redirect_request_to_rs(protocal, message, rs_target, path, version=ApiVersion.v3.name):
+async def relay_tx_request(protocol, message, relay_target, path, version=ApiVersion.v3.name):
     method_name = "icx_sendTransaction"
 
-    rs_url = f"{protocal}://{rs_target}/{path}"
-    Logger.debug(f'rs_url: {rs_url}')
+    relay_uri = f"{protocol}://{relay_target}/{path}"
+    Logger.debug(f'relay_uri: {relay_uri}')
 
     async with aiohttp.ClientSession() as session:
-        Logger.debug(f"redirect_request : "
+        Logger.info(f"relay_tx_request : "
                      f"message[{message}], "
-                     f"rs_target[{rs_target}], "
+                     f"relay_target[{relay_target}], "
                      f"version[{version}], "
                      f"method[{method_name}]")
-        result = await CustomAiohttpClient(session, rs_url).request(method_name, message)
-        Logger.debug(f"redirect_result : "
-                     f"result[{result}]")
+        result = await CustomAiohttpClient(session, relay_uri).request(method_name, message)
+        Logger.debug(f"relay_tx_request result[{result}]")
 
     return result
 
