@@ -464,7 +464,7 @@ icx_sendTransaction_v3: dict = {
                 "nid": {"type": "string", "format": "int_16"},
                 "nonce": {"type": "string", "format": "int_16"},
                 "signature": {"type": "string"},
-                "dataType": {"type": "string", "enum": ["call", "deploy", "message"]},
+                "dataType": {"type": "string", "enum": ["call", "deploy", "message", "deposit"]},
                 "data": {
                     "oneOf": [
                         {
@@ -485,6 +485,16 @@ icx_sendTransaction_v3: dict = {
                             },
                             "additionalProperties": False,
                             "required": ["contentType", "content"]
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "action": {"type": "string", "enum": ["add", "withdraw"]},
+                                "term": {"type": "string"},
+                                "id": {"type": "string"}
+                            },
+                            "additionalProperties": False,
+                            "required": ["action"]
                         },
                         {"type": "string"}
                     ],
