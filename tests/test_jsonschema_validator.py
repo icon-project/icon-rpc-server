@@ -416,6 +416,28 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
             }
         }
 
+        self.sendTransaction_deposit = {
+            "jsonrpc": "2.0",
+            "id": 3003,
+            'method': 'icx_sendTransaction',
+            'params': {
+                "version": "0x3",
+                "from": create_address(data=b'from'),
+                "to": create_address(data=b'to', is_eoa=False),
+                "value": "0xde0b6b3a7640000",
+                "stepLimit": "0x12345",
+                "timestamp": "0x563a6cf330136",
+                "nid": "0x3fcb",
+                "nonce": "0x1",
+                "signature": "VAia7YZ2Ji6igKWzjR2YsGa2m53nKPrfK7uXYW78QLE+ATehAVZPC40szvAiA6NEU5gCYB4c4qaQzqDh2ugcHgA=",
+                "dataType": "deposit",
+                "data": {
+                    "action": "add",
+                    "term": "0x123"
+                }
+            }
+        }
+
     def test_getLastBlock(self):
         full_data = self.getLastBlock
 
@@ -532,7 +554,8 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
             self.sendTransaction,
             self.sendTransaction_call,
             self.sendTransaction_deploy,
-            self.sendTransaction_message
+            self.sendTransaction_message,
+            self.sendTransaction_deposit
         ]
 
         for data in send_txs:
