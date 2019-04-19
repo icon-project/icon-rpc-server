@@ -486,6 +486,7 @@ icx_sendTransaction_v3: dict = {
                             "additionalProperties": False,
                             "required": ["contentType", "content"]
                         },
+                        {"type": "string"},
                         {
                             "type": "object",
                             "properties": {
@@ -495,8 +496,7 @@ icx_sendTransaction_v3: dict = {
                             },
                             "additionalProperties": False,
                             "required": ["action"]
-                        },
-                        {"type": "string"}
+                        }
                     ],
                 }
             },
