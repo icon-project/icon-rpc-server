@@ -61,7 +61,7 @@ Below table shows the most common "VALUE types".
 | <a id="T_INT">T_INT</a> | "0x" + lowercase HEX string | 0xa |
 | <a id="T_BIN_DATA">T_BIN_DATA</a> | "0x" + lowercase HEX string. Length must be even. | 0x34b2 |
 | <a id="T_SIG">T_SIG</a> | base64 encoded string | VAia7YZ2Ji6igKWzjR2YsGa2m53nKPrfK7uXYW78QLE+ATehAVZPC40szvAiA6NEU5gCYB4c4qaQzqDh2ugcHgA= |
-| <a id="T_DATA_TYPE">T_DATA_TYPE</a> | Type of data | call, deploy, message, deposit |
+| <a id="T_DATA_TYPE">T_DATA_TYPE</a> | Type of data | call, deploy, message or deposit |
 
 # JSON-RPC Error Codes
 
@@ -738,7 +738,7 @@ Total number of ICX coins issued.
 | blockHeight | [T_INT](#T_INT) | Block height where this transaction was in. Null when it is pending. |
 | blockHash | [T_HASH](#T_HASH) | Hash of the block where this transaction was in. Null when it is pending. |
 | signature | [T_SIG](#T_SIG) | Signature of the transaction. |
-| dataType | [T_DATA_TYPE](#T_DATA_TYPE) | Type of data. (call, deploy, message, deposit) |
+| dataType | [T_DATA_TYPE](#T_DATA_TYPE) | Type of data. (call, deploy, message or deposit) |
 | data | T_DICT or String | Contains various type of data depending on the dataType. See [Parameters - data](#sendtxparameterdata). |
 
 ### Example
