@@ -70,23 +70,30 @@ class Version2Dispatcher:
         return urlsplit(url).scheme
 
     @staticmethod
+    async def __relay_icx_transaction(url, path, message):
+        rs_target = RestProperty().rs_target
+        if not rs_target:
+            response_code = message_code.Response.fail_invalid_peer_target
+            return {'response_code': response_code,
+                    'message': message_code.responseCodeMap[response_code][1],
+                    'tx_hash': None}
+
+        dispatch_protocol = Version2Dispatcher.get_dispatch_protocol_from_url(url)
+        Logger.debug(f'Dispatch Protocol: {dispatch_protocol}')
+        redirect_protocol = StubCollection().conf.get(ConfigKey.REDIRECT_PROTOCOL)
+        Logger.debug(f'Redirect Protocol: {redirect_protocol}')
+        if redirect_protocol:
+            dispatch_protocol = redirect_protocol
+        Logger.debug(f'Protocol: {dispatch_protocol}')
+
+        return await relay_tx_request(dispatch_protocol, message, rs_target, path[1:], ApiVersion.v2.name)
+
+    @staticmethod
     @methods.add
     async def icx_sendTransaction(**kwargs):
         url = kwargs['context']['url']
         path = urlparse(url).path
         del kwargs['context']
-
-        if RestProperty().node_type == NodeType.CitizenNode:
-            dispatch_protocol = Version2Dispatcher.get_dispatch_protocol_from_url(url)
-            Logger.debug(f'Dispatch Protocol: {dispatch_protocol}')
-            redirect_protocol = StubCollection().conf.get(ConfigKey.REDIRECT_PROTOCOL)
-            Logger.debug(f'Redirect Protocol: {redirect_protocol}')
-            if redirect_protocol:
-                dispatch_protocol = redirect_protocol
-            Logger.debug(f'Protocol: {dispatch_protocol}')
-
-            return await relay_tx_request(dispatch_protocol, kwargs, RestProperty().rs_target, path[1:],
-                                          ApiVersion.v2.name)
 
         request = make_request("icx_sendTransaction", kwargs, ParamType.send_tx)
         channel = StubCollection().conf[ConfigKey.CHANNEL]
@@ -98,6 +105,9 @@ class Version2Dispatcher:
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
         channel_tx_creator_stub = StubCollection().channel_tx_creator_stubs[channel_name]
         response_code, tx_hash = await channel_tx_creator_stub.async_task().create_icx_tx(kwargs)
+
+        if response_code == message_code.Response.fail_no_permission:
+            return await Version2Dispatcher.__relay_icx_transaction(url, path, kwargs)
 
         response_data = {'response_code': response_code}
         if response_code != message_code.Response.success:
