@@ -6,8 +6,8 @@ from setuptools import setup, find_packages
 version = os.environ.get('VERSION')
 
 if version is None:
-	with open(os.path.join('.', 'VERSION')) as version_file:
-		version = version_file.read().strip()
+    with open(os.path.join('.', 'VERSION')) as version_file:
+        version = version_file.read().strip()
 
 with open('requirements.txt') as requirements:
     requires = list(requirements)

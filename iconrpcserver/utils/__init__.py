@@ -12,8 +12,48 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
 
-def to_low_camel_case(snake_str: str) -> str:
-    str_array = snake_str.split('_')
-    tmp_str = str_array[0].swapcase() + ''.join(sub.title() for sub in str_array[1:])
-    return tmp_str
+
+def camel_to_upper_snake(camel: str) -> str:
+    """convert lower/upper camel case to upper snake case
+
+    Example:
+        camelCase -> CAMEL_CASE
+        CamelCase -> CAMEL_CASE
+    :param camel:
+    :return:
+    """
+    REG = r'(.[a-z]+)([A-Z])?'
+
+    def snake(match):
+        group2 = match.group(2)
+        group2 = '_' + group2 if group2 else ''
+        return match.group(1).upper() + group2
+
+    return re.sub(REG, snake, camel)
+
+
+def upper_camel_to_lower_camel(upper_camel: str) -> str:
+    """convert upper camel case to lower camel case
+
+    Example:
+        CamelCase -> camelCase
+    :param upper_camel:
+    :return:
+    """
+    return upper_camel[0].lower() + upper_camel[1:]
+
+
+def convert_upper_camel_method_to_lower_camel(method_name: str) -> str:
+    """convert upper camel method to lower camel method
+
+    Example:
+        prefix_MethodName -> prefix_methodName
+
+    :param method_name:
+    :return:
+    """
+    prefix = method_name.split('_')[0]
+    method = upper_camel_to_lower_camel(method_name.split('_')[1])
+    return prefix + '_' + method

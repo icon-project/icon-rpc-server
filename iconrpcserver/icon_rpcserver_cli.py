@@ -26,6 +26,7 @@ from iconcommons.logger import Logger
 
 from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
+from iconrpcserver.utils import camel_to_upper_snake
 
 ICON_RPCSERVER_CLI = "IconRpcServerCli"
 
@@ -57,7 +58,7 @@ def main():
                         choices=['start', 'stop'],
                         help='rest type [start|stop]')
 
-    parser.add_argument("-p", type=str, dest=ConfigKey.PORT, default=None,
+    parser.add_argument("-p", type=int, dest=ConfigKey.PORT, default=None,
                         help="rest_proxy port")
     parser.add_argument("-c", type=str, dest=ConfigKey.CONFIG, default=None,
                         help="json configure file path")
@@ -90,18 +91,6 @@ def main():
     conf = IconConfig(conf_path, default_rpcserver_config)
     conf.load()
     conf.update_conf(dict(vars(args)))
-
-    # set env config
-    redirect_protocol = os.getenv(ConfigKey.REDIRECT_PROTOCOL)
-    if redirect_protocol:
-        conf.update_conf({ConfigKey.REDIRECT_PROTOCOL: redirect_protocol})
-    else:
-        from iconrpcserver.utils import to_low_camel_case
-        low_camel_case_key = to_low_camel_case(ConfigKey.REDIRECT_PROTOCOL)
-        redirect_protocol = conf.get(low_camel_case_key)
-        if redirect_protocol is not None:
-            conf.update_conf({ConfigKey.REDIRECT_PROTOCOL: redirect_protocol})
-
     Logger.load_config(conf)
 
     command = args.command[0]
