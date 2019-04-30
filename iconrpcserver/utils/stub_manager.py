@@ -36,10 +36,8 @@ class StubManager:
 
     def call(self, method_name, message, timeout=None):
         if timeout is None:
-
             timeout = StubCollection().conf[ConfigKey.GRPC_TIMEOUT]
 
-        e = None
         for _ in range(StubCollection().conf[ConfigKey.GRPC_RETRY]):
             try:
                 stub_method = getattr(self.__stub, method_name)
@@ -47,5 +45,4 @@ class StubManager:
             except Exception as e:
                 self.__make_stub()
                 Logger.warning(f"gRPC call fail method_name({method_name}), message({message}): {e}")
-
-        raise e
+                raise e

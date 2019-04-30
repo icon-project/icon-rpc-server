@@ -16,6 +16,7 @@
 
 import argparse
 import os
+import signal
 import subprocess
 import sys
 from enum import IntEnum
@@ -25,6 +26,7 @@ from iconcommons.logger import Logger
 
 from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
+from iconrpcserver.utils import camel_to_upper_snake
 
 ICON_RPCSERVER_CLI = "IconRpcServerCli"
 
@@ -56,7 +58,7 @@ def main():
                         choices=['start', 'stop'],
                         help='rest type [start|stop]')
 
-    parser.add_argument("-p", type=str, dest=ConfigKey.PORT, default=None,
+    parser.add_argument("-p", type=int, dest=ConfigKey.PORT, default=None,
                         help="rest_proxy port")
     parser.add_argument("-c", type=str, dest=ConfigKey.CONFIG, default=None,
                         help="json configure file path")
@@ -89,18 +91,6 @@ def main():
     conf = IconConfig(conf_path, default_rpcserver_config)
     conf.load()
     conf.update_conf(dict(vars(args)))
-
-    # set env config
-    redirect_protocol = os.getenv(ConfigKey.REDIRECT_PROTOCOL)
-    if redirect_protocol:
-        conf.update_conf({ConfigKey.REDIRECT_PROTOCOL: redirect_protocol})
-    else:
-        from iconrpcserver.utils import to_low_camel_case
-        low_camel_case_key = to_low_camel_case(ConfigKey.REDIRECT_PROTOCOL)
-        redirect_protocol = conf.get(low_camel_case_key)
-        if redirect_protocol is not None:
-            conf.update_conf({ConfigKey.REDIRECT_PROTOCOL: redirect_protocol})
-
     Logger.load_config(conf)
 
     command = args.command[0]
@@ -115,14 +105,14 @@ def main():
 
 
 def start(conf: 'IconConfig') -> int:
-    if not _is_running_icon_service(conf):
+    if not _check_if_process_running(conf):
         start_process(conf)
     Logger.info(f'start_command done!', ICON_RPCSERVER_CLI)
     return ExitCode.SUCCEEDED
 
 
 def stop(conf: 'IconConfig') -> int:
-    if _is_running_icon_service(conf):
+    if _check_if_process_running(conf):
         stop_process(conf)
     Logger.info(f'stop_command done!', ICON_RPCSERVER_CLI)
     return ExitCode.SUCCEEDED
@@ -158,24 +148,26 @@ def start_process(conf: 'IconConfig'):
 
 
 def stop_process(conf: 'IconConfig'):
-    command = f'lsof -i :{conf[ConfigKey.PORT]} -t | xargs kill'
-    subprocess.run(command, stdout=subprocess.PIPE, shell=True)
-    Logger.info(f'stop_process_rest_app!', ICON_RPCSERVER_CLI)
+    Logger.info(f'stop_process!', ICON_RPCSERVER_CLI)
+    pids = _get_process_list_by_port(conf[ConfigKey.PORT])
+    for p in pids:
+        try:
+            os.kill(int(p), signal.SIGKILL)
+        except ValueError:
+            continue
 
 
-def _is_running_icon_service(conf: 'IconConfig') -> bool:
-    return _check_service_running(conf)
+def _check_if_process_running(conf: 'IconConfig') -> bool:
+    Logger.info(f'check_if_process_running!', ICON_RPCSERVER_CLI)
+    if _get_process_list_by_port(conf[ConfigKey.PORT]):
+        return True
+    return False
 
 
-def _check_service_running(conf: 'IconConfig') -> bool:
-    Logger.info(f'check_serve_rest_app!', ICON_RPCSERVER_CLI)
-    return find_procs_by_params(conf[ConfigKey.PORT])
-
-
-def find_procs_by_params(port) -> bool:
-    # Return a list of processes matching 'name'.
-    command = f"lsof -i TCP:{port}"
-    result = subprocess.run(command, stdout=subprocess.PIPE, shell=True)
-    if result.returncode == 1:
-        return False
-    return True
+def _get_process_list_by_port(port) -> list:
+    if not isinstance(port, int):
+        raise Exception('Invalid port number')
+    result = subprocess.run(['lsof', '-i', f'TCP:{port}', '-t'], stdout=subprocess.PIPE)
+    if result.returncode == 0:
+        return result.stdout.split(b'\n')
+    return []

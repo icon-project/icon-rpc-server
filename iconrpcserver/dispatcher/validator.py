@@ -14,12 +14,81 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
+
 from jsonrpcserver import status
 from jsonschema import Draft4Validator, FormatChecker
 from jsonschema.exceptions import ValidationError
-import re
 
 from .exception import GenericJsonRpcServerError, JsonError
+
+node_getChannelInfos: dict = {
+    "title": "node_getChannelInfos",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": ["number", "string"]},
+        "params": {"type": "object"},
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id"]
+}
+
+node_announceConfirmedBlock: dict = {
+    "title": "node_announceConfirmedBlock",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": ["number", "string"]},
+        "params": {
+            "type": "object",
+            "properties": {
+                "block_hash": {"type": "string"},
+                "channel": {"type": "string"},
+                "block": {"type": "string"},
+                "commit_state": {"type": "string"}
+            },
+            "additionalProperties": False,
+            "required": ["block", "commit_state"]
+        }
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id", "params"]
+}
+
+node_getBlockByHeight: dict = {
+    "title": "node_getBlockByHeight",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": ["number", "string"]},
+        "params": {
+            "type": "object",
+            "properties": {
+                "height": {"type": "string", "format": "int_10"},
+                "channel": {"type": "string"},
+            },
+            "additionalProperties": False,
+            "required": ["height"]
+        }
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id", "params"]
+}
+
+SCHEMA_NODE: dict = {
+    "node_getChannelInfos": node_getChannelInfos,
+    "node_announceConfirmedBlock": node_announceConfirmedBlock,
+    "node_getBlockByHeight": node_getBlockByHeight
+}
+
+
+def validate_jsonschema_node(request: object):
+    validate_jsonschema(request, SCHEMA_NODE)
+
 
 icx_sendTransaction_v2: dict = {
     "title": "icx_sendTransaction",
@@ -441,8 +510,8 @@ icx_sendTransaction_v3: dict = {
 }
 
 debug_estimateStep_v3: dict = {
-    "title": "icx_estimateStep",
-    "id": "https://repo.theloop.co.kr/theloop/LoopChain/wikis/doc/loopchain-json-rpc-v3#icx_estimateStep",
+    "title": "debug_estimateStep",
+    "id": "https://github.com/icon-project/icon-rpc-server/blob/master/docs/icon-json-rpc-v3.md#debug_estimateStep",
     "type": "object",
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
@@ -505,6 +574,7 @@ rep_getList_v3: dict = {
     }
 }
 
+
 SCHEMA_V3: dict = {
     "icx_getLastBlock": icx_getLastBlock,
     "icx_getBlockByHeight": icx_getBlockByHeight_v3,
@@ -516,26 +586,10 @@ SCHEMA_V3: dict = {
     "icx_getTransactionResult": icx_getTransactionResult_v3,
     "icx_getTransactionByHash": icx_getTransactionByHash_v3,
     "icx_sendTransaction": icx_sendTransaction_v3,
+    "debug_estimateStep": debug_estimateStep_v3,
     "ise_getStatus": ise_getStatus_v3,
     "rep_getList": rep_getList_v3
 }
-
-# TODO change to this thing that include debug_estimatestep when iconservice update to 1.2
-# SCHEMA_V3: dict = {
-#     "icx_getLastBlock": icx_getLastBlock,
-#     "icx_getBlockByHeight": icx_getBlockByHeight_v3,
-#     "icx_getBlockByHash": icx_getBlockByHash_v3,
-#     "icx_call": icx_call_v3,
-#     "icx_getBalance": icx_getBalance_v3,
-#     "icx_getScoreApi": icx_getScoreApi_v3,
-#     "icx_getTotalSupply": icx_getTotalSupply,
-#     "icx_getTransactionResult": icx_getTransactionResult_v3,
-#     "icx_getTransactionByHash": icx_getTransactionByHash_v3,
-#     "icx_sendTransaction": icx_sendTransaction_v3,
-#     "debug_estimateStep": debug_estimateStep_v3,
-#     "ise_getStatus": ise_getStatus_v3,
-#     "rep_getList": rep_getList_v3
-# }
 
 
 def validate_jsonschema_v3(request: object):

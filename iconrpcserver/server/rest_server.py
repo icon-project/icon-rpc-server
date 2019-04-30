@@ -16,6 +16,7 @@
 import _ssl
 import ssl
 from http import HTTPStatus
+from urllib.parse import urlparse
 
 from sanic import Sanic, response
 from sanic.views import HTTPMethodView
@@ -127,6 +128,9 @@ class ServerComponents(metaclass=SingletonMetaClass):
                 results = await StubCollection().peer_stub.async_task().get_channel_info_detail(channel_name)
                 RestProperty().node_type = NodeType(results[6])
                 RestProperty().rs_target = results[3]
+                relay_target = StubCollection().conf.get(ConfigKey.RELAY_TARGET, None)
+                RestProperty().relay_target = urlparse(relay_target).netloc \
+                    if urlparse(relay_target).scheme else relay_target
 
             Logger.debug(f'rest_server:initialize complete. '
                          f'node_type({RestProperty().node_type}), rs_target({RestProperty().rs_target})')
