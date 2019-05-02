@@ -118,11 +118,11 @@ class WSDispatcher:
             channel_stub = get_channel_stub_by_channel_name(channel_name)
             try:
                 while ws.open:
-                    new_block: dict = json.loads(
-                        await channel_stub.async_task().announce_new_block(subscriber_block_height=height)
-                    )
+                    new_block_dumped, confirm_info = await \
+                        channel_stub.async_task().announce_new_block(subscriber_block_height=height)
+                    new_block: dict = json.loads(new_block_dumped)
                     Logger.debug(f"publish_new_block: {new_block}")
-                    request = Request("node_ws_PublishNewBlock", block=new_block)
+                    request = Request("node_ws_PublishNewBlock", block=new_block, confirm_info=confirm_info)
 
                     await ws.send(json.dumps(request))
                     height += 1
