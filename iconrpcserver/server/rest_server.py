@@ -98,7 +98,6 @@ class ServerComponents(metaclass=SingletonMetaClass):
         self.__app.add_route(Status.as_view(), '/api/v1/status/peer')
         self.__app.add_route(Avail.as_view(), '/api/v1/avail/peer')
 
-        self.__app.add_websocket_route(NodeDispatcher.websocket_dispatch, '/api/node/<channel_name>')
         self.__app.add_websocket_route(WSDispatcher.dispatch, '/api/ws/<channel_name>')
 
     def ready(self):
