@@ -58,8 +58,10 @@ class WSDispatcher:
             WSDispatcher.publish_new_block(ws, channel_name, height)
         ]
 
-        await asyncio.wait(futures, return_when=asyncio.FIRST_EXCEPTION)
-        await WSDispatcher.channel_unregister(ws, channel_name, peer_id)
+        try:
+            await asyncio.wait(futures, return_when=asyncio.FIRST_EXCEPTION)
+        finally:
+            await WSDispatcher.channel_unregister(ws, channel_name, peer_id)
 
     @staticmethod
     async def channel_register(ws, channel_name: str, peer_id: str):
