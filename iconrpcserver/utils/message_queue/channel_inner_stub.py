@@ -46,7 +46,7 @@ class ChannelInnerTask:
         pass
 
     @message_queue_task
-    async def announce_new_block(self, subscriber_block_height: int):
+    async def announce_new_block(self, subscriber_block_height: int) -> Tuple[str, str]:
         pass
 
     @message_queue_task
