@@ -433,7 +433,6 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
                 "dataType": "deposit",
                 "data": {
                     "action": "add",
-                    "term": "0x123"
                 }
             }
         }

@@ -925,7 +925,6 @@ It is used when depositing icx in SCORE or withdrawing deposited icx, and `data`
 | KEY | VALUE type | Required | Description |
 |:----|:-----------|:--------:|:------------|
 | action | String | required | Name of the action |
-| term | String | optional | needed when deposit icx in SCORE |
 | id | String | optional | needed when withdraw deposited icx |
 
 ### Returns
@@ -1088,7 +1087,6 @@ It is used when depositing icx in SCORE or withdrawing deposited icx, and `data`
         "dataType": "deposit",
         "data": {
             "action": "add",
-            "term": "0x13c680"
         }
     }
 }

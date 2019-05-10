@@ -433,7 +433,6 @@ icx_sendTransaction_v3: dict = {
                             "type": "object",
                             "properties": {
                                 "action": {"type": "string", "enum": ["add", "withdraw"]},
-                                "term": {"type": "string"},
                                 "id": {"type": "string"}
                             },
                             "additionalProperties": False,
