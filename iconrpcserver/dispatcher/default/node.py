@@ -12,23 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.'
 
-import asyncio
 import json
-import traceback
+from typing import Dict, List
 
 from iconcommons.logger import Logger
-from jsonrpcclient.request import Request
 from jsonrpcserver.aio import AsyncMethods
 from jsonrpcserver.response import ExceptionResponse
+from sanic import response as sanic_response
 
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, DISPATCH_NODE_TAG
 from iconrpcserver.dispatcher import GenericJsonRpcServerError, validate_jsonschema_node
 from iconrpcserver.protos import message_code
+from iconrpcserver.utils import convert_upper_camel_method_to_lower_camel
 from iconrpcserver.utils.icon_service import ParamType, convert_params
 from iconrpcserver.utils.json_rpc import get_block_by_params, get_channel_stub_by_channel_name
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
-from iconrpcserver.utils import convert_upper_camel_method_to_lower_camel
-from sanic import response as sanic_response
 
 methods = AsyncMethods()
 ws_methods = AsyncMethods()
@@ -89,3 +87,13 @@ class NodeDispatcher:
         block_hash, response = await get_block_by_params(channel_name=channel, block_height=request['height'],
                                                          with_commit_state=True)
         return response
+
+    @staticmethod
+    @methods.add
+    async def node_getCitizens(**kwargs):
+        channel = kwargs['context']['channel']
+        channel_stub = get_channel_stub_by_channel_name(channel)
+        citizens: List[Dict[str, str]] = await channel_stub.async_task().get_citizens()
+        return {
+            "citizens": citizens
+        }

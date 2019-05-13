@@ -79,10 +79,24 @@ node_getBlockByHeight: dict = {
     "required": ["jsonrpc", "method", "id", "params"]
 }
 
+node_getCitizens: dict = {
+    "title": "node_getCitizens",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": ["number", "string"]},
+        "params": {"type": "object"}
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id"]
+}
+
 SCHEMA_NODE: dict = {
     "node_getChannelInfos": node_getChannelInfos,
     "node_announceConfirmedBlock": node_announceConfirmedBlock,
-    "node_getBlockByHeight": node_getBlockByHeight
+    "node_getBlockByHeight": node_getBlockByHeight,
+    "node_getCitizens": node_getCitizens
 }
 
 
