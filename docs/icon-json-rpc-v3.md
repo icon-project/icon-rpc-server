@@ -920,12 +920,12 @@ It is used when transferring a message, and `data` has a HEX string.
 
 ##### dataType == deposit
 
-It is used when depositing icx in SCORE or withdrawing deposited icx, and `data` has dictionary value as follows.
+It is used when depositing ICX in SCORE or withdrawing the deposited ICX, and `data` has dictionary value as follows.
 
 | KEY | VALUE type | Required | Description |
 |:----|:-----------|:--------:|:------------|
-| action | String | required | Name of the action |
-| id | String | optional | needed when withdraw deposited icx |
+| action | String | required | Name of the action (`add` or `withdraw`) |
+| id | String | optional | needed when withdrawing the deposited ICX |
 
 ### Returns
 
@@ -1067,7 +1067,7 @@ It is used when depositing icx in SCORE or withdrawing deposited icx, and `data`
     }
 }
 ```
-#### Deposit icx for SCORE
+#### Deposit ICX to SCORE
 
 ```javascript
 // Request
@@ -1079,6 +1079,7 @@ It is used when depositing icx in SCORE or withdrawing deposited icx, and `data`
         "version": "0x3",
         "from": "hxbe258ceb872e08851f1f59694dac2558708ece11",
         "to": "cxbe258ceb872e08851f1f59694dac2558708ece11",
+        "value": "0x10f0cf064dd59200000",
         "stepLimit": "0x12345",
         "timestamp": "0x563a6cf330136",
         "nid": "0x3",
@@ -1092,7 +1093,7 @@ It is used when depositing icx in SCORE or withdrawing deposited icx, and `data`
 }
 ```
 
-#### Withdraw icx for SCORE
+#### Withdraw ICX from SCORE
 
 ```javascript
 // Request
