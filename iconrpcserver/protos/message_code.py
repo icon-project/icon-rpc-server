@@ -72,6 +72,7 @@ class Response:
     fail_subscribe_limit = -15
     fail_invalid_key_error = -16
     fail_wrong_block_height = -17
+    fail_no_permission = -18
     fail_tx_invalid_unknown = -100
     fail_tx_invalid_hash_format = -101
     fail_tx_invalid_hash_generation = -102
@@ -81,7 +82,7 @@ class Response:
     fail_tx_invalid_signature = -106
     fail_tx_invalid_params = -107
     fail_tx_invalid_duplicated_hash = -108
-    fain_tx_invalid_out_of_time_bound = -109
+    fail_tx_invalid_out_of_time_bound = -109
     fail_tx_invalid_wrong_nid = -110
     fail_tx_not_invoked = -111
 
@@ -149,6 +150,9 @@ responseCodeMap = {
     Response.fail_wrong_block_height:
         (Response.fail_wrong_block_height, "fail wrong block height"),
 
+    Response.fail_no_permission:
+        (Response.fail_no_permission, "fail no permission"),
+
     Response.fail_tx_invalid_unknown:
         (Response.fail_tx_invalid_unknown, "fail tx invalid unknown"),
 
@@ -176,8 +180,8 @@ responseCodeMap = {
     Response.fail_tx_invalid_duplicated_hash:
         (Response.fail_tx_invalid_duplicated_hash, "fail tx invalid duplicated hash"),
 
-    Response.fain_tx_invalid_out_of_time_bound:
-        (Response.fain_tx_invalid_out_of_time_bound, "fain tx invalid out of time bound"),
+    Response.fail_tx_invalid_out_of_time_bound:
+        (Response.fail_tx_invalid_out_of_time_bound, "fail tx invalid out of time bound"),
 
     Response.fail_tx_invalid_wrong_nid:
         (Response.fail_tx_invalid_wrong_nid, "fail tx invalid no nid"),
