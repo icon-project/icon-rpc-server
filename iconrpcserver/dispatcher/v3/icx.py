@@ -56,26 +56,33 @@ class IcxDispatcher:
         return response_to_json_query(response)
 
     @staticmethod
+    async def __relay_icx_transaction(url, path, message):
+        relay_target = RestProperty().relay_target
+        relay_target = relay_target if relay_target is not None else RestProperty().rs_target
+        if not relay_target:
+            raise GenericJsonRpcServerError(
+                code=JsonError.INTERNAL_ERROR,
+                message=message_code.responseCodeMap[message_code.Response.fail_invalid_peer_target][1],
+                http_status=status.HTTP_INTERNAL_ERROR
+            )
+
+        dispatch_protocol = IcxDispatcher.get_dispatch_protocol_from_url(url)
+        Logger.debug(f'Dispatch Protocol: {dispatch_protocol}')
+        redirect_protocol = StubCollection().conf.get(ConfigKey.REDIRECT_PROTOCOL)
+        Logger.debug(f'Redirect Protocol: {redirect_protocol}')
+        if redirect_protocol:
+            dispatch_protocol = redirect_protocol
+        Logger.debug(f'Protocol: {dispatch_protocol}')
+
+        return await relay_tx_request(dispatch_protocol, message, relay_target, path=path[1:])
+
+    @staticmethod
     @methods.add
     async def icx_sendTransaction(**kwargs):
         channel = kwargs['context']['channel']
         url = kwargs['context']['url']
         path = urlparse(url).path
         del kwargs['context']
-
-        if RestProperty().node_type == NodeType.CitizenNode:
-            dispatch_protocol = IcxDispatcher.get_dispatch_protocol_from_url(url)
-            Logger.debug(f'Dispatch Protocol: {dispatch_protocol}')
-            redirect_protocol = StubCollection().conf.get(ConfigKey.REDIRECT_PROTOCOL)
-            Logger.debug(f'Redirect Protocol: {redirect_protocol}')
-            if redirect_protocol:
-                dispatch_protocol = redirect_protocol
-            Logger.debug(f'Protocol: {dispatch_protocol}')
-
-            relay_target = RestProperty().relay_target
-            relay_target = relay_target if relay_target is not None else RestProperty().rs_target
-
-            return await relay_tx_request(dispatch_protocol, kwargs, relay_target, path=path[1:])
 
         method = 'icx_sendTransaction'
         request = make_request(method, kwargs)
@@ -87,6 +94,9 @@ class IcxDispatcher:
 
         channel_tx_creator_stub = StubCollection().channel_tx_creator_stubs[channel]
         response_code, tx_hash = await channel_tx_creator_stub.async_task().create_icx_tx(kwargs)
+
+        if response_code == message_code.Response.fail_no_permission:
+            return await IcxDispatcher.__relay_icx_transaction(url, path, kwargs)
 
         if response_code != message_code.Response.success:
             raise GenericJsonRpcServerError(
