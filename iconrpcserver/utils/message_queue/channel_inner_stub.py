@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from earlgrey import MessageQueueStub, message_queue_task
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING, Tuple, List, Dict
 from . import exit_process
 
 if TYPE_CHECKING:
@@ -34,11 +34,17 @@ class ChannelInnerTask:
         pass
 
     @message_queue_task
-    async def get_block_v2(self, block_height, block_hash, block_data_filter, tx_data_filter) -> Tuple[int, str, str, list]:
+    async def get_block_v2(self, block_height,
+                           block_hash,
+                           block_data_filter,
+                           tx_data_filter) -> Tuple[int, str, str, list]:
         pass
 
     @message_queue_task
-    async def get_block(self, block_height, block_hash, block_data_filter, tx_data_filter) -> Tuple[int, str, str, list]:
+    async def get_block(self, block_height,
+                        block_hash,
+                        block_data_filter,
+                        tx_data_filter) -> Tuple[int, str, bytes, str, list]:
         pass
 
     @message_queue_task
@@ -46,19 +52,23 @@ class ChannelInnerTask:
         pass
 
     @message_queue_task
-    async def announce_new_block(self, subscriber_block_height: int) -> Tuple[str, str]:
+    async def announce_new_block(self, subscriber_block_height: int) -> Tuple[str, bytes]:
         pass
 
     @message_queue_task
-    async def register_subscriber(self, peer_id):
+    async def get_citizens(self) -> List[Dict[str, str]]:
         pass
 
     @message_queue_task
-    async def unregister_subscriber(self, peer_id):
+    async def register_citizen(self, peer_id, target, connected_time) -> bool:
         pass
 
     @message_queue_task
-    async def is_registered_subscriber(self, peer_id):
+    async def unregister_citizen(self, peer_id):
+        pass
+
+    @message_queue_task
+    async def is_citizen_registered(self, peer_id) -> bool:
         pass
 
 
