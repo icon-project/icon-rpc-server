@@ -156,7 +156,7 @@ class Avail(HTTPMethodView):
         status = HTTPStatus.OK
         result = PeerServiceStub().get_status(channel_name)
 
-        if result['status'] != "Service is online: 0":
+        if not result['is_available']:
             status = HTTPStatus.SERVICE_UNAVAILABLE
 
         return response.json(result, status=status)
