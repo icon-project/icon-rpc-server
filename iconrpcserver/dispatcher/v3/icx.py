@@ -102,7 +102,7 @@ class IcxDispatcher:
             raise GenericJsonRpcServerError(
                 code=JsonError.INVALID_REQUEST,
                 message=message_code.responseCodeMap[response_code][1],
-                http_status=status.HTTP_BAD_REQUEST
+                http_status=message_code.get_response_http_status_code(response_code, status.HTTP_BAD_REQUEST)
             )
 
         if tx_hash is None:
