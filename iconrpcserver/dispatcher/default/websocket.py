@@ -13,7 +13,6 @@
 # limitations under the License.'
 
 import asyncio
-import contextlib
 import json
 import traceback
 from websockets import exceptions
@@ -28,8 +27,37 @@ from iconrpcserver.utils.json_rpc import get_channel_stub_by_channel_name
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 from iconrpcserver.utils import get_now_timestamp
 
-methods = AsyncMethods()
 ws_methods = AsyncMethods()
+
+
+class Reception:
+    """ register and unregister citizen by asynccontextmanager in websocket node_ws_Subscribe
+    """
+
+    def __init__(self, channel_name: str, peer_id: str, remote_target: str):
+        self._peer_id = peer_id
+        self._remote_target = remote_target
+        self._channel_stub = get_channel_stub_by_channel_name(channel_name)
+
+    async def __aenter__(self):
+        connected_time = get_now_timestamp()
+        self._registered = await self._channel_stub.async_task().register_citizen(
+            peer_id=self._peer_id,
+            target=self._remote_target,
+            connected_time=connected_time
+        )
+
+        if self._registered:
+            Logger.debug(f"register citizen: {self._peer_id}")
+        else:
+            Logger.warning(f"This peer can no longer take more subscribe requests.")
+
+        return self._registered
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        if self._registered:
+            Logger.debug(f"unregister citizen: {self._peer_id}")
+            await self._channel_stub.async_task().unregister_citizen(peer_id=self._peer_id)
 
 
 class WSDispatcher:
@@ -56,12 +84,13 @@ class WSDispatcher:
         height = kwargs['height']
         peer_id = kwargs['peer_id']
 
-        async with WSDispatcher.reception(channel_name, peer_id, remote_target) as registered:
+        async with Reception(channel_name, peer_id, remote_target) as registered:
             if not registered:
-                await WSDispatcher.send_and_raise_exception(ws=ws,
-                                                            method="node_ws_PublishHeartbeat",
-                                                            exception=RuntimeError("Unregistered"),
-                                                            error_code=message_code.Response.fail_subscribe_limit)
+                await WSDispatcher.send_and_raise_exception(
+                    ws=ws,
+                    method="node_ws_PublishHeartbeat",
+                    exception=RuntimeError("Unregistered"),
+                    error_code=message_code.Response.fail_subscribe_limit)
 
             futures = [
                 WSDispatcher.publish_heartbeat(ws),
@@ -69,29 +98,6 @@ class WSDispatcher:
             ]
 
             await asyncio.wait(futures, return_when=asyncio.FIRST_EXCEPTION)
-
-    @staticmethod
-    @contextlib.asynccontextmanager
-    async def reception(channel_name: str, peer_id: str, remote_target: str):
-        channel_stub = get_channel_stub_by_channel_name(channel_name)
-        connected_time = get_now_timestamp()
-        registered = await channel_stub.async_task().register_citizen(
-            peer_id=peer_id,
-            target=remote_target,
-            connected_time=connected_time
-        )
-
-        if registered:
-            Logger.debug(f"register citizen: {peer_id}")
-        else:
-            Logger.warning(f"This peer can no longer take more subscribe requests.")
-
-        try:
-            yield registered
-        finally:
-            if registered:
-                Logger.debug(f"unregister citizen: {peer_id}")
-                await channel_stub.async_task().unregister_citizen(peer_id=peer_id)
 
     @staticmethod
     async def publish_heartbeat(ws):
