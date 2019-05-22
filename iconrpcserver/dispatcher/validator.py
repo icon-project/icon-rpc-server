@@ -35,29 +35,6 @@ node_getChannelInfos: dict = {
     "required": ["jsonrpc", "method", "id"]
 }
 
-node_announceConfirmedBlock: dict = {
-    "title": "node_announceConfirmedBlock",
-    "type": "object",
-    "properties": {
-        "jsonrpc": {"type": "string", "enum": ["2.0"]},
-        "method": {"type": "string"},
-        "id": {"type": ["number", "string"]},
-        "params": {
-            "type": "object",
-            "properties": {
-                "block_hash": {"type": "string"},
-                "channel": {"type": "string"},
-                "block": {"type": "string"},
-                "commit_state": {"type": "string"}
-            },
-            "additionalProperties": False,
-            "required": ["block", "commit_state"]
-        }
-    },
-    "additionalProperties": False,
-    "required": ["jsonrpc", "method", "id", "params"]
-}
-
 node_getBlockByHeight: dict = {
     "title": "node_getBlockByHeight",
     "type": "object",
@@ -94,7 +71,6 @@ node_getCitizens: dict = {
 
 SCHEMA_NODE: dict = {
     "node_getChannelInfos": node_getChannelInfos,
-    "node_announceConfirmedBlock": node_announceConfirmedBlock,
     "node_getBlockByHeight": node_getBlockByHeight,
     "node_getCitizens": node_getCitizens
 }
