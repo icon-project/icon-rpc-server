@@ -48,10 +48,6 @@ class ChannelInnerTask:
         pass
 
     @message_queue_task
-    async def announce_confirmed_block(self, serialized_block, commit_state):
-        pass
-
-    @message_queue_task
     async def announce_new_block(self, subscriber_block_height: int) -> Tuple[str, bytes]:
         pass
 

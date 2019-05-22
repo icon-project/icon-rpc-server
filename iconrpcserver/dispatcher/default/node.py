@@ -22,7 +22,6 @@ from sanic import response as sanic_response
 
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, DISPATCH_NODE_TAG
 from iconrpcserver.dispatcher import GenericJsonRpcServerError, validate_jsonschema_node
-from iconrpcserver.protos import message_code
 from iconrpcserver.utils import convert_upper_camel_method_to_lower_camel
 from iconrpcserver.utils.icon_service import ParamType, convert_params
 from iconrpcserver.utils.json_rpc import get_block_by_params, get_channel_stub_by_channel_name
@@ -68,16 +67,6 @@ class NodeDispatcher:
     async def node_getChannelInfos(**kwargs):
         channel_infos = await StubCollection().peer_stub.async_task().get_channel_infos()
         return {"channel_infos": channel_infos}
-
-    @staticmethod
-    @methods.add
-    async def node_announceConfirmedBlock(**kwargs):
-        channel = kwargs['context']['channel']
-        block, commit_state = kwargs['block'], kwargs.get('commit_state', "{}")
-        channel_stub = get_channel_stub_by_channel_name(channel)
-        response_code = await channel_stub.async_task().announce_confirmed_block(block, commit_state)
-        return {"response_code": response_code,
-                "message": message_code.get_response_msg(response_code)}
 
     @staticmethod
     @methods.add
