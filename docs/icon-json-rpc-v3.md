@@ -1087,7 +1087,7 @@ It is used when depositing ICX in SCORE or withdrawing the deposited ICX, and `d
         "signature": "VAia7YZ2Ji6igKWzjR2YsGa2m53nKPrfK7uXYW78QLE+ATehAVZPC40szvAiA6NEU5gCYB4c4qaQzqDh2ugcHgA=",
         "dataType": "deposit",
         "data": {
-            "action": "add",
+            "action": "add"
         }
     }
 }
