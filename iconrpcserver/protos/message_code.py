@@ -73,6 +73,8 @@ class Response:
     fail_invalid_key_error = -16
     fail_wrong_block_height = -17
     fail_no_permission = -18
+    fail_out_of_tps_limit = -19
+    fail_connection_closed = -20
     fail_tx_invalid_unknown = -100
     fail_tx_invalid_hash_format = -101
     fail_tx_invalid_hash_generation = -102
@@ -153,6 +155,9 @@ responseCodeMap = {
     Response.fail_no_permission:
         (Response.fail_no_permission, "fail no permission"),
 
+    Response.fail_out_of_tps_limit:
+        (Response.fail_out_of_tps_limit, "Server is processing too many requests"),
+
     Response.fail_tx_invalid_unknown:
         (Response.fail_tx_invalid_unknown, "fail tx invalid unknown"),
 
@@ -207,3 +212,13 @@ def get_response_msg(code):
 
 def get_response(code):
     return responseCodeMap[code][0], responseCodeMap[code][1]
+
+
+responseHttpStatusCodeMap = {
+    Response.success: 200,  # OK
+    Response.fail_out_of_tps_limit: 503  # Service Unavailable
+}
+
+
+def get_response_http_status_code(code, default=520):  # 520: Unknown Error
+    return responseHttpStatusCodeMap.get(code, default)

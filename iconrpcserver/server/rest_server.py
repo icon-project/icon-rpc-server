@@ -86,6 +86,7 @@ class ServerComponents(metaclass=SingletonMetaClass):
     def set_resource(self):
         self.__app.add_route(NodeDispatcher.dispatch, '/api/node/<channel_name>', methods=['POST'])
         self.__app.add_route(NodeDispatcher.dispatch, '/api/node/', methods=['POST'])
+        self.__app.add_websocket_route(WSDispatcher.dispatch, '/api/node/<channel_name>')
 
         self.__app.add_route(Version2Dispatcher.dispatch, '/api/v2', methods=['POST'])
         self.__app.add_route(Version3Dispatcher.dispatch, '/api/v3/<channel_name>', methods=['POST'])
@@ -155,7 +156,7 @@ class Avail(HTTPMethodView):
         status = HTTPStatus.OK
         result = PeerServiceStub().get_status(channel_name)
 
-        if result['status'] != "Service is online: 0":
+        if not result['service_available']:
             status = HTTPStatus.SERVICE_UNAVAILABLE
 
         return response.json(result, status=status)

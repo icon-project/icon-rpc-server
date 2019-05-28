@@ -154,7 +154,7 @@ async def get_block_by_params(channel_name=None, block_height=None, block_hash="
     result = {
         'response_code': response_code,
         'block': block,
-        'confirm_info': True if confirm_info else False
+        'confirm_info': confirm_info.decode('utf-8')
     }
 
     if 'commit_state' in result['block'] and not with_commit_state:

@@ -26,7 +26,6 @@ from iconcommons.logger import Logger
 
 from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
-from iconrpcserver.utils import camel_to_upper_snake
 
 ICON_RPCSERVER_CLI = "IconRpcServerCli"
 

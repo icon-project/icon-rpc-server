@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import re
+import time
 
 
 def camel_to_upper_snake(camel: str) -> str:
@@ -57,3 +58,7 @@ def convert_upper_camel_method_to_lower_camel(method_name: str) -> str:
     prefix = method_name.split('_')[0]
     method = upper_camel_to_lower_camel(method_name.split('_')[1])
     return prefix + '_' + method
+
+
+def get_now_timestamp():
+    return hex(int(time.time() * 1_000_000))
