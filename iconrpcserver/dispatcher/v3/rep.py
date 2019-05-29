@@ -16,8 +16,8 @@
 from iconcommons.logger import Logger
 
 from iconrpcserver.dispatcher.v3 import methods
-from iconrpcserver.utils.icon_service import response_to_json_query
-from iconrpcserver.utils.message_queue.stub_collection import StubCollection
+from iconrpcserver.utils.icon_service import response_to_json_query, make_request
+from iconrpcserver.utils.json_rpc import get_icon_stub_by_channel_name
 
 
 class RepDispatcher:
@@ -25,10 +25,13 @@ class RepDispatcher:
     @methods.add
     async def rep_getList(**kwargs):
         channel = kwargs['context']['channel']
-        channel_infos = await StubCollection().peer_stub.async_task().get_channel_infos()
-        channel_infos_by_channel = channel_infos.get(channel)
+        score_stub = get_icon_stub_by_channel_name(channel)
+        method = "ise_getPReps"
+        request = make_request(method, kwargs)
 
-        rep_list = [{'id': peer['id']} for peer in channel_infos_by_channel['peers']]
+        response = score_stub.sync_task().call(request)
+        rep_list = [{"id": rep_info["id"], "target": rep_info["target"]}
+                    for rep_info in response["result"]["preps"]]
         Logger.debug(f'rep list: {rep_list}')
 
         start_term_height = '0x0'
