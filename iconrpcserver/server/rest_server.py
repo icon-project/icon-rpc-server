@@ -121,12 +121,11 @@ class ServerComponents(metaclass=SingletonMetaClass):
             else:
                 await StubCollection().create_peer_stub()
                 channels = await StubCollection().peer_stub.async_task().get_channel_infos()
-                channel_name = None
                 for channel_name in channels:
                     await StubCollection().create_channel_stub(channel_name)
                     await StubCollection().create_channel_tx_creator_stub(channel_name)
                     await StubCollection().create_icon_score_stub(channel_name)
-                results: dict = await StubCollection().peer_stub.async_task().get_channel_info_detail(channel_name)
+                results: dict = await StubCollection().peer_stub.async_task().get_node_info_detail()
                 RestProperty().node_type = NodeType(results.get('node_type'))
                 RestProperty().rs_target = results.get('rs_target')
                 relay_target = StubCollection().conf.get(ConfigKey.RELAY_TARGET, None)

@@ -19,15 +19,15 @@ from urllib.parse import urlsplit, urlparse
 from iconcommons.logger import Logger
 from jsonrpcserver import status
 
+from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
 from iconrpcserver.dispatcher import GenericJsonRpcServerError, JsonError
-from iconrpcserver.server.rest_property import RestProperty
-from iconrpcserver.protos import message_code
 from iconrpcserver.dispatcher.v3 import methods
+from iconrpcserver.protos import message_code
+from iconrpcserver.server.rest_property import RestProperty
 from iconrpcserver.utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
-from iconrpcserver.utils.json_rpc import relay_tx_request, get_block_by_params
 from iconrpcserver.utils.json_rpc import get_icon_stub_by_channel_name, get_channel_stub_by_channel_name
+from iconrpcserver.utils.json_rpc import relay_tx_request, get_block_by_params
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
-from iconrpcserver.default_conf.icon_rpcserver_constant import NodeType, ConfigKey
 
 
 class IcxDispatcher:
@@ -58,8 +58,7 @@ class IcxDispatcher:
 
     @staticmethod
     async def __relay_icx_transaction(url, path, message):
-        relay_target = RestProperty().relay_target
-        relay_target = relay_target if relay_target is not None else RestProperty().rs_target
+        relay_target = RestProperty().relay_target or RestProperty().rs_target
         if not relay_target:
             raise GenericJsonRpcServerError(
                 code=JsonError.INTERNAL_ERROR,
