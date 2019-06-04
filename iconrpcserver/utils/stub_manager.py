@@ -31,8 +31,22 @@ class StubManager:
         self.__make_stub()
 
     def __make_stub(self):
+        self.__invalidate_stub()
+
         self.__channel = grpc.insecure_channel(self.__target)
         self.__stub = self.__stub_type(self.__channel)
+
+    def __invalidate_stub(self):
+        if self.__channel is not None:
+            try:
+                Logger.warning(f"Closing... gRPC channel. channel={self.__channel}.")
+                self.__channel.close()
+                Logger.warning(f"Closed gRPC channel. channel={self.__channel}.")
+            except AttributeError as e:
+                # Channel.close method doesn't exist prior to grpc version 1.12.0
+                Logger.warning(f"gRPC channel has no close function. channel={self.__channel}, e={e}")
+            self.__channel = None
+        self.__stub = None
 
     def call(self, method_name, message, timeout=None):
         if timeout is None:
