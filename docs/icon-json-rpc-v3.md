@@ -61,7 +61,7 @@ Below table shows the most common "VALUE types".
 | <a id="T_INT">T_INT</a> | "0x" + lowercase HEX string | 0xa |
 | <a id="T_BIN_DATA">T_BIN_DATA</a> | "0x" + lowercase HEX string. Length must be even. | 0x34b2 |
 | <a id="T_SIG">T_SIG</a> | base64 encoded string | VAia7YZ2Ji6igKWzjR2YsGa2m53nKPrfK7uXYW78QLE+ATehAVZPC40szvAiA6NEU5gCYB4c4qaQzqDh2ugcHgA= |
-| <a id="T_DATA_TYPE">T_DATA_TYPE</a> | Type of data | call, deploy, or message |
+| <a id="T_DATA_TYPE">T_DATA_TYPE</a> | Type of data | call, deploy, message or deposit |
 
 # JSON-RPC Error Codes
 
@@ -738,7 +738,7 @@ Total number of ICX coins issued.
 | blockHeight | [T_INT](#T_INT) | Block height where this transaction was in. Null when it is pending. |
 | blockHash | [T_HASH](#T_HASH) | Hash of the block where this transaction was in. Null when it is pending. |
 | signature | [T_SIG](#T_SIG) | Signature of the transaction. |
-| dataType | [T_DATA_TYPE](#T_DATA_TYPE) | Type of data. (call, deploy, or message) |
+| dataType | [T_DATA_TYPE](#T_DATA_TYPE) | Type of data. (call, deploy, message or deposit) |
 | data | T_DICT or String | Contains various type of data depending on the dataType. See [Parameters - data](#sendtxparameterdata). |
 
 ### Example
@@ -889,7 +889,7 @@ This function causes state transition.
 | nid | [T_INT](#T_INT) | required | Network ID ("0x1" for Mainnet, "0x2" for Testnet, etc) |
 | nonce | [T_INT](#T_INT) | optional | An arbitrary number used to prevent transaction hash collision. |
 | signature | [T_SIG](#T_SIG) | required | Signature of the transaction. |
-| dataType | [T_DATA_TYPE](#T_DATA_TYPE) | optional | Type of data. (call, deploy, or message) |
+| dataType | [T_DATA_TYPE](#T_DATA_TYPE) | optional | Type of data. (call, deploy, message or deposit) |
 | data | T_DICT or String | optional | The content of data varies depending on the dataType. See [Parameters - data](#sendtxparameterdata). |
 
 #### <a id ="sendtxparameterdata">Parameters - data</a>
@@ -916,7 +916,16 @@ It is used when installing or updating a SCORE, and `data` has dictionary value 
 
 ##### dataType == message
 
-It is used when transfering a message, and `data` has a HEX string.
+It is used when transferring a message, and `data` has a HEX string.
+
+##### dataType == deposit
+
+It is used when depositing ICX in SCORE or withdrawing the deposited ICX, and `data` has dictionary value as follows.
+
+| KEY | VALUE type | Required | Description |
+|:----|:-----------|:--------:|:------------|
+| action | String | required | Name of the action (`add` or `withdraw`) |
+| id | String | optional | needed when withdrawing the deposited ICX |
 
 ### Returns
 
@@ -1058,7 +1067,57 @@ It is used when transfering a message, and `data` has a HEX string.
     }
 }
 ```
+#### Deposit ICX to SCORE
 
+```javascript
+// Request
+{
+    "jsonrpc": "2.0",
+    "method": "icx_sendTransaction",
+    "id": 1234,
+    "params": {
+        "version": "0x3",
+        "from": "hxbe258ceb872e08851f1f59694dac2558708ece11",
+        "to": "cxbe258ceb872e08851f1f59694dac2558708ece11",
+        "value": "0x10f0cf064dd59200000",
+        "stepLimit": "0x12345",
+        "timestamp": "0x563a6cf330136",
+        "nid": "0x3",
+        "nonce": "0x1",
+        "signature": "VAia7YZ2Ji6igKWzjR2YsGa2m53nKPrfK7uXYW78QLE+ATehAVZPC40szvAiA6NEU5gCYB4c4qaQzqDh2ugcHgA=",
+        "dataType": "deposit",
+        "data": {
+            "action": "add"
+        }
+    }
+}
+```
+
+#### Withdraw ICX from SCORE
+
+```javascript
+// Request
+{
+    "jsonrpc": "2.0",
+    "method": "icx_sendTransaction",
+    "id": 1234,
+    "params": {
+        "version": "0x3",
+        "from": "hxbe258ceb872e08851f1f59694dac2558708ece11",
+        "to": "cxbe258ceb872e08851f1f59694dac2558708ece11",
+        "stepLimit": "0x12345",
+        "timestamp": "0x563a6cf330136",
+        "nid": "0x3",
+        "nonce": "0x1",
+        "signature": "VAia7YZ2Ji6igKWzjR2YsGa2m53nKPrfK7uXYW78QLE+ATehAVZPC40szvAiA6NEU5gCYB4c4qaQzqDh2ugcHgA=",
+        "dataType": "deposit",
+        "data": {
+            "action": "withdraw",
+            "id": "0x4bf74e6aeeb43bde5dc8d5b62537a33ac8eb7605ebbdb51b015c1881b45b3111"
+        }
+    }
+}
+```
 #### Responses
 
 ```javascript
