@@ -44,6 +44,11 @@ class StandaloneApplication(gunicorn.app.base.BaseApplication):
         self.application = app
         super(StandaloneApplication, self).__init__()
 
+        # FIXME : below is temporary patch for snap packaging
+        from gunicorn.workers import base
+        from iconrpcserver.utils import gunicorn_patch
+        base.WorkerTmp.__init__ = gunicorn_patch.__worker_tmp_init__
+
     def load_config(self):
         config = dict([(key, value) for key, value in iteritems(self.options)
                        if key in self.cfg.settings and value is not None])
@@ -161,6 +166,10 @@ async def _run(conf: 'IconConfig'):
         'keyfile': keyfile,
         'capture_output': False
     }
+
+    # TODO : update gunicorn settings at once
+    if conf.get(ConfigKey.GUNICORN_WORKER_TMP_DIR, None):
+        options.update({'worker_tmp_dir': conf[ConfigKey.GUNICORN_WORKER_TMP_DIR]})
 
     # Launch gunicorn web server.
     ServerComponents.conf = conf

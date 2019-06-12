@@ -69,6 +69,7 @@ class ConfigKey:
     WS_HEARTBEAT_TIME = 'wsHeartBeatTime'
     REQUEST_MAX_SIZE = "requestMaxSize"
     RELAY_TARGET = "relayTarget"
+    GUNICORN_WORKER_TMP_DIR = 'gunicornWorkerTmpDir'
 
 
 ICON_RPC_SERVER_LOG_TAG = 'IconService'
