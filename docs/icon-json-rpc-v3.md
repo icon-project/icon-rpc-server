@@ -136,6 +136,10 @@ API path : `<scheme>://<host>/api/v3`
 * [icx_getTotalSupply](#icx_gettotalsupply)
 * [icx_getTransactionResult](#icx_gettransactionresult)
 * [icx_getTransactionByHash](#icx_gettransactionbyhash)
+* [icx_getTransactionProof](#icx_gettransactionproof)
+* [icx_getReceiptProof](#icx_getreceiptproof)
+* [icx_proveTransaction](#icx_provetransaction)
+* [icx_proveReceipt](#icx_provereceipt)
 * [icx_sendTransaction](#icx_sendtransaction)
 
 ## Debug API
