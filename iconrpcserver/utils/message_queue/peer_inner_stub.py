@@ -27,7 +27,7 @@ class PeerInnerTask:
         pass
 
     @message_queue_task
-    async def get_channel_info_detail(self, channel_name):
+    async def get_channel_info_detail(self, channel_name) -> dict:
         pass
 
 
