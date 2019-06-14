@@ -83,6 +83,10 @@ class ChannelInnerTask:
     async def is_citizen_registered(self, peer_id) -> bool:
         pass
 
+    @message_queue_task
+    async def get_reps(self) -> List[Dict[str, str]]:
+        pass
+
 
 class ChannelInnerStub(MessageQueueStub[ChannelInnerTask]):
     TaskType = ChannelInnerTask
