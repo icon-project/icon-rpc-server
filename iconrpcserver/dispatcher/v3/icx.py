@@ -24,7 +24,8 @@ from iconrpcserver.server.rest_property import RestProperty
 from iconrpcserver.protos import message_code
 from iconrpcserver.dispatcher.v3 import methods
 from iconrpcserver.utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
-from iconrpcserver.utils.json_rpc import relay_tx_request, get_block_by_params, get_icon_stub_by_channel_name
+from iconrpcserver.utils.json_rpc import relay_tx_request, get_block_by_params
+from iconrpcserver.utils.json_rpc import get_icon_stub_by_channel_name, get_channel_stub_by_channel_name
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 from iconrpcserver.default_conf.icon_rpcserver_constant import NodeType, ConfigKey
 
@@ -243,6 +244,48 @@ class IcxDispatcher:
 
         response = convert_params(result['block'], ParamType.get_block_response)
         return response
+
+    @staticmethod
+    @methods.add
+    async def icx_getTransactionProof(**kwargs):
+        channel = kwargs['context']['channel']
+        channel_stub = get_channel_stub_by_channel_name(channel)
+
+        tx_hash = kwargs['txHash']
+        response = await channel_stub.async_task().get_tx_proof(tx_hash)
+        return response_to_json_query(response)
+
+    @staticmethod
+    @methods.add
+    async def icx_getReceiptProof(**kwargs):
+        channel = kwargs['context']['channel']
+        channel_stub = get_channel_stub_by_channel_name(channel)
+
+        tx_hash = kwargs['txHash']
+        response = await channel_stub.async_task().get_receipt_proof(tx_hash)
+        return response_to_json_query(response)
+
+    @staticmethod
+    @methods.add
+    async def icx_proveTransaction(**kwargs):
+        channel = kwargs['context']['channel']
+        channel_stub = get_channel_stub_by_channel_name(channel)
+
+        tx_hash = kwargs['txHash']
+        proof = kwargs['proof']
+        response = await channel_stub.async_task().prove_tx(tx_hash, proof)
+        return response_to_json_query(response)
+
+    @staticmethod
+    @methods.add
+    async def icx_proveReceipt(**kwargs):
+        channel = kwargs['context']['channel']
+        channel_stub = get_channel_stub_by_channel_name(channel)
+
+        tx_hash = kwargs['txHash']
+        proof = kwargs['proof']
+        response = await channel_stub.async_task().prove_receipt(tx_hash, proof)
+        return response_to_json_query(response)
 
     @staticmethod
     @methods.add

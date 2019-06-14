@@ -27,7 +27,7 @@ def response_to_json_query(response, is_convert: bool = False):
     if check_error_response(response):
         response = response['error']
         raise GenericJsonRpcServerError(
-            code=-response['code'],
+            code=-abs(response['code']),
             message=response['message'],
             http_status=status.HTTP_BAD_REQUEST
         )

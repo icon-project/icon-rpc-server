@@ -60,6 +60,7 @@ Below table shows the most common "VALUE types".
 | <a id="T_HASH">T_HASH</a> | "0x" + 64 digit HEX string | 0xc71303ef8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238 |
 | <a id="T_INT">T_INT</a> | "0x" + lowercase HEX string | 0xa |
 | <a id="T_BIN_DATA">T_BIN_DATA</a> | "0x" + lowercase HEX string. Length must be even. | 0x34b2 |
+| <a id="T_PROOF_DATA">T_PROOF_DATA</a> | {"left": T_HASH} or {"right": T_HASH} | {"left": "0xc71303ef8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238" }
 | <a id="T_SIG">T_SIG</a> | base64 encoded string | VAia7YZ2Ji6igKWzjR2YsGa2m53nKPrfK7uXYW78QLE+ATehAVZPC40szvAiA6NEU5gCYB4c4qaQzqDh2ugcHgA= |
 | <a id="T_DATA_TYPE">T_DATA_TYPE</a> | Type of data | call, deploy, message or deposit |
 
@@ -135,6 +136,10 @@ API path : `<scheme>://<host>/api/v3`
 * [icx_getTotalSupply](#icx_gettotalsupply)
 * [icx_getTransactionResult](#icx_gettransactionresult)
 * [icx_getTransactionByHash](#icx_gettransactionbyhash)
+* [icx_getTransactionProof](#icx_gettransactionproof)
+* [icx_getReceiptProof](#icx_getreceiptproof)
+* [icx_proveTransaction](#icx_provetransaction)
+* [icx_proveReceipt](#icx_provereceipt)
 * [icx_sendTransaction](#icx_sendtransaction)
 
 ## Debug API
@@ -811,6 +816,296 @@ Total number of ICX coins issued.
         "code": -32602,
         "message": "Invalid params txHash"
     }
+}
+```
+
+## icx_getTransactionProof
+
+* Returns the transaction proof requested by transaction hash.
+
+### Parameters
+
+| KEY | VALUE type | Description |
+|:----|:----------|:----- |
+| txHash | [T_HASH](#T_HASH) | Hash of the transaction |
+
+
+### Returns
+
+* T_LIST([T_PROOF_DATA](#T_PROOF_DATA)) : List of proof data.
+
+### Example
+
+```javascript
+// Request
+{
+    "jsonrpc" : "2.0",
+    "method": "icx_getTransactionProof",
+    "id": 1234,
+    "params": {
+        "txHash": "0x6c85809ead0e601de5e84f063ef3b7d7c504b95a404356af6094f26a39713eb1"
+    }
+}
+
+// Response - success
+{
+    "jsonrpc": "2.0",
+    "result": [
+        {
+            "left": "0xac1695c9d3ec0dedd7320d49e8b28bb76cb3f4332f99b396154d35cdb521efbc"
+        },
+        {
+            "right": "0xbb65b23173914f5618c4101b93a8a9e221814b3733dbd4cab6ae06f47982808e"
+        },
+        {
+            "right": "0xc845505ca7667bec30d03c67ba6cfa5a3829ed7d7f1250729bed5f780c31606e"
+        },
+        {
+            "left": "0x0a4ec933df08db2d6982b43b97b5c9564a27dd37ee844660e2613d2d183afce5"
+        },
+        {
+            "left": "0xac51d42744d093dfaff493de34cc1eff77e4f86989dabf53254f1acea40c6322"
+        },
+        {
+            "left": "0x757f4ab5a86f8a159f1dac9a7c50c2522b223c9b17fa6d5beeb0c1c20b4cc948"
+        },
+        {
+            "left": "0x3454646a681c036075b30eb1ca096057cc1a357d861e9ee4c8c8cb2ed6eaae26"
+        }
+    ],
+    "id": 1234
+}
+
+// Response - error
+{
+    "jsonrpc": "2.0",
+    "error": {
+        "code": -32602,
+        "message": "Tx does not exist."
+    },
+    "id": 1234
+}
+```
+
+## icx_getReceiptProof
+
+* Returns the transaction receipt proof requested by transaction hash.
+
+### Parameters
+
+| KEY | VALUE type | Description |
+|:----|:----------|:----- |
+| txHash | [T_HASH](#T_HASH) | Hash of the transaction |
+
+
+### Returns
+
+* T_LIST([T_PROOF_DATA](#T_PROOF_DATA)) : List of proof data.
+
+### Example
+
+```javascript
+// Request
+{
+    "jsonrpc" : "2.0",
+    "method": "icx_getReceiptProof",
+    "id": 1234,
+    "params": {
+        "txHash": "0x6c85809ead0e601de5e84f063ef3b7d7c504b95a404356af6094f26a39713eb1"
+    }
+}
+
+// Response - success
+{
+    "jsonrpc": "2.0",
+    "result": [
+        {
+            "left": "0xac1695c9d3ec0dedd7320d49e8b28bb76cb3f4332f99b396154d35cdb521efbc"
+        },
+        {
+            "right": "0xbb65b23173914f5618c4101b93a8a9e221814b3733dbd4cab6ae06f47982808e"
+        },
+        {
+            "right": "0xc845505ca7667bec30d03c67ba6cfa5a3829ed7d7f1250729bed5f780c31606e"
+        },
+        {
+            "left": "0x0a4ec933df08db2d6982b43b97b5c9564a27dd37ee844660e2613d2d183afce5"
+        },
+        {
+            "left": "0xac51d42744d093dfaff493de34cc1eff77e4f86989dabf53254f1acea40c6322"
+        },
+        {
+            "left": "0x757f4ab5a86f8a159f1dac9a7c50c2522b223c9b17fa6d5beeb0c1c20b4cc948"
+        },
+        {
+            "left": "0x3454646a681c036075b30eb1ca096057cc1a357d861e9ee4c8c8cb2ed6eaae26"
+        }
+    ],
+    "id": 1234
+}
+
+// Response - error
+{
+    "jsonrpc": "2.0",
+    "error": {
+        "code": -32602,
+        "message": "Tx does not exist."
+    },
+    "id": 1234
+}
+```
+
+## icx_proveTransaction
+
+* Returns the result of proving requested by transaction hash with its proof.
+
+### Parameters
+
+| KEY | VALUE type | Description |
+|:----|:----------|:----- |
+| txHash | [T_HASH](#T_HASH) | Hash of the transaction |
+| proof | T_LIST([T_PROOF_DATA](#T_PROOF_DATA)) | List of proof data |
+
+
+### Returns
+
+* T_INT : 1 on success, 0 on failure.
+
+### Example
+
+```javascript
+// Request
+{
+    "jsonrpc" : "2.0",
+    "method": "icx_proveTransaction",
+    "id": 1234,
+    "params": {
+        "txHash": "0x6c85809ead0e601de5e84f063ef3b7d7c504b95a404356af6094f26a39713eb1",
+        "proof":  [
+        	{
+	            "left": "0xac1695c9d3ec0dedd7320d49e8b28bb76cb3f4332f99b396154d35cdb521efbc"
+	        },
+	        {
+	            "right": "0xbb65b23173914f5618c4101b93a8a9e221814b3733dbd4cab6ae06f47982808e"
+	        },
+	        {
+	            "right": "0xc845505ca7667bec30d03c67ba6cfa5a3829ed7d7f1250729bed5f780c31606e"
+	        },
+	        {
+	            "left": "0x0a4ec933df08db2d6982b43b97b5c9564a27dd37ee844660e2613d2d183afce5"
+	        },
+	        {
+	            "left": "0xac51d42744d093dfaff493de34cc1eff77e4f86989dabf53254f1acea40c6322"
+	        },
+	        {
+	            "left": "0x757f4ab5a86f8a159f1dac9a7c50c2522b223c9b17fa6d5beeb0c1c20b4cc948"
+	        },
+	        {
+	            "left": "0x3454646a681c036075b30eb1ca096057cc1a357d861e9ee4c8c8cb2ed6eaae26"
+	        }
+	    ]
+    }
+}
+
+// Response - success
+{
+    "jsonrpc": "2.0",
+    "result": 0x1,
+    "id": 1234
+}
+
+// Response - failure
+{
+    "jsonrpc": "2.0",
+    "result": 0x0,
+    "id": 1234
+}
+
+// Response - error
+{
+    "jsonrpc": "2.0",
+    "error": {
+        "code": -32602,
+        "message": "Tx does not exist."
+    },
+    "id": 1234
+}
+```
+
+## icx_proveReceipt
+
+* Returns the result of proving the receipt requested by transaction hash with its proof.
+
+### Parameters
+
+| KEY | VALUE type | Description |
+|:----|:----------|:----- |
+| txHash | [T_HASH](#T_HASH) | Hash of the transaction |
+| proof | T_LIST([T_PROOF_DATA](#T_PROOF_DATA)) | List of proof data |
+
+
+### Returns
+
+* T_INT : 1 on success, 0 on failure.
+
+### Example
+
+```javascript
+// Request
+{
+    "jsonrpc" : "2.0",
+    "method": "icx_proveReceipt",
+    "id": 1234,
+    "params": {
+        "txHash": "0x6c85809ead0e601de5e84f063ef3b7d7c504b95a404356af6094f26a39713eb1",
+        "proof":  [
+        	{
+	            "left": "0xac1695c9d3ec0dedd7320d49e8b28bb76cb3f4332f99b396154d35cdb521efbc"
+	        },
+	        {
+	            "right": "0xbb65b23173914f5618c4101b93a8a9e221814b3733dbd4cab6ae06f47982808e"
+	        },
+	        {
+	            "right": "0xc845505ca7667bec30d03c67ba6cfa5a3829ed7d7f1250729bed5f780c31606e"
+	        },
+	        {
+	            "left": "0x0a4ec933df08db2d6982b43b97b5c9564a27dd37ee844660e2613d2d183afce5"
+	        },
+	        {
+	            "left": "0xac51d42744d093dfaff493de34cc1eff77e4f86989dabf53254f1acea40c6322"
+	        },
+	        {
+	            "left": "0x757f4ab5a86f8a159f1dac9a7c50c2522b223c9b17fa6d5beeb0c1c20b4cc948"
+	        },
+	        {
+	            "left": "0x3454646a681c036075b30eb1ca096057cc1a357d861e9ee4c8c8cb2ed6eaae26"
+	        }
+	    ]
+    }
+}
+
+// Response - success
+{
+    "jsonrpc": "2.0",
+    "result": 0x1,
+    "id": 1234
+}
+
+// Response - failure
+{
+    "jsonrpc": "2.0",
+    "result": 0x0,
+    "id": 1234
+}
+
+// Response - error
+{
+    "jsonrpc": "2.0",
+    "error": {
+        "code": -32602,
+        "message": "Tx does not exist."
+    },
+    "id": 1234
 }
 ```
 
