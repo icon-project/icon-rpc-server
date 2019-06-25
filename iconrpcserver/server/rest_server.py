@@ -106,7 +106,8 @@ class ServerComponents(metaclass=SingletonMetaClass):
         StubCollection().amqp_key = ServerComponents.conf[ConfigKey.AMQP_KEY]
         StubCollection().conf = ServerComponents.conf
 
-        async def ready_tasks():
+        @self.__app.listener("before_server_start")
+        async def ready_tasks(app, loop):
             Logger.debug('rest_server:initialize')
 
             if self.conf.get(ConfigKey.TBEARS_MODE, False):
@@ -134,8 +135,6 @@ class ServerComponents(metaclass=SingletonMetaClass):
 
             Logger.debug(f'rest_server:initialize complete. '
                          f'node_type({RestProperty().node_type}), rs_target({RestProperty().rs_target})')
-
-        self.__app.add_task(ready_tasks())
 
     def serve(self, api_port):
         self.ready()

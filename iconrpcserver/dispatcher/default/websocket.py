@@ -94,7 +94,7 @@ class WSDispatcher:
 
             futures = [
                 WSDispatcher.publish_heartbeat(ws),
-                WSDispatcher.publish_new_block(ws, channel_name, height)
+                WSDispatcher.publish_new_block(ws, channel_name, height, peer_id)
             ]
 
             await asyncio.wait(futures, return_when=asyncio.FIRST_EXCEPTION)
@@ -121,14 +121,14 @@ class WSDispatcher:
         await WSDispatcher.send_and_raise_exception(ws, "node_ws_PublishHeartbeat", exception, error_code)
 
     @staticmethod
-    async def publish_new_block(ws, channel_name, height):
+    async def publish_new_block(ws, channel_name, height, peer_id):
         exception = None
         error_code = None
         channel_stub = get_channel_stub_by_channel_name(channel_name)
         try:
             while ws.open:
                 new_block_dumped, confirm_info_bytes = await \
-                    channel_stub.async_task().announce_new_block(subscriber_block_height=height)
+                    channel_stub.async_task().announce_new_block(subscriber_block_height=height, subscriber_id=peer_id)
                 new_block: dict = json.loads(new_block_dumped)
                 confirm_info = confirm_info_bytes.decode('utf-8')
                 request = Request("node_ws_PublishNewBlock", block=new_block, confirm_info=confirm_info)
