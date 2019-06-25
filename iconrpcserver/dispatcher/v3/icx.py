@@ -85,6 +85,16 @@ class IcxDispatcher:
         path = urlparse(url).path
         del kwargs['context']
 
+        channel_tx_creator_stub = StubCollection().channel_tx_creator_stubs[channel]
+        response_code = await channel_tx_creator_stub.async_task().is_limited(kwargs)
+
+        if response_code != message_code.Response.success:
+            raise GenericJsonRpcServerError(
+                code=JsonError.INVALID_REQUEST,
+                message=message_code.responseCodeMap[response_code][1],
+                http_status=message_code.get_response_http_status_code(response_code, status.HTTP_BAD_REQUEST)
+            )
+
         method = 'icx_sendTransaction'
         request = make_request(method, kwargs)
         score_stub = get_icon_stub_by_channel_name(channel)
@@ -93,7 +103,6 @@ class IcxDispatcher:
         # Error Check
         response_to_json_query(response)
 
-        channel_tx_creator_stub = StubCollection().channel_tx_creator_stubs[channel]
         response_code, tx_hash = await channel_tx_creator_stub.async_task().create_icx_tx(kwargs)
 
         if response_code == message_code.Response.fail_no_permission:
