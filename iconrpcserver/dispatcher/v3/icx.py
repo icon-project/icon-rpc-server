@@ -85,14 +85,6 @@ class IcxDispatcher:
         path = urlparse(url).path
         del kwargs['context']
 
-        method = 'icx_sendTransaction'
-        request = make_request(method, kwargs)
-        score_stub = get_icon_stub_by_channel_name(channel)
-        icon_stub = score_stub
-        response = await icon_stub.async_task().validate_transaction(request)
-        # Error Check
-        response_to_json_query(response)
-
         channel_tx_creator_stub = StubCollection().channel_tx_creator_stubs[channel]
         response_code, tx_hash = await channel_tx_creator_stub.async_task().create_icx_tx(kwargs)
 
