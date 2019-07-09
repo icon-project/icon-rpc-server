@@ -131,9 +131,6 @@ async def _run(conf: 'IconConfig'):
 
     Logger.print_config(conf, ICON_RPCSERVER_CLI)
 
-    # Setup port and host values.
-    host = '0.0.0.0'
-
     # Connect gRPC stub.
     PeerServiceStub().conf = conf
     PeerServiceStub().rest_grpc_timeout = \
@@ -150,32 +147,26 @@ async def _run(conf: 'IconConfig'):
 
     # Configure SSL.
     ssl_context = ServerComponents().ssl_context
-    certfile = ""
-    keyfile = ""
+    certfile = ''
+    keyfile = ''
 
     if ssl_context is not None:
         certfile = ssl_context[0]
         keyfile = ssl_context[1]
 
-    options = {
-        'bind': f"{host}:{conf[ConfigKey.PORT]}",
-        'workers': conf[ConfigKey.GUNICORN_WORKER_COUNT],
-        'worker_class': "sanic.worker.GunicornWorker",
+    options = conf.get(ConfigKey.GUNICORN_CONFIG, {})
+    options.update({
+        'bind': f'{conf[ConfigKey.HOST]}:{conf[ConfigKey.PORT]}',
         'certfile': certfile,
-        'SERVER_SOFTWARE': gunicorn.SERVER_SOFTWARE,
         'keyfile': keyfile,
+        'SERVER_SOFTWARE': gunicorn.SERVER_SOFTWARE,
         'capture_output': False
-    }
-
-    # TODO : update gunicorn settings at once
-    if conf.get(ConfigKey.GUNICORN_WORKER_TMP_DIR, None):
-        options.update({'worker_tmp_dir': conf[ConfigKey.GUNICORN_WORKER_TMP_DIR]})
+    })
 
     # Launch gunicorn web server.
     ServerComponents.conf = conf
     ServerComponents().ready()
     StandaloneApplication(ServerComponents().app, options).run()
-    Logger.error("Rest App Done!")
 
 
 # Run as gunicorn web server.

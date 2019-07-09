@@ -49,11 +49,11 @@ ICON_SCORE_QUEUE_NAME_FORMAT = "IconScore.{channel_name}.{amqp_key}"
 class ConfigKey:
     CONFIG = 'config'
     CHANNEL = 'channel'
+    HOST = 'host'
     PORT = 'port'
     PORT_DIFF_REST_SERVICE_CONTAINER = 'portDiffRestServiceContainer'
     AMQP_TARGET = 'amqpTarget'
     AMQP_KEY = 'amqpKey'
-    GUNICORN_WORKER_COUNT = 'gunicornWorkerCount'
     DISABLE_V1_API = 'disableV1Api'
     REST_SSL_TYPE = 'restSslType'
     DEFAULT_SSL_CERT_PATH = 'defaultSslCertPath'
@@ -67,9 +67,9 @@ class ConfigKey:
     TBEARS_MODE = 'tbearsMode'
     REDIRECT_PROTOCOL = 'redirectProtocol'
     WS_HEARTBEAT_TIME = 'wsHeartBeatTime'
-    REQUEST_MAX_SIZE = "requestMaxSize"
+    REQUEST_MAX_SIZE = 'requestMaxSize'
     RELAY_TARGET = "relayTarget"
-    GUNICORN_WORKER_TMP_DIR = 'gunicornWorkerTmpDir'
+    GUNICORN_CONFIG = 'gunicornConfig'
 
 
 ICON_RPC_SERVER_LOG_TAG = 'IconService'
