@@ -116,7 +116,6 @@ class ServerComponents(metaclass=SingletonMetaClass):
                 await StubCollection().create_channel_tx_creator_stub(channel_name)
                 await StubCollection().create_icon_score_stub(channel_name)
 
-                RestProperty().node_type = NodeType.CommunityNode
                 RestProperty().rs_target = None
             else:
                 await StubCollection().create_peer_stub()
@@ -126,14 +125,12 @@ class ServerComponents(metaclass=SingletonMetaClass):
                     await StubCollection().create_channel_tx_creator_stub(channel_name)
                     await StubCollection().create_icon_score_stub(channel_name)
                 results: dict = await StubCollection().peer_stub.async_task().get_node_info_detail()
-                RestProperty().node_type = NodeType(results.get('node_type'))
                 RestProperty().rs_target = results.get('rs_target')
                 relay_target = StubCollection().conf.get(ConfigKey.RELAY_TARGET, None)
                 RestProperty().relay_target = urlparse(relay_target).netloc \
                     if urlparse(relay_target).scheme else relay_target
 
-            Logger.debug(f'rest_server:initialize complete. '
-                         f'node_type({RestProperty().node_type}), rs_target({RestProperty().rs_target})')
+            Logger.debug(f'rest_server:initialize complete. rs_target({RestProperty().rs_target})')
 
     def serve(self, api_port):
         self.ready()
