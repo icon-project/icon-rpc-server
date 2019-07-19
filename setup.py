@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 import os
+import subprocess
 
 from setuptools import setup, find_packages
+from setuptools.command.build_py import build_py as _build_py
+from setuptools.command.develop import develop as _develop
 
 version = os.environ.get('VERSION')
 
@@ -11,6 +14,23 @@ if version is None:
 
 with open('requirements.txt') as requirements:
     requires = list(requirements)
+
+
+def generate_proto():
+    subprocess.check_call(['make', 'generate-proto'])
+
+
+class build_py(_build_py):
+    def run(self):
+        generate_proto()
+        _build_py.run(self)
+
+
+class develop(_develop):
+    def run(self):
+        generate_proto()
+        _develop.run(self)
+
 
 setup_options = {
     'name': 'iconrpcserver',
@@ -31,6 +51,10 @@ setup_options = {
         'console_scripts': [
             'iconrpcserver=iconrpcserver:main'
         ],
+    },
+    'cmdclass': {
+        'build_py': build_py,
+        'develop': develop
     },
     'classifiers': [
         'Development Status :: 5 - Production/Stable',
