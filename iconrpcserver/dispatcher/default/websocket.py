@@ -41,23 +41,26 @@ class Reception:
 
     async def __aenter__(self):
         connected_time = get_now_timestamp()
-        self._registered = await self._channel_stub.async_task().register_citizen(
-            peer_id=self._peer_id,
-            target=self._remote_target,
-            connected_time=connected_time
-        )
+        try:
+            self._registered = await self._channel_stub.async_task().register_citizen(
+                peer_id=self._peer_id,
+                target=self._remote_target,
+                connected_time=connected_time
+            )
+        except Exception as e:
+            Logger.warning(f"{type(e)} during register new citizen, {e}")
+            self._registered = False
 
         if self._registered:
             Logger.debug(f"register citizen: {self._peer_id}")
         else:
-            Logger.warning(f"This peer can no longer take more subscribe requests.")
+            Logger.warning(f"Cannot register this citizen({self._peer_id})")
 
         return self._registered
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        if self._registered:
-            Logger.debug(f"unregister citizen: {self._peer_id}")
-            await self._channel_stub.async_task().unregister_citizen(peer_id=self._peer_id)
+        Logger.debug(f"unregister citizen: {self._peer_id}")
+        await self._channel_stub.async_task().unregister_citizen(peer_id=self._peer_id)
 
 
 class WSDispatcher:
