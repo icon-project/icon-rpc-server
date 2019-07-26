@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import subprocess
 
 from setuptools import setup, find_packages
 from setuptools.command.build_py import build_py as _build_py
@@ -17,7 +16,18 @@ with open('requirements.txt') as requirements:
 
 
 def generate_proto():
-    subprocess.check_call(['make', 'generate-proto'])
+    import grpc_tools.protoc
+
+    proto_path = './iconrpcserver/protos'
+    proto_file = os.path.join(proto_path, 'loopchain.proto')
+
+    grpc_tools.protoc.main([
+        'grcp_tools.protoc',
+        f'-I{proto_path}',
+        f'--python_out={proto_path}',
+        f'--grpc_python_out={proto_path}',
+        f'{proto_file}'
+    ])
 
 
 class build_py(_build_py):
