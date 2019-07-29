@@ -7,11 +7,11 @@ This is intended to give an introduction ICON RPC Server. ICON RPC Server receiv
 ## Building source code
  First, clone this project. Then go to the project folder and create a user environment and run build script.
 ```
-$ virtualenv -p python3 venv  # Create a virtual environment.
+$ python3 -m venv venv        # Create a virtual environment.
 $ source venv/bin/activate    # Enter the virtual environment.
-(venv)$ ./build.sh            # run build script
+(venv)$ make build            # run build
 (venv)$ ls dist/              # check result wheel file
-iconrpcserver-1.0.0-py3-none-any.whl
+iconrpcserver-x.x.x-py3-none-any.whl
 ```
 
 ## Installation
@@ -38,6 +38,7 @@ ICON RPC Server development and execution requires following environments.
 ### Setup on MacOS / Linux
 
 ```bash
+$ python3 -m venv work      # Create a virtual environment.
 # Install the ICON RPC Server
 (work) $ pip install iconrpcserver
 ```
