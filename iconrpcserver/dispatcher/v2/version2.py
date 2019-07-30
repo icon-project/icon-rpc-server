@@ -69,7 +69,7 @@ class Version2Dispatcher:
 
     @staticmethod
     async def __relay_icx_transaction(url, path, message):
-        rs_target = RestProperty().rs_target
+        rs_target = RestProperty().relay_target[ConfigKey.CHANNEL] or RestProperty().rs_target[ConfigKey.CHANNEL]
         if not rs_target:
             response_code = message_code.Response.fail_invalid_peer_target
             return {'response_code': response_code,
