@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/icon-project/icon-rpc-server.svg?branch=master)](https://travis-ci.org/icon-project/icon-rpc-server)
+
 # ICON RPC Server
 
 This is intended to give an introduction ICON RPC Server. ICON RPC Server receives request messages from external clients, and send a response to clients. when receiving the message, ICON RPC Server checks the method of requests and transfer it to appropriate components (loopchain or ICON Service). ICON RPC Server also checks the basic syntax error of messages. 
