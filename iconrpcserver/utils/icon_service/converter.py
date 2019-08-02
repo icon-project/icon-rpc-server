@@ -256,6 +256,11 @@ templates[ParamType.get_block_response] = {
         {
             "txHash": ValueType.hex_0x_hash_number
         }
+    ],
+    "transactions": [
+        {
+            "txHash": ValueType.hex_0x_hash_number
+        },
     ]
 }
 
