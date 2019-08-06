@@ -694,17 +694,24 @@ debug_estimateStep_v3: dict = {
 
 }
 
-rep_getList_v3: dict = {
-    "title": "rep_getList",
+rep_getListByHash_v3: dict = {
+    "title": "rep_getListByHash",
     "id": "https://github.com/icon-project/icon-rpc-server/blob/master/docs/icon-json-rpc-v3.md#rep_getlist",
     "type": "object",
     "properties": {
         "jsonrpc": {"type": "string", "enum": ["2.0"]},
         "method": {"type": "string"},
+        "params": {
+            "type": "object",
+            "properties": {
+                "repsHash": {"type": "string", "format": "hash"}
+            },
+            "additionalProperties": False,
+            "required": ["repsHash"]
+        },
         "id": {"type": "number"},
     }
 }
-
 
 SCHEMA_V3: dict = {
     "icx_getLastBlock": icx_getLastBlock,
@@ -723,7 +730,7 @@ SCHEMA_V3: dict = {
     "icx_sendTransaction": icx_sendTransaction_v3,
     "debug_estimateStep": debug_estimateStep_v3,
     "ise_getStatus": ise_getStatus_v3,
-    "rep_getList": rep_getList_v3
+    "rep_getListByHash": rep_getListByHash_v3,
 }
 
 

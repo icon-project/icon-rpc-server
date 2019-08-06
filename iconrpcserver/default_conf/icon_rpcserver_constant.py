@@ -54,7 +54,6 @@ class ConfigKey:
     PORT_DIFF_REST_SERVICE_CONTAINER = 'portDiffRestServiceContainer'
     AMQP_TARGET = 'amqpTarget'
     AMQP_KEY = 'amqpKey'
-    DISABLE_V1_API = 'disableV1Api'
     REST_SSL_TYPE = 'restSslType'
     DEFAULT_SSL_CERT_PATH = 'defaultSslCertPath'
     DEFAULT_SSL_KEY_PATH = 'defaultSslKeyPath'

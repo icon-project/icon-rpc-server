@@ -84,7 +84,7 @@ class ChannelInnerTask:
         pass
 
     @message_queue_task
-    async def get_reps(self) -> List[Dict[str, str]]:
+    async def get_reps_by_hash(self, reps_hash) -> List[Dict[str, str]]:
         pass
 
 
