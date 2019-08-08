@@ -30,10 +30,6 @@ class RepDispatcher:
         reps_hash = request.get('repsHash')
         reps = await channel_stub.async_task().get_reps_by_hash(reps_hash=reps_hash)
         Logger.debug(f"reps_hash: {reps_hash}, reps: {reps}")
-        reps = [{'address': rep['id'], 'p2pEndpoint': rep['p2pEndpoint']} for rep in reps]
+        response = [{'address': rep['id'], 'p2pEndpoint': rep['p2pEndpoint']} for rep in reps]
 
-        response = {
-            'repsHash': reps_hash,
-            'reps': reps
-        }
         return response_to_json_query(response)
