@@ -33,7 +33,6 @@ default_rpcserver_config = \
             "worker_class": "sanic.worker.GunicornWorker",
             "graceful_timeout": 30
         },
-        ConfigKey.DISABLE_V1_API: True,
         ConfigKey.REST_SSL_TYPE: SSLAuthType.none.value,
         ConfigKey.DEFAULT_SSL_CERT_PATH: "resources/ssl_test_cert/cert.pem",
         ConfigKey.DEFAULT_SSL_KEY_PATH: "resources/ssl_test_cert/key.pem",

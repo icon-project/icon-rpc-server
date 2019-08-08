@@ -143,14 +143,14 @@ class ServerComponents(metaclass=SingletonMetaClass):
 class Status(HTTPMethodView):
     async def get(self, request):
         args = request.raw_args
-        channel_name = ServerComponents.conf[ConfigKey.CHANNEL] if args.get('channel') is None else args.get('channel')
+        channel_name = args.get('channel') or ServerComponents.conf.get(ConfigKey.CHANNEL)
         return response.json(PeerServiceStub().get_status(channel_name))
 
 
 class Avail(HTTPMethodView):
     async def get(self, request):
         args = request.raw_args
-        channel_name = ServerComponents.conf[ConfigKey.CHANNEL] if args.get('channel') is None else args.get('channel')
+        channel_name = args.get('channel') or ServerComponents.conf.get(ConfigKey.CHANNEL)
         status = HTTPStatus.OK
         result = PeerServiceStub().get_status(channel_name)
 

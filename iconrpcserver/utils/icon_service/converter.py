@@ -36,6 +36,7 @@ class ParamType(Enum):
     get_tx_by_hash_response = 12
     get_tx_result_response = 13
     send_tx_response = 14
+    get_reps_by_hash = 15
 
 
 class ValueType(Enum):
@@ -283,3 +284,7 @@ templates[ParamType.get_tx_by_hash_response] = {
 }
 
 templates[ParamType.send_tx_response] = ValueType.hex_0x_hash_number
+
+templates[ParamType.get_reps_by_hash] = {
+    "repsHash": ValueType.hex_0x_hash_number
+}
