@@ -15,7 +15,7 @@
 
 import json
 import re
-from urllib.parse import urlsplit, urlparse
+from urllib.parse import urlparse
 
 from iconcommons.logger import Logger
 from jsonrpcserver import config
@@ -23,11 +23,12 @@ from jsonrpcserver.aio import AsyncMethods
 from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
+from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion, DISPATCH_V2_TAG
 from iconrpcserver.dispatcher import GenericJsonRpcServerError
-from iconrpcserver.server.rest_property import RestProperty
-from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, NodeType, ApiVersion, DISPATCH_V2_TAG
-from iconrpcserver.protos import message_code
 from iconrpcserver.dispatcher import validate_jsonschema_v2
+from iconrpcserver.protos import message_code
+from iconrpcserver.server.rest_property import RestProperty
+from iconrpcserver.utils import get_protocol_from_uri
 from iconrpcserver.utils.icon_service import make_request, response_to_json_query, ParamType
 from iconrpcserver.utils.json_rpc import relay_tx_request, get_block_v2_by_params
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
@@ -66,10 +67,6 @@ class Version2Dispatcher:
         return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
 
     @staticmethod
-    def get_dispatch_protocol_from_url(url: str) -> str:
-        return urlsplit(url).scheme
-
-    @staticmethod
     async def __relay_icx_transaction(url, path, message):
         rs_target = RestProperty().rs_target
         if not rs_target:
@@ -78,7 +75,7 @@ class Version2Dispatcher:
                     'message': message_code.responseCodeMap[response_code][1],
                     'tx_hash': None}
 
-        dispatch_protocol = Version2Dispatcher.get_dispatch_protocol_from_url(url)
+        dispatch_protocol = get_protocol_from_uri(url)
         Logger.debug(f'Dispatch Protocol: {dispatch_protocol}')
         redirect_protocol = StubCollection().conf.get(ConfigKey.REDIRECT_PROTOCOL)
         Logger.debug(f'Redirect Protocol: {redirect_protocol}')

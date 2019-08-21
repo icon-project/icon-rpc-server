@@ -14,7 +14,7 @@
 """json rpc dispatcher version 3"""
 
 import json
-from urllib.parse import urlsplit, urlparse
+from urllib.parse import urlparse
 
 from iconcommons.logger import Logger
 from jsonrpcserver import status
@@ -24,17 +24,14 @@ from iconrpcserver.dispatcher import GenericJsonRpcServerError, JsonError
 from iconrpcserver.dispatcher.v3 import methods
 from iconrpcserver.protos import message_code
 from iconrpcserver.server.rest_property import RestProperty
+from iconrpcserver.utils import get_protocol_from_uri
 from iconrpcserver.utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
-from iconrpcserver.utils.json_rpc import get_icon_stub_by_channel_name, get_channel_stub_by_channel_name
-from iconrpcserver.utils.json_rpc import relay_tx_request, get_block_by_params
+from iconrpcserver.utils.json_rpc import (get_icon_stub_by_channel_name, get_channel_stub_by_channel_name,
+                                          relay_tx_request, get_block_by_params)
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
 
 class IcxDispatcher:
-    @staticmethod
-    def get_dispatch_protocol_from_url(url: str) -> str:
-        return urlsplit(url).scheme
-
     @staticmethod
     @methods.add
     async def icx_call(**kwargs):
@@ -66,7 +63,7 @@ class IcxDispatcher:
                 http_status=status.HTTP_INTERNAL_ERROR
             )
 
-        dispatch_protocol = IcxDispatcher.get_dispatch_protocol_from_url(url)
+        dispatch_protocol = get_protocol_from_uri(url)
         Logger.debug(f'Dispatch Protocol: {dispatch_protocol}')
         redirect_protocol = StubCollection().conf.get(ConfigKey.REDIRECT_PROTOCOL)
         Logger.debug(f'Redirect Protocol: {redirect_protocol}')
@@ -203,7 +200,7 @@ class IcxDispatcher:
 
         block_hash, result = await get_block_by_params(block_height=-1,
                                                        channel_name=channel)
-        response = convert_params(result['block'], ParamType.get_block_response)
+        response = convert_params(result['block'], ParamType.get_block_response_0_1a)
 
         return response_to_json_query(response)
 
@@ -223,7 +220,7 @@ class IcxDispatcher:
                 http_status=status.HTTP_BAD_REQUEST
             )
 
-        response = convert_params(result['block'], ParamType.get_block_response)
+        response = convert_params(result['block'], ParamType.get_block_response_0_1a)
         return response
 
     @staticmethod
@@ -241,7 +238,7 @@ class IcxDispatcher:
                 http_status=status.HTTP_BAD_REQUEST
             )
 
-        response = convert_params(result['block'], ParamType.get_block_response)
+        response = convert_params(result['block'], ParamType.get_block_response_0_1a)
         return response
 
     @staticmethod
@@ -285,9 +282,3 @@ class IcxDispatcher:
         proof = kwargs['proof']
         response = await channel_stub.async_task().prove_receipt(tx_hash, proof)
         return response_to_json_query(response)
-
-    @staticmethod
-    @methods.add
-    async def icx_getLastTransaction(**kwargs):
-
-        return ""
