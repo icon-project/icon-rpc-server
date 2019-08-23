@@ -25,7 +25,9 @@ from iconrpcserver.dispatcher.v3 import methods
 from iconrpcserver.protos import message_code
 from iconrpcserver.server.rest_property import RestProperty
 from iconrpcserver.utils import get_protocol_from_uri
-from iconrpcserver.utils.icon_service import make_request, response_to_json_query, ParamType, convert_params
+from iconrpcserver.utils.icon_service import (response_to_json_query,
+                                              RequestParamType, ResponseParamType)
+from iconrpcserver.utils.icon_service.converter import convert_params, make_request
 from iconrpcserver.utils.json_rpc import (get_icon_stub_by_channel_name, get_channel_stub_by_channel_name,
                                           relay_tx_request, get_block_by_params)
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
@@ -109,13 +111,13 @@ class IcxDispatcher:
                 http_status=status.HTTP_BAD_REQUEST
             )
 
-        return convert_params(tx_hash, ParamType.send_tx_response)
+        return convert_params(tx_hash, ResponseParamType.send_tx)
 
     @staticmethod
     @methods.add
     async def icx_getTransactionResult(**kwargs):
         channel = kwargs['context']['channel']
-        request = convert_params(kwargs, ParamType.get_tx_request)
+        request = convert_params(kwargs, RequestParamType.get_tx_result)
         channel_stub = StubCollection().channel_stubs[channel]
         verify_result = dict()
 
@@ -143,14 +145,14 @@ class IcxDispatcher:
             except json.JSONDecodeError as e:
                 Logger.warning(f"your result is not json, result({result}), {e}")
 
-        response = convert_params(verify_result, ParamType.get_tx_result_response)
+        response = convert_params(verify_result, ResponseParamType.get_tx_result)
         return response
 
     @staticmethod
     @methods.add
     async def icx_getTransactionByHash(**kwargs):
         channel = kwargs['context']['channel']
-        request = convert_params(kwargs, ParamType.get_tx_request)
+        request = convert_params(kwargs, RequestParamType.get_tx_result)
         channel_stub = StubCollection().channel_stubs[channel]
 
         response_code, tx_info = await channel_stub.async_task().get_tx_info(request["txHash"])
@@ -167,7 +169,7 @@ class IcxDispatcher:
         result["blockHeight"] = tx_info["block_height"]
         result["blockHash"] = tx_info["block_hash"]
 
-        response = convert_params(result, ParamType.get_tx_by_hash_response)
+        response = convert_params(result, ResponseParamType.get_tx_by_hash)
         return response
 
     @staticmethod
@@ -200,7 +202,7 @@ class IcxDispatcher:
 
         block_hash, result = await get_block_by_params(block_height=-1,
                                                        channel_name=channel)
-        response = convert_params(result['block'], ParamType.get_block_response_0_1a)
+        response = convert_params(result['block'], ResponseParamType.get_block_v0_1a_tx_v3)
 
         return response_to_json_query(response)
 
@@ -208,7 +210,7 @@ class IcxDispatcher:
     @methods.add
     async def icx_getBlockByHash(**kwargs):
         channel = kwargs['context']['channel']
-        request = convert_params(kwargs, ParamType.get_block_by_hash_request)
+        request = convert_params(kwargs, RequestParamType.get_block_by_hash)
         block_hash, result = await get_block_by_params(block_hash=request['hash'],
                                                        channel_name=channel)
 
@@ -220,14 +222,14 @@ class IcxDispatcher:
                 http_status=status.HTTP_BAD_REQUEST
             )
 
-        response = convert_params(result['block'], ParamType.get_block_response_0_1a)
+        response = convert_params(result['block'], ResponseParamType.get_block_v0_1a_tx_v3)
         return response
 
     @staticmethod
     @methods.add
     async def icx_getBlockByHeight(**kwargs):
         channel = kwargs['context']['channel']
-        request = convert_params(kwargs, ParamType.get_block_by_height_request)
+        request = convert_params(kwargs, RequestParamType.get_block_by_height)
         block_hash, result = await get_block_by_params(block_height=request['height'],
                                                        channel_name=channel)
         response_code = result['response_code']
@@ -238,7 +240,7 @@ class IcxDispatcher:
                 http_status=status.HTTP_BAD_REQUEST
             )
 
-        response = convert_params(result['block'], ParamType.get_block_response_0_1a)
+        response = convert_params(result['block'], ResponseParamType.get_block_v0_1a_tx_v3)
         return response
 
     @staticmethod

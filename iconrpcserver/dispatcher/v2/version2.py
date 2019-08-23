@@ -29,7 +29,8 @@ from iconrpcserver.dispatcher import validate_jsonschema_v2
 from iconrpcserver.protos import message_code
 from iconrpcserver.server.rest_property import RestProperty
 from iconrpcserver.utils import get_protocol_from_uri
-from iconrpcserver.utils.icon_service import make_request, response_to_json_query, ParamType
+from iconrpcserver.utils.icon_service import response_to_json_query, RequestParamType
+from iconrpcserver.utils.icon_service.converter import make_request
 from iconrpcserver.utils.json_rpc import relay_tx_request, get_block_v2_by_params
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
@@ -92,7 +93,7 @@ class Version2Dispatcher:
         path = urlparse(url).path
         del kwargs['context']
 
-        request = make_request("icx_sendTransaction", kwargs, ParamType.send_tx)
+        request = make_request("icx_sendTransaction", kwargs, RequestParamType.send_tx)
         channel = StubCollection().conf[ConfigKey.CHANNEL]
         icon_stub = StubCollection().icon_score_stubs[channel]
         response = await icon_stub.async_task().validate_transaction(request)
@@ -169,7 +170,7 @@ class Version2Dispatcher:
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
         method = 'icx_getBalance'
-        request = make_request(method, kwargs, ParamType.get_balance)
+        request = make_request(method, kwargs, RequestParamType.get_balance)
 
         stub = StubCollection().icon_score_stubs[channel_name]
         response = await stub.async_task().query(request)
@@ -181,7 +182,7 @@ class Version2Dispatcher:
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
         method = 'icx_getTotalSupply'
-        request = make_request(method, kwargs, ParamType.get_total_supply)
+        request = make_request(method, kwargs, RequestParamType.get_total_supply)
 
         stub = StubCollection().icon_score_stubs[channel_name]
         response = await stub.async_task().query(request)

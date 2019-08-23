@@ -25,7 +25,8 @@ from past.builtins import basestring
 from ..dispatcher import GenericJsonRpcServerError, JsonError
 from ..default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion
 from ..protos import message_code
-from ..utils.icon_service.converter import convert_params, ParamType
+from ..utils.icon_service.converter import convert_params
+from ..utils.icon_service.templates import ResponseParamType
 from ..utils.message_queue.stub_collection import StubCollection
 
 
@@ -106,7 +107,7 @@ async def get_block_v2_by_params(block_height=None, block_hash="", with_commit_s
     block = json.loads(block_data_json)  # if fail, block = {}
 
     if block:
-        block = convert_params(block, ParamType.get_block_response_v2)
+        block = convert_params(block, ResponseParamType.get_block_v0_1a_tx_v2)
 
     result = {
         'response_code': response_code,
