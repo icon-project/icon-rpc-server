@@ -16,7 +16,8 @@
 from typing import Any, Optional
 
 from iconrpcserver.dispatcher.v3 import methods
-from iconrpcserver.utils.icon_service import make_request, response_to_json_query
+from iconrpcserver.utils.icon_service import response_to_json_query
+from iconrpcserver.utils.icon_service.converter import make_request
 from iconrpcserver.utils.json_rpc import get_icon_stub_by_channel_name
 
 
