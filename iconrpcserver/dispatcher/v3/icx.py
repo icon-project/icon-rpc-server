@@ -197,6 +197,28 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
+    async def icx_getBlock(**kwargs):
+        channel = kwargs['context']['channel']
+        request = convert_params(kwargs, RequestParamType.get_block)
+        if all(param in request for param in ["hash", "height"]):
+            raise GenericJsonRpcServerError(
+                code=JsonError.INVALID_PARAMS,
+                message='Invalid params (only one parameter is allowed)',
+                http_status=status.HTTP_BAD_REQUEST
+            )
+        if 'hash' in request:
+            block_hash, result = await get_block_by_params(block_hash=request['hash'],
+                                                           channel_name=channel)
+        elif 'height' in request:
+            block_hash, result = await get_block_by_params(block_height=request['height'],
+                                                           channel_name=channel)
+        else:
+            block_hash, result = await get_block_by_params(block_height=-1,
+                                                           channel_name=channel)
+        return response_to_json_query(result['block'])
+
+    @staticmethod
+    @methods.add
     async def icx_getLastBlock(**kwargs):
         channel = kwargs['context']['channel']
 

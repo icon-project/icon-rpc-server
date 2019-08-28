@@ -38,10 +38,11 @@ class RequestParamType(Enum):
     invoke = 5
     write_precommit_state = 6
     remove_precommit_state = 7
-    get_block_by_hash = 8
-    get_block_by_height = 9
-    get_tx_result = 10
-    get_reps_by_hash = 11
+    get_block = 8
+    get_block_by_hash = 9
+    get_block_by_height = 10
+    get_tx_result = 11
+    get_reps_by_hash = 12
 
 
 class ResponseParamType(Enum):

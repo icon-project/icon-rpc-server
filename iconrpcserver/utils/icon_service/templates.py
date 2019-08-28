@@ -96,6 +96,11 @@ templates[RequestParamType.write_precommit_state] = {
 
 templates[RequestParamType.remove_precommit_state] = templates[RequestParamType.write_precommit_state]
 
+templates[RequestParamType.get_block] = {
+    "hash": ValueType.hex_number,
+    "height": ValueType.integer
+}
+
 templates[RequestParamType.get_block_by_hash] = {
     "hash": ValueType.hex_number
 }

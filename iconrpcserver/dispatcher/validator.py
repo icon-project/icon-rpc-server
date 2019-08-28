@@ -260,6 +260,28 @@ def validate_jsonschema_v2(request: object):
     validate_jsonschema(request, SCHEMA_V2)
 
 
+icx_getBlock: dict = {
+    "title": "icx_getBlock",
+    "id": "https://github.com/icon-project/icon-rpc-server/blob/master/docs/icon-json-rpc-v3.md",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": ["number", "string"]},
+        "params": {
+            "type": "object",
+            "properties": {
+                "hash": {"type": "string", "format": "hash"},
+                "height": {"type": "string", "format": "int_16"},
+            },
+            "additionalProperties": False
+        }
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id"]
+}
+
+
 icx_getBlockByHeight_v3: dict = {
     "title": "icx_getBlockByHeight",
     "id": "https://github.com/icon-project/icon-rpc-server/blob/master/docs/icon-json-rpc-v3.md#icx_getblockbyheight",
@@ -714,6 +736,7 @@ rep_getListByHash_v3: dict = {
 }
 
 SCHEMA_V3: dict = {
+    "icx_getBlock": icx_getBlock,
     "icx_getLastBlock": icx_getLastBlock,
     "icx_getBlockByHeight": icx_getBlockByHeight_v3,
     "icx_getBlockByHash": icx_getBlockByHash_v3,
