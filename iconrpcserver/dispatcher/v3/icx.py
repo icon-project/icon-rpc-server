@@ -32,6 +32,9 @@ from iconrpcserver.utils.json_rpc import (get_icon_stub_by_channel_name, get_cha
                                           relay_tx_request, get_block_by_params)
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
+BLOCK_v0_1a = '0.1a'
+BLOCK_v0_3 = '0.3'
+
 
 class IcxDispatcher:
     @staticmethod
@@ -215,7 +218,13 @@ class IcxDispatcher:
         else:
             block_hash, result = await get_block_by_params(block_height=-1,
                                                            channel_name=channel)
-        return response_to_json_query(result['block'])
+        response = result['block']
+
+        if result['block'].get('version') == BLOCK_v0_1a:
+            response = convert_params(result['block'], ResponseParamType.get_block_v0_1a_tx_v3)
+        elif result['block'].get('version') == BLOCK_v0_3:
+            response = convert_params(result['block'], ResponseParamType.get_block_v0_3_tx_v3)
+        return response_to_json_query(response)
 
     @staticmethod
     @methods.add

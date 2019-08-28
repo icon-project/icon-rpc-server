@@ -150,15 +150,11 @@ BLOCK_0_1a = {
     "next_leader": ValueType.text
 }
 
-templates[ResponseParamType.get_block_v0_1a_tx_v3] = dict(BLOCK_0_1a)
-templates[ResponseParamType.get_block_v0_1a_tx_v3]["confirmed_transaction_list"] = [
-    {
-        "txHash": ValueType.hex_0x_hash_number
-    }
-]
+BLOCK_0_3 = {
+    "transactions": None
+}
 
-templates[ResponseParamType.get_block_v0_1a_tx_v2] = dict(BLOCK_0_1a)
-templates[ResponseParamType.get_block_v0_1a_tx_v2]["confirmed_transaction_list"] = [
+TX_V2 = [
     {
         CHANGE: {
             "txHash": ConvertChange("tx_hash"),
@@ -173,6 +169,21 @@ templates[ResponseParamType.get_block_v0_1a_tx_v2]["confirmed_transaction_list"]
         "tx_hash": ValueType.hex_hash_number
     }
 ]
+
+TX_V3 = [
+    {
+        "txHash": ValueType.hex_0x_hash_number
+    }
+]
+
+templates[ResponseParamType.get_block_v0_1a_tx_v3] = dict(BLOCK_0_1a)
+templates[ResponseParamType.get_block_v0_1a_tx_v3]["confirmed_transaction_list"] = TX_V3
+
+templates[ResponseParamType.get_block_v0_1a_tx_v2] = dict(BLOCK_0_1a)
+templates[ResponseParamType.get_block_v0_1a_tx_v2]["confirmed_transaction_list"] = TX_V2
+
+templates[ResponseParamType.get_block_v0_3_tx_v3] = dict(BLOCK_0_3)
+templates[ResponseParamType.get_block_v0_3_tx_v3]["transactions"] = TX_V3
 
 templates[ResponseParamType.get_tx_result] = {
     "txHash": ValueType.hex_0x_hash_number,

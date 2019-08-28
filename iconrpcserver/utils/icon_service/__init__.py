@@ -51,6 +51,7 @@ class ResponseParamType(Enum):
     get_tx_result = 2
     get_block_v0_1a_tx_v2 = 3
     get_block_v0_1a_tx_v3 = 4
+    get_block_v0_3_tx_v3 = 5
 
 
 def check_error_response(result: Any):
