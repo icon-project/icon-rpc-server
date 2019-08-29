@@ -218,12 +218,13 @@ class IcxDispatcher:
         else:
             block_hash, result = await get_block_by_params(block_height=-1,
                                                            channel_name=channel)
-        response = result['block']
-
-        if result['block'].get('version') == BLOCK_v0_1a:
+        block = result['block']
+        if block['version'] == BLOCK_v0_1a:
             response = convert_params(result['block'], ResponseParamType.get_block_v0_1a_tx_v3)
-        elif result['block'].get('version') == BLOCK_v0_3:
+        elif block['version'] == BLOCK_v0_3:
             response = convert_params(result['block'], ResponseParamType.get_block_v0_3_tx_v3)
+        else:
+            response = block
         return response_to_json_query(response)
 
     @staticmethod
