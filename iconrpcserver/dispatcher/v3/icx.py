@@ -32,6 +32,9 @@ from iconrpcserver.utils.json_rpc import (get_icon_stub_by_channel_name, get_cha
                                           relay_tx_request, get_block_by_params)
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
+BLOCK_v0_1a = '0.1a'
+BLOCK_v0_3 = '0.3'
+
 
 class IcxDispatcher:
     @staticmethod
@@ -193,6 +196,35 @@ class IcxDispatcher:
         score_stub = get_icon_stub_by_channel_name(channel)
         response = await score_stub.async_task().query(request)
 
+        return response_to_json_query(response)
+
+    @staticmethod
+    @methods.add
+    async def icx_getBlock(**kwargs):
+        channel = kwargs['context']['channel']
+        request = convert_params(kwargs, RequestParamType.get_block)
+        if all(param in request for param in ["hash", "height"]):
+            raise GenericJsonRpcServerError(
+                code=JsonError.INVALID_PARAMS,
+                message='Invalid params (only one parameter is allowed)',
+                http_status=status.HTTP_BAD_REQUEST
+            )
+        if 'hash' in request:
+            block_hash, result = await get_block_by_params(block_hash=request['hash'],
+                                                           channel_name=channel)
+        elif 'height' in request:
+            block_hash, result = await get_block_by_params(block_height=request['height'],
+                                                           channel_name=channel)
+        else:
+            block_hash, result = await get_block_by_params(block_height=-1,
+                                                           channel_name=channel)
+        block = result['block']
+        if block['version'] == BLOCK_v0_1a:
+            response = convert_params(result['block'], ResponseParamType.get_block_v0_1a_tx_v3)
+        elif block['version'] == BLOCK_v0_3:
+            response = convert_params(result['block'], ResponseParamType.get_block_v0_3_tx_v3)
+        else:
+            response = block
         return response_to_json_query(response)
 
     @staticmethod

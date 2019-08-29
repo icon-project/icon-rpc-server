@@ -38,10 +38,11 @@ class RequestParamType(Enum):
     invoke = 5
     write_precommit_state = 6
     remove_precommit_state = 7
-    get_block_by_hash = 8
-    get_block_by_height = 9
-    get_tx_result = 10
-    get_reps_by_hash = 11
+    get_block = 8
+    get_block_by_hash = 9
+    get_block_by_height = 10
+    get_tx_result = 11
+    get_reps_by_hash = 12
 
 
 class ResponseParamType(Enum):
@@ -50,6 +51,7 @@ class ResponseParamType(Enum):
     get_tx_result = 2
     get_block_v0_1a_tx_v2 = 3
     get_block_v0_1a_tx_v3 = 4
+    get_block_v0_3_tx_v3 = 5
 
 
 def check_error_response(result: Any):

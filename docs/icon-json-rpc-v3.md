@@ -127,6 +127,7 @@ Below table shows the default error messages for the error code. Actual message 
 
 API path : `<scheme>://<host>/api/v3`
 
+* [icx_getBlock](#icx_getblock)
 * [icx_getLastBlock](#icx_getlastblock)
 * [icx_getBlockByHeight](#icx_getblockbyheight)
 * [icx_getBlockByHash](#icx_getblockbyhash)
@@ -156,6 +157,130 @@ API path : `<scheme>://<host>/api/v3`
 * [rep_getList](#rep_getlist)
 
 # JSON-RPC Methods
+
+## icx_getBlock
+
+* Returns the block information by given parameter.
+
+### Parameters
+
+| KEY | VALUE type | Description |
+|:----|:-----------|:-----|
+| hash | [T_HASH](#T_HASH) | Hash of a block |
+| height | [T_INT](#T_INT) | Integer of a block height |
+| None | - | Last block |
+
+### Returns
+Block data (including v0.3)
+
+### Example
+
+```javascript
+// Request 1 - get last block
+{
+    "jsonrpc" : "2.0",
+    "method": "icx_getBlock",
+    "id": 1234
+}
+
+// Request 2 - get block by hash
+{
+    "jsonrpc" : "2.0",
+    "method": "icx_getBlock",
+    "id": 1234,
+    "params": {
+        "hash": "0x6d4a4dbb950152050684eef5d0e228b8a31cae7afd37d9760b79312305008977"
+    }
+}
+
+// Request 3 - get block by height
+{
+    "jsonrpc" : "2.0",
+    "method": "icx_getBlock",
+    "id": 1234,
+    "params": {
+        "height": "0x4"
+    }
+}
+
+// Response - success
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "version": "0.3",
+        "prevHash": "0xecafbdc4fb0311995e9f5f4cd01e82deb3d4016c6276c45e77b66eea053a2b22",
+        "transactionsHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "stateHash": "0xa7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a",
+        "receiptsHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "repsHash": "0xa0fa1058145d96226fbe31d4987ae43b54fe83a6bed7939dc7c38da1d44f06bc",
+        "nextRepsHash": "0xa0fa1058145d96226fbe31d4987ae43b54fe83a6bed7939dc7c38da1d44f06bc",
+        "leaderVotesHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "prevVotesHash": "0x51e030a24c5967047f8463c138024f857ec6663535df1f4e76e224f95abbe4b1",
+        "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "timestamp": "0x5908392532c01",
+        "transactions": [],
+        "leaderVotes": [],
+        "prevVotes": [
+            {
+                "rep": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe",
+                "timestamp": "0x590839234a5de",
+                "blockHeight": "0x3",
+                "blockHash": "0xecafbdc4fb0311995e9f5f4cd01e82deb3d4016c6276c45e77b66eea053a2b22",
+                "signature": "9MhqZW4n9CtJXTKfDOiVsvZRuGQh9G3X9g3X3+4V2Fp8PcqGvkKHoAI4nJpAxGiJICiT7kgMqwQmvQ8ndGVXrgE="
+            },
+            {
+                "rep": "hx9f049228bade72bc0a3490061b824f16bbb74589",
+                "timestamp": "0x590839235367b",
+                "blockHeight": "0x3",
+                "blockHash": "0xecafbdc4fb0311995e9f5f4cd01e82deb3d4016c6276c45e77b66eea053a2b22",
+                "signature": "e2JNWDnNTulhksibVR2AV0/ZLLPwDfeOdq1A5DE/GAIPI56QR+78nV7I/eNHvFDzL6OcpN7D5/VZ5dfFBszB2QE="
+            },
+            {
+                "rep": "hx6435405122df9fe5187d659588beccdf7aee8557",
+                "timestamp": "0x590839235419f",
+                "blockHeight": "0x3",
+                "blockHash": "0xecafbdc4fb0311995e9f5f4cd01e82deb3d4016c6276c45e77b66eea053a2b22",
+                "signature": "mjhQSlSZhYuwLSqu+CbNDsiB4WTn8096RQ2EP89YPAVRita+bDuCBhyUkfZWhDqQPVW//sCwQD2GDXxNCC5dCgA="
+            },
+            {
+                "rep": "hx475bfec4178f3abc88c959faa2e6384e6b409c8f",
+                "timestamp": "0x59083923541d1",
+                "blockHeight": "0x3",
+                "blockHash": "0xecafbdc4fb0311995e9f5f4cd01e82deb3d4016c6276c45e77b66eea053a2b22",
+                "signature": "o2OnbkaLK1rvGP+pDwrTo/+VV1Ag2/HuDeUV5aoReOhvmS4rOWLGuV00B5KZmE9GO7ZRHl32Ys0oSrj85ve3uAA="
+            }
+        ],
+        "hash": "0x6d4a4dbb950152050684eef5d0e228b8a31cae7afd37d9760b79312305008977",
+        "height": "0x4",
+        "leader": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe",
+        "signature": "OPHFV8Zfyr//lP+SmKsr/RK3yawJDtolrfsdqDFKh3wxmyMh243zVp7CTLRu5wG5PdneX7mHzuLA9x41mqzjrAE=",
+        "nextLeader": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe"
+    },
+    "id": 1234
+}
+
+// Request (fail if both parameters are in request message.)
+{
+    "jsonrpc" : "2.0",
+    "method": "icx_getBlock",
+    "id": 1234,
+    "params": {
+        "hash": "0x6d4a4dbb950152050684eef5d0e228b8a31cae7afd37d9760b79312305008977",
+        "height": "0x4"
+    }
+}
+ 
+ 
+// Response - fail
+{
+    "jsonrpc": "2.0",
+    "id": 1234,
+    "error": {
+        "code": -32602,
+        "message": "Invalid params (only one parameter is allowed)"
+    }
+}
+```
 
 ## icx_getLastBlock
 
