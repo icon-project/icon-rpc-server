@@ -81,7 +81,10 @@ class CustomAiohttpClient(AsyncClient):
 async def relay_tx_request(protocol, message, relay_target, path, version=ApiVersion.v3.name):
     method_name = "icx_sendTransaction"
 
-    relay_uri = f"{protocol}://{relay_target}/{path}"
+    # TODO required post review [LC-454]
+    # relay_uri = f"{protocol}://{relay_target}/{path}"
+    # I think relay_target is already normalized by loopchain
+    relay_uri = f"{relay_target}/{path}"
     Logger.debug(f'relay_uri: {relay_uri}')
 
     async with aiohttp.ClientSession() as session:
