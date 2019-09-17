@@ -127,6 +127,7 @@ class ServerComponents(metaclass=SingletonMetaClass):
 
                     channel_stub = StubCollection().channel_stubs[channel_name]
                     rs_target = await channel_stub.async_task().get_rs_target()
+                    Logger.debug(f"Radiostation Target from Channel: {rs_target}")
                     RestProperty().rs_target[channel_name] = rs_target
 
                     relay_target = StubCollection().conf.get(ConfigKey.RELAY_TARGET, None)
