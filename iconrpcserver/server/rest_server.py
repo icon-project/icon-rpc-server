@@ -1,4 +1,4 @@
-# Copyright 2018 ICON Foundation
+# Copyright 2019 ICON Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -115,8 +115,6 @@ class ServerComponents(metaclass=SingletonMetaClass):
                 await StubCollection().create_channel_stub(channel_name)
                 await StubCollection().create_channel_tx_creator_stub(channel_name)
                 await StubCollection().create_icon_score_stub(channel_name)
-
-                RestProperty().rs_target = None
             else:
                 await StubCollection().create_peer_stub()
                 channels = await StubCollection().peer_stub.async_task().get_channel_infos()
@@ -125,16 +123,12 @@ class ServerComponents(metaclass=SingletonMetaClass):
                     await StubCollection().create_channel_tx_creator_stub(channel_name)
                     await StubCollection().create_icon_score_stub(channel_name)
 
-                    channel_stub = StubCollection().channel_stubs[channel_name]
-                    rs_target = await channel_stub.async_task().get_rs_target()
-                    Logger.debug(f"Radiostation Target from Channel: {rs_target}")
-                    RestProperty().rs_target[channel_name] = rs_target
-
                     relay_target = StubCollection().conf.get(ConfigKey.RELAY_TARGET, None)
-                    relay_target = urlparse(relay_target).netloc if urlparse(relay_target).scheme else relay_target
+                    relay_target = \
+                        urlparse(relay_target).netloc if urlparse(relay_target).scheme else relay_target
                     RestProperty().relay_target[channel_name] = relay_target
 
-            Logger.debug(f'rest_server:initialize complete. rs_target({RestProperty().rs_target}) '
+            Logger.debug(f'rest_server:initialize complete. '
                          f'relay_target({RestProperty().relay_target})')
 
     def serve(self, api_port):

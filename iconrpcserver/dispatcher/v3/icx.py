@@ -59,8 +59,8 @@ class IcxDispatcher:
         return response_to_json_query(response)
 
     @staticmethod
-    async def __relay_icx_transaction(url, path, message):
-        relay_target = RestProperty().relay_target[ConfigKey.CHANNEL] or RestProperty().rs_target[ConfigKey.CHANNEL]
+    async def __relay_icx_transaction(url, path, message, channel_name, relay_target):
+        relay_target = RestProperty().relay_target[channel_name] or relay_target
         if not relay_target:
             raise GenericJsonRpcServerError(
                 code=JsonError.INTERNAL_ERROR,
@@ -95,10 +95,11 @@ class IcxDispatcher:
         response_to_json_query(response)
 
         channel_tx_creator_stub = StubCollection().channel_tx_creator_stubs[channel]
-        response_code, tx_hash = await channel_tx_creator_stub.async_task().create_icx_tx(kwargs)
+        response_code, tx_hash, relay_target = \
+            await channel_tx_creator_stub.async_task().create_icx_tx(kwargs)
 
         if response_code == message_code.Response.fail_no_permission:
-            return await IcxDispatcher.__relay_icx_transaction(url, path, kwargs)
+            return await IcxDispatcher.__relay_icx_transaction(url, path, kwargs, channel, relay_target)
 
         if response_code != message_code.Response.success:
             raise GenericJsonRpcServerError(

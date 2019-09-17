@@ -95,7 +95,7 @@ class ChannelInnerStub(MessageQueueStub[ChannelInnerTask]):
 
 class ChannelTxCreatorInnerTask:
     @message_queue_task
-    async def create_icx_tx(self, kwargs) -> Tuple[int, str]:
+    async def create_icx_tx(self, kwargs) -> Tuple[int, str, str]:
         pass
 
 
