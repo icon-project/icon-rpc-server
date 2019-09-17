@@ -60,7 +60,7 @@ class IcxDispatcher:
 
     @staticmethod
     async def __relay_icx_transaction(url, path, message):
-        relay_target = RestProperty().relay_target or RestProperty().rs_target
+        relay_target = RestProperty().relay_target[ConfigKey.CHANNEL] or RestProperty().rs_target[ConfigKey.CHANNEL]
         if not relay_target:
             raise GenericJsonRpcServerError(
                 code=JsonError.INTERNAL_ERROR,
