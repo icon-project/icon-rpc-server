@@ -17,5 +17,4 @@ from ..components import SingletonMetaClass
 
 class RestProperty(metaclass=SingletonMetaClass):
     def __init__(self):
-        self.rs_target = dict()
         self.relay_target = dict()

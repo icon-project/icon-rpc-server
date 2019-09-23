@@ -124,8 +124,6 @@ class ServerComponents(metaclass=SingletonMetaClass):
                     await StubCollection().create_icon_score_stub(channel_name)
 
                     relay_target = StubCollection().conf.get(ConfigKey.RELAY_TARGET, None)
-                    relay_target = \
-                        urlparse(relay_target).netloc if urlparse(relay_target).scheme else relay_target
                     RestProperty().relay_target[channel_name] = relay_target
 
             Logger.debug(f'rest_server:initialize complete. '
