@@ -125,10 +125,6 @@ async def _check_rabbitmq(amqp_target: str):
 
 
 async def _run(conf: 'IconConfig'):
-    redirect_protocol_env = os.getenv(camel_to_upper_snake(ConfigKey.REDIRECT_PROTOCOL))
-    if redirect_protocol_env:
-        conf.update_conf({ConfigKey.REDIRECT_PROTOCOL: redirect_protocol_env})
-
     Logger.print_config(conf, ICON_RPCSERVER_CLI)
 
     # Connect gRPC stub.
