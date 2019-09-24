@@ -64,7 +64,6 @@ class ConfigKey:
     REST_ADDITIONAL_TIMEOUT = 'restAdditionalTimeout'
     SCORE_QUERY_TIMEOUT = 'scoreQueryTimeout'
     TBEARS_MODE = 'tbearsMode'
-    REDIRECT_PROTOCOL = 'redirectProtocol'
     WS_HEARTBEAT_TIME = 'wsHeartBeatTime'
     REQUEST_MAX_SIZE = 'requestMaxSize'
     GUNICORN_CONFIG = 'gunicornConfig'
