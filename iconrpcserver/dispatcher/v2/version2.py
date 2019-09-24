@@ -68,23 +68,15 @@ class Version2Dispatcher:
         return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
 
     @staticmethod
-    async def __relay_icx_transaction(url, path, message, channel_name, relay_target):
-        relay_target = RestProperty().relay_target[channel_name] or relay_target
+    async def __relay_icx_transaction(path, message, channel_name, relay_target):
+        relay_target = RestProperty().relay_target.get(channel_name) or relay_target
         if not relay_target:
             response_code = message_code.Response.fail_invalid_peer_target
             return {'response_code': response_code,
                     'message': message_code.responseCodeMap[response_code][1],
                     'tx_hash': None}
 
-        dispatch_protocol = get_protocol_from_uri(url)
-        Logger.debug(f'Dispatch Protocol: {dispatch_protocol}')
-        redirect_protocol = StubCollection().conf.get(ConfigKey.REDIRECT_PROTOCOL)
-        Logger.debug(f'Redirect Protocol: {redirect_protocol}')
-        if redirect_protocol:
-            dispatch_protocol = redirect_protocol
-        Logger.debug(f'Protocol: {dispatch_protocol}')
-
-        return await relay_tx_request(dispatch_protocol, message, relay_target, path[1:], ApiVersion.v2.name)
+        return await relay_tx_request(relay_target, message, path[1:], ApiVersion.v2.name)
 
     @staticmethod
     @methods.add
@@ -106,7 +98,7 @@ class Version2Dispatcher:
             await channel_tx_creator_stub.async_task().create_icx_tx(kwargs)
 
         if response_code == message_code.Response.fail_no_permission:
-            return await Version2Dispatcher.__relay_icx_transaction(url, path, kwargs, channel, relay_target)
+            return await Version2Dispatcher.__relay_icx_transaction(path, kwargs, channel, relay_target)
 
         response_data = {'response_code': response_code}
         if response_code != message_code.Response.success:
