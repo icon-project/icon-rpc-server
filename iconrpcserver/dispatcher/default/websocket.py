@@ -89,16 +89,12 @@ class WSDispatcher:
 
         async with Reception(channel_name, peer_id, remote_target) as registered:
             if not registered:
-                await WSDispatcher.send_exception(
-                    ws=ws,
-                    method="node_ws_PublishHeartbeat",
-                    exception=RuntimeError("Unregistered"),
-                    error_code=message_code.Response.fail_subscribe_limit)
-                return  # TODO: need to raise exception?
+                return await WSDispatcher.publish_unregister(ws, channel_name, peer_id, force=True)
 
             futures = [
                 WSDispatcher.publish_heartbeat(ws),
-                WSDispatcher.publish_new_block(ws, channel_name, height, peer_id)
+                WSDispatcher.publish_new_block(ws, channel_name, height, peer_id),
+                WSDispatcher.publish_unregister(ws, channel_name, peer_id)
             ]
 
             try:
@@ -132,8 +128,10 @@ class WSDispatcher:
         channel_stub = get_channel_stub_by_channel_name(channel_name)
         try:
             while True:
-                new_block_dumped, confirm_info_bytes = await \
-                    channel_stub.async_task().announce_new_block(subscriber_block_height=height, subscriber_id=peer_id)
+                new_block_dumped, confirm_info_bytes = await channel_stub.async_task().announce_new_block(
+                    subscriber_block_height=height,
+                    subscriber_id=peer_id
+                )
                 new_block: dict = json.loads(new_block_dumped)
                 confirm_info = confirm_info_bytes.decode('utf-8')
 
@@ -151,6 +149,22 @@ class WSDispatcher:
                 exception=e,
                 error_code=message_code.Response.fail_announce_block
             )
+
+    @staticmethod
+    async def publish_unregister(ws, channel_name, peer_id, force: bool = False):
+        call_method = "node_ws_PublishHeartbeat"
+        if force:  # unregister due to subscribe limit
+            signal = True
+            error_code = message_code.Response.fail_subscribe_limit
+        else:
+            channel_stub = get_channel_stub_by_channel_name(channel_name)
+            signal = await channel_stub.async_task().wait_for_unregister_signal(peer_id)
+            error_code = message_code.Response.fail_connect_to_leader
+        if signal:
+            await WSDispatcher.send_exception(
+                ws, call_method,
+                exception=ConnectionError("Unregistered"),
+                error_code=error_code)
 
     @staticmethod
     async def send_exception(ws, method, exception, error_code):

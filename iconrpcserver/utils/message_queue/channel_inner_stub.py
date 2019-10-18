@@ -85,6 +85,10 @@ class ChannelInnerTask:
     async def get_reps_by_hash(self, reps_hash) -> List[Dict[str, str]]:
         pass
 
+    @message_queue_task
+    async def wait_for_unregister_signal(self, subscriber_id: str):
+        pass
+
 
 class ChannelInnerStub(MessageQueueStub[ChannelInnerTask]):
     TaskType = ChannelInnerTask
