@@ -117,7 +117,6 @@ class WSDispatcher:
                 heartbeat_time = StubCollection().conf[ConfigKey.WS_HEARTBEAT_TIME]
                 await asyncio.sleep(heartbeat_time)
         except exceptions.ConnectionClosed:
-            traceback.print_exc()  # TODO: Keep this tb?
             Logger.debug("Connection Closed by child.")  # TODO: Useful message needed.
         except Exception as e:
             traceback.print_exc()  # TODO: Keep this tb?
@@ -144,7 +143,6 @@ class WSDispatcher:
                 await ws.send(json.dumps(request))
                 height += 1
         except exceptions.ConnectionClosed:
-            traceback.print_exc()  # TODO: Keep this tb?
             Logger.debug("Connection Closed by child.")  # TODO: Useful message needed.
         except Exception as e:
             traceback.print_exc()  # TODO: Keep this tb?
