@@ -15,17 +15,17 @@
 import asyncio
 import json
 import traceback
-from websockets import exceptions
 
 from iconcommons.logger import Logger
 from jsonrpcclient.request import Request
 from jsonrpcserver.aio import AsyncMethods
+from websockets import exceptions
 
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
 from iconrpcserver.protos import message_code
+from iconrpcserver.utils import get_now_timestamp
 from iconrpcserver.utils.json_rpc import get_channel_stub_by_channel_name
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
-from iconrpcserver.utils import get_now_timestamp
 
 ws_methods = AsyncMethods()
 
@@ -89,71 +89,70 @@ class WSDispatcher:
 
         async with Reception(channel_name, peer_id, remote_target) as registered:
             if not registered:
-                await WSDispatcher.send_and_raise_exception(
+                await WSDispatcher.send_exception(
                     ws=ws,
                     method="node_ws_PublishHeartbeat",
                     exception=RuntimeError("Unregistered"),
                     error_code=message_code.Response.fail_subscribe_limit)
+                return  # TODO: need to raise exception?
 
             futures = [
                 WSDispatcher.publish_heartbeat(ws),
                 WSDispatcher.publish_new_block(ws, channel_name, height, peer_id)
             ]
 
-            await asyncio.wait(futures, return_when=asyncio.FIRST_EXCEPTION)
+            try:
+                await asyncio.wait(futures, return_when=asyncio.FIRST_EXCEPTION)
+            except Exception as e:
+                pass
 
     @staticmethod
     async def publish_heartbeat(ws):
-        exception = None
-        while ws.open:
-            try:
-                request = Request("node_ws_PublishHeartbeat")
-                Logger.debug(f"node_ws_PublishHeartbeat: {request}")
+        call_method = "node_ws_PublishHeartbeat"
+        try:
+            while True:
+                request = Request(call_method)
+                Logger.debug(f"{call_method}: {request}")
                 await ws.send(json.dumps(request))
                 heartbeat_time = StubCollection().conf[ConfigKey.WS_HEARTBEAT_TIME]
                 await asyncio.sleep(heartbeat_time)
-            except Exception as e:
-                exception = e
-                traceback.print_exc()
-                break
-
-        if not exception:
-            exception = ConnectionError("Connection closed.")
-
-        error_code = message_code.Response.fail_connection_closed
-        await WSDispatcher.send_and_raise_exception(ws, "node_ws_PublishHeartbeat", exception, error_code)
+        except exceptions.ConnectionClosed:
+            Logger.debug("Connection Closed by child.")  # TODO: Useful message needed.
+        except Exception as e:
+            traceback.print_exc()  # TODO: Keep this tb?
+            await WSDispatcher.send_exception(
+                ws, call_method,
+                exception=e,
+                error_code=message_code.Response.fail_connection_closed
+            )
 
     @staticmethod
     async def publish_new_block(ws, channel_name, height, peer_id):
-        exception = None
-        error_code = None
+        call_method = "node_ws_PublishNewBlock"
         channel_stub = get_channel_stub_by_channel_name(channel_name)
         try:
-            while ws.open:
+            while True:
                 new_block_dumped, confirm_info_bytes = await \
                     channel_stub.async_task().announce_new_block(subscriber_block_height=height, subscriber_id=peer_id)
                 new_block: dict = json.loads(new_block_dumped)
                 confirm_info = confirm_info_bytes.decode('utf-8')
-                request = Request("node_ws_PublishNewBlock", block=new_block, confirm_info=confirm_info)
-                Logger.debug(f"node_ws_PublishNewBlock: {request}")
+
+                request = Request(call_method, block=new_block, confirm_info=confirm_info)
+                Logger.debug(f"{call_method}: {request}")
 
                 await ws.send(json.dumps(request))
                 height += 1
-        except exceptions.ConnectionClosed as e:
-            exception = e
-            error_code = message_code.Response.fail_connection_closed
+        except exceptions.ConnectionClosed:
+            Logger.debug("Connection Closed by child.")  # TODO: Useful message needed.
         except Exception as e:
-            exception = e
-            error_code = message_code.Response.fail_announce_block
-            traceback.print_exc()
-
-        if not exception:
-            exception = ConnectionError("Connection closed.")
-
-        await WSDispatcher.send_and_raise_exception(ws, "node_ws_PublishNewBlock", exception, error_code)
+            traceback.print_exc()  # TODO: Keep this tb?
+            await WSDispatcher.send_exception(
+                ws, call_method,
+                exception=e,
+                error_code=message_code.Response.fail_announce_block
+            )
 
     @staticmethod
-    async def send_and_raise_exception(ws, method, exception, error_code):
+    async def send_exception(ws, method, exception, error_code):
         request = Request(method, error=str(exception), code=error_code)
         await ws.send(json.dumps(request))
-        raise exception
