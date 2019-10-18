@@ -101,27 +101,31 @@ class WSDispatcher:
                 WSDispatcher.publish_new_block(ws, channel_name, height, peer_id)
             ]
 
-            await asyncio.wait(futures, return_when=asyncio.FIRST_EXCEPTION)
+            try:
+                await asyncio.wait(futures, return_when=asyncio.FIRST_EXCEPTION)
+            except Exception as e:
+                pass
 
     @staticmethod
     async def publish_heartbeat(ws):
         call_method = "node_ws_PublishHeartbeat"
-        while True:
-            try:
+        try:
+            while True:
                 request = Request(call_method)
                 Logger.debug(f"{call_method}: {request}")
                 await ws.send(json.dumps(request))
                 heartbeat_time = StubCollection().conf[ConfigKey.WS_HEARTBEAT_TIME]
                 await asyncio.sleep(heartbeat_time)
-            except exceptions.ConnectionClosed:
-                Logger.debug("Connection Closed by child.")  # TODO: Useful message needed.
-            except Exception as e:
-                traceback.print_exc()  # TODO: Keep this tb?
-                await WSDispatcher.send_exception(
-                    ws, call_method,
-                    exception=e,
-                    error_code=message_code.Response.fail_connection_closed
-                )
+        except exceptions.ConnectionClosed:
+            traceback.print_exc()  # TODO: Keep this tb?
+            Logger.debug("Connection Closed by child.")  # TODO: Useful message needed.
+        except Exception as e:
+            traceback.print_exc()  # TODO: Keep this tb?
+            await WSDispatcher.send_exception(
+                ws, call_method,
+                exception=e,
+                error_code=message_code.Response.fail_connection_closed
+            )
 
     @staticmethod
     async def publish_new_block(ws, channel_name, height, peer_id):
@@ -133,12 +137,14 @@ class WSDispatcher:
                     channel_stub.async_task().announce_new_block(subscriber_block_height=height, subscriber_id=peer_id)
                 new_block: dict = json.loads(new_block_dumped)
                 confirm_info = confirm_info_bytes.decode('utf-8')
+
                 request = Request(call_method, block=new_block, confirm_info=confirm_info)
                 Logger.debug(f"{call_method}: {request}")
 
                 await ws.send(json.dumps(request))
                 height += 1
         except exceptions.ConnectionClosed:
+            traceback.print_exc()  # TODO: Keep this tb?
             Logger.debug("Connection Closed by child.")  # TODO: Useful message needed.
         except Exception as e:
             traceback.print_exc()  # TODO: Keep this tb?
