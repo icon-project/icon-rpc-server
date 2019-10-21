@@ -142,8 +142,12 @@ class WSDispatcher:
                     subscriber_id=peer_id
                 )
                 new_block: dict = json.loads(new_block_dumped)
-                confirm_info = confirm_info_bytes.decode('utf-8')
 
+                if "error" in new_block_dumped:
+                    Logger.error(f"announce_new_block error: {new_block_dumped}, to citizen({peer_id})")
+                    break
+
+                confirm_info = confirm_info_bytes.decode('utf-8')
                 request = Request(call_method, block=new_block, confirm_info=confirm_info)
                 Logger.debug(f"{call_method}: {request}")
 
