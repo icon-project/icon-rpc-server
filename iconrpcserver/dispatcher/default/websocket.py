@@ -64,6 +64,9 @@ class Reception:
 
 
 class WSDispatcher:
+    PUBLISH_HEARTBEAT = "node_ws_PublishHeartbeat"
+    PUBLISH_NEW_BLOCK = "node_ws_PublishNewBlock"
+
     @staticmethod
     async def dispatch(request, ws, channel_name=None):
         ip = request.remote_addr or request.ip
@@ -90,13 +93,14 @@ class WSDispatcher:
         async with Reception(channel_name, peer_id, remote_target) as registered:
             if not registered:
                 return await WSDispatcher.publish_unregister(ws, channel_name, peer_id, force=True)
+            else:  # send first heartbeat to let citizen know it's registered
+                await WSDispatcher._publish_heartbeat(ws)
 
             futures = [
                 WSDispatcher.publish_heartbeat(ws),
                 WSDispatcher.publish_new_block(ws, channel_name, height, peer_id),
                 WSDispatcher.publish_unregister(ws, channel_name, peer_id)
             ]
-
             try:
                 await asyncio.wait(futures, return_when=asyncio.FIRST_EXCEPTION)
             except Exception as e:
@@ -104,12 +108,10 @@ class WSDispatcher:
 
     @staticmethod
     async def publish_heartbeat(ws):
-        call_method = "node_ws_PublishHeartbeat"
+        call_method = WSDispatcher.PUBLISH_HEARTBEAT
         try:
             while True:
-                request = Request(call_method)
-                Logger.debug(f"{call_method}: {request}")
-                await ws.send(json.dumps(request))
+                await WSDispatcher._publish_heartbeat(ws)
                 heartbeat_time = StubCollection().conf[ConfigKey.WS_HEARTBEAT_TIME]
                 await asyncio.sleep(heartbeat_time)
         except exceptions.ConnectionClosed:
@@ -123,8 +125,15 @@ class WSDispatcher:
             )
 
     @staticmethod
+    async def _publish_heartbeat(ws):
+        call_method = WSDispatcher.PUBLISH_HEARTBEAT
+        request = Request(call_method)
+        Logger.debug(f"{call_method}: {request}")
+        await ws.send(json.dumps(request))
+
+    @staticmethod
     async def publish_new_block(ws, channel_name, height, peer_id):
-        call_method = "node_ws_PublishNewBlock"
+        call_method = WSDispatcher.PUBLISH_NEW_BLOCK
         channel_stub = get_channel_stub_by_channel_name(channel_name)
         try:
             while True:
@@ -152,7 +161,7 @@ class WSDispatcher:
 
     @staticmethod
     async def publish_unregister(ws, channel_name, peer_id, force: bool = False):
-        call_method = "node_ws_PublishHeartbeat"
+        call_method = WSDispatcher.PUBLISH_HEARTBEAT
         if force:  # unregister due to subscribe limit
             signal = True
             error_code = message_code.Response.fail_subscribe_limit

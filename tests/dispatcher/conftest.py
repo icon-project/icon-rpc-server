@@ -1,38 +1,26 @@
-import functools
-
 import pytest
+
+from iconrpcserver.utils.message_queue.channel_inner_stub import ChannelInnerStub
+from iconrpcserver.utils.message_queue.stub_collection import StubCollection
+
+CHANNEL_STUB_NAME = "icon_dex"
 
 
 class MockChannelInnerStub:
-    def __init__(self, mock_register_citizen, mock_unregister_citizen):
-        self.mock_register_citizen = mock_register_citizen
-        self.mock_unregister_citizen = mock_unregister_citizen
-
     def async_task(self):
         return self
 
     async def register_citizen(self, peer_id, target, connected_time):
-        return self.mock_register_citizen()
+        pass
 
     async def unregister_citizen(self, peer_id):
-        return self.mock_unregister_citizen()
+        pass
+
+    async def wait_for_unregister_signal(self, peer_id):
+        pass
 
 
-@pytest.fixture
-def mock_channel_stub_factory(mocker):
-    def _mock_channel_stub(mocker_fixture, **kwargs_register_citizen_mock):
-        channel_register_citizen = mocker_fixture.MagicMock(**kwargs_register_citizen_mock)
-        channel_unregister_citizen = mocker_fixture.MagicMock()
-        mock_channel_stub = MockChannelInnerStub(mock_register_citizen=channel_register_citizen,
-                                                 mock_unregister_citizen=channel_unregister_citizen)
-
-        def mock_get_channel_stub_by_channel_name(channel_name):
-            return mock_channel_stub
-
-        mocker.patch("iconrpcserver.dispatcher.default.websocket.get_channel_stub_by_channel_name", mock_get_channel_stub_by_channel_name)
-
-        return mock_channel_stub
-
-    return functools.partial(_mock_channel_stub, mocker_fixture=mocker)
-
-
+@pytest.fixture(autouse=True)
+def patch_stubcollection():
+    mock_channel_stub: ChannelInnerStub = MockChannelInnerStub()
+    StubCollection().channel_stubs[CHANNEL_STUB_NAME] = mock_channel_stub
