@@ -1,19 +1,30 @@
 import json
 
 import pytest
+from asyncmock import AsyncMock
 from jsonrpcclient.request import Request
 
 from iconrpcserver.dispatcher.default.websocket import WSDispatcher
 from iconrpcserver.protos import message_code
+from iconrpcserver.utils.message_queue.stub_collection import StubCollection
+from .conftest import CHANNEL_STUB_NAME
+
+
+class MockWebSocket:
+    async def send(self, *args, **kwargs):
+        pass
 
 
 @pytest.fixture
 def request_dict():
+    ws = MockWebSocket()
+    ws.send = AsyncMock()
+
     peer_id = "0xaaaaaa"
     context = {
         "channel": "icon_dex",
         "peer_id": peer_id,
-        "ws": "mock_ws",
+        "ws": ws,
         "remote_target": f"iii.pp.ii.ppp:pppp"
     }
 
@@ -25,85 +36,20 @@ def request_dict():
 
 
 @pytest.mark.asyncio
-class TestWSDispatcher:
-    @pytest.fixture
-    def mock_publish_method_factory(self, mocker, mock_channel_stub_factory):
-        def _mock_publish_method(**kwargs_for_mock):
-            check_by_this_method = mocker.MagicMock(**kwargs_for_mock)
-
-            async def _this_async_mock_will_substitute_origin_func(*args, **kwargs):
-                return check_by_this_method(*args, **kwargs)
-
-            return check_by_this_method, _this_async_mock_will_substitute_origin_func
-
-        return _mock_publish_method
-
-    async def test_do_publish_if_register_succeed(self, mocker, request_dict, mock_channel_stub_factory, mock_publish_method_factory):
-        mock_value = {"return_value": True}
-        mock_channel_stub_factory(**mock_value)
-        publish_heartbeat, mock_publish_heartbeat = mock_publish_method_factory(**mock_value)
-        publish_new_block, mock_publish_new_block = mock_publish_method_factory(**mock_value)
-
-        mocker.patch.object(WSDispatcher, "publish_heartbeat", new=mock_publish_heartbeat)
-        mocker.patch.object(WSDispatcher, "publish_new_block", new=mock_publish_new_block)
-        await WSDispatcher.node_ws_Subscribe(**request_dict)
-
-        assert publish_heartbeat.called
-        assert publish_new_block.called
-
-    async def test_no_publish_if_register_fail(self, mocker, request_dict, mock_channel_stub_factory, mock_publish_method_factory):
-        mock_value = {"return_value": False}
-        mock_channel_stub_factory(**mock_value)
-        publish_heartbeat, mock_publish_heartbeat = mock_publish_method_factory(**mock_value)
-        publish_new_block, mock_publish_new_block = mock_publish_method_factory(**mock_value)
-        send_exception, mock_send_exception = mock_publish_method_factory(**mock_value)
-
-        mocker.patch.object(WSDispatcher, "publish_heartbeat", new=mock_publish_heartbeat)
-        mocker.patch.object(WSDispatcher, "publish_new_block", new=mock_publish_new_block)
-        mocker.patch.object(WSDispatcher, "send_exception", new=mock_send_exception)
-        await WSDispatcher.node_ws_Subscribe(**request_dict)
-
-        assert not publish_heartbeat.called
-        assert not publish_new_block.called
-        assert send_exception.called
-
-    async def test_no_publish_if_exc_during_register(self, mocker, request_dict, mock_channel_stub_factory, mock_publish_method_factory):
-        reception_mock_value = {"side_effect": RuntimeError("REGISTER FAILED DURING CHANNEL STUB")}
-        mock_channel_stub_factory(**reception_mock_value)
-
-        mock_publish_value = {"return_value": True}
-        publish_heartbeat, mock_publish_heartbeat = mock_publish_method_factory(**mock_publish_value)
-        publish_new_block, mock_publish_new_block = mock_publish_method_factory(**mock_publish_value)
-        send_exception, mock_send_exception = mock_publish_method_factory(**mock_publish_value)
-
-        mocker.patch.object(WSDispatcher, "publish_heartbeat", new=mock_publish_heartbeat)
-        mocker.patch.object(WSDispatcher, "publish_new_block", new=mock_publish_new_block)
-        mocker.patch.object(WSDispatcher, "send_exception", new=mock_send_exception)
-        await WSDispatcher.node_ws_Subscribe(**request_dict)
-
-        assert not publish_heartbeat.called
-        assert not publish_new_block.called
-        assert send_exception.called
-
-    async def test_send_exception(self, mocker, mock_channel_stub_factory):
-        class MockWebSocket:
-            def __init__(self, mocker_fixture):
-                self.mock_send = mocker_fixture.MagicMock()
-
-            async def send(self, *args, **kwargs):
-                self.mock_send(*args, **kwargs)
-
-        ws = MockWebSocket(mocker)
+class TestWSDispatcherBasic:
+    async def test_send_exception_check_parameters(self):
+        ws = MockWebSocket()
+        ws.send = AsyncMock()
         expected_method = "fake_method"
         expected_exc = RuntimeError("test")
         expected_error_code = message_code.Response.fail_subscribe_limit
 
-        await WSDispatcher.send_exception(ws, method=expected_method, exception=expected_exc, error_code=expected_error_code)
-
         expected_request = Request(method=expected_method, error=str(expected_exc), code=expected_error_code)
         expected_called_params = dict(expected_request)
 
-        actual_called_params, _ = ws.mock_send.call_args
+        await WSDispatcher.send_exception(ws, method=expected_method, exception=expected_exc, error_code=expected_error_code)
+
+        actual_called_params, _ = ws.send.call_args
         actual_called_params: dict = json.loads(actual_called_params[0])
 
         # Remove id because jsonrpc call auto-increments request id.
@@ -111,3 +57,49 @@ class TestWSDispatcher:
         actual_called_params.pop("id")
 
         assert actual_called_params == expected_called_params
+
+
+@pytest.mark.asyncio
+class TestWSDispatcherRegister:
+    async def test_do_publish_if_register_succeed(self, request_dict):
+        channel_stub = StubCollection().channel_stubs[CHANNEL_STUB_NAME]
+        channel_stub.register_citizen = AsyncMock(return_value=True)
+
+        WSDispatcher.publish_heartbeat = AsyncMock()
+        WSDispatcher.publish_new_block = AsyncMock()
+        WSDispatcher.publish_unregister = AsyncMock()
+
+        await WSDispatcher.node_ws_Subscribe(**request_dict)
+
+        assert WSDispatcher.publish_heartbeat.called
+        assert WSDispatcher.publish_new_block.called
+        assert WSDispatcher.publish_unregister.called
+
+    async def test_no_publish_if_register_fail(self, request_dict):
+        channel_stub = StubCollection().channel_stubs[CHANNEL_STUB_NAME]
+        channel_stub.register_citizen = AsyncMock(return_value=False)
+
+        WSDispatcher.publish_heartbeat = AsyncMock()
+        WSDispatcher.publish_new_block = AsyncMock()
+        WSDispatcher.publish_unregister = AsyncMock()
+
+        await WSDispatcher.node_ws_Subscribe(**request_dict)
+
+        assert not WSDispatcher.publish_heartbeat.called
+        assert not WSDispatcher.publish_new_block.called
+        assert WSDispatcher.publish_unregister.called
+
+    async def test_no_publish_if_exc_during_register(self, request_dict):
+        channel_stub = StubCollection().channel_stubs[CHANNEL_STUB_NAME]
+        channel_stub.register_citizen = AsyncMock(return_value=False)
+
+        WSDispatcher.publish_heartbeat = AsyncMock()
+        WSDispatcher.publish_new_block = AsyncMock()
+        WSDispatcher.publish_unregister = AsyncMock()
+
+        await WSDispatcher.node_ws_Subscribe(**request_dict)
+
+        assert not WSDispatcher.publish_heartbeat.called
+        assert not WSDispatcher.publish_new_block.called
+        assert WSDispatcher.publish_unregister.called
+
