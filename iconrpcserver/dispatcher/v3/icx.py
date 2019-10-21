@@ -36,6 +36,15 @@ BLOCK_v0_1a = '0.1a'
 BLOCK_v0_3 = '0.3'
 
 
+def check_response_code(response_code: message_code.Response):
+    if response_code != message_code.Response.success:
+        raise GenericJsonRpcServerError(
+            code=JsonError.INVALID_PARAMS,
+            message=message_code.responseCodeMap[response_code][1],
+            http_status=status.HTTP_BAD_REQUEST
+        )
+
+
 class IcxDispatcher:
     @staticmethod
     @methods.add
@@ -219,6 +228,10 @@ class IcxDispatcher:
         else:
             block_hash, result = await get_block_by_params(block_height=-1,
                                                            channel_name=channel)
+
+        response_code = result['response_code']
+        check_response_code(response_code)
+
         block = result['block']
         if block['version'] == BLOCK_v0_1a:
             response = convert_params(result['block'], ResponseParamType.get_block_v0_1a_tx_v3)
@@ -248,12 +261,7 @@ class IcxDispatcher:
                                                        channel_name=channel)
 
         response_code = result['response_code']
-        if response_code != message_code.Response.success:
-            raise GenericJsonRpcServerError(
-                code=JsonError.INVALID_PARAMS,
-                message=message_code.responseCodeMap[response_code][1],
-                http_status=status.HTTP_BAD_REQUEST
-            )
+        check_response_code(response_code)
 
         response = convert_params(result['block'], ResponseParamType.get_block_v0_1a_tx_v3)
         return response
@@ -266,12 +274,7 @@ class IcxDispatcher:
         block_hash, result = await get_block_by_params(block_height=request['height'],
                                                        channel_name=channel)
         response_code = result['response_code']
-        if response_code != message_code.Response.success:
-            raise GenericJsonRpcServerError(
-                code=JsonError.INVALID_PARAMS,
-                message=message_code.responseCodeMap[response_code][1],
-                http_status=status.HTTP_BAD_REQUEST
-            )
+        check_response_code(response_code)
 
         response = convert_params(result['block'], ResponseParamType.get_block_v0_1a_tx_v3)
         return response
