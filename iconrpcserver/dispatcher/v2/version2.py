@@ -24,8 +24,8 @@ from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion, DISPATCH_V2_TAG
-from iconrpcserver.dispatcher import GenericJsonRpcServerError
-from iconrpcserver.dispatcher import validate_jsonschema_v2
+from iconrpcserver.dispatcher.exception import GenericJsonRpcServerError
+from iconrpcserver.dispatcher.v2.schema import validate_jsonschema_v2
 from iconrpcserver.protos import message_code
 from iconrpcserver.utils import get_protocol_from_uri
 from iconrpcserver.utils.icon_service import response_to_json_query, RequestParamType

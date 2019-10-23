@@ -18,8 +18,8 @@ import json
 from iconcommons.logger import Logger
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
 from iconrpcserver.default_conf.icon_rpcserver_constant import DISPATCH_V3_TAG
-from iconrpcserver.dispatcher import GenericJsonRpcServerError
-from iconrpcserver.dispatcher import validate_jsonschema_v3
+from iconrpcserver.dispatcher.exception import GenericJsonRpcServerError
+from iconrpcserver.dispatcher.v3.schema import validate_jsonschema_v3
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 from jsonrpcserver import config
 from jsonrpcserver.aio import AsyncMethods

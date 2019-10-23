@@ -21,7 +21,8 @@ from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, DISPATCH_NODE_TAG
-from iconrpcserver.dispatcher import GenericJsonRpcServerError, validate_jsonschema_node
+from iconrpcserver.dispatcher.exception import GenericJsonRpcServerError
+from iconrpcserver.dispatcher.default.schema import validate_jsonschema_node
 from iconrpcserver.utils import convert_upper_camel_method_to_lower_camel
 from iconrpcserver.utils.icon_service import RequestParamType
 from iconrpcserver.utils.icon_service.converter import convert_params

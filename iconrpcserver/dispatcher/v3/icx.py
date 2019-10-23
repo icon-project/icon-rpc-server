@@ -20,7 +20,7 @@ from iconcommons.logger import Logger
 from jsonrpcserver import status
 
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
-from iconrpcserver.dispatcher import GenericJsonRpcServerError, JsonError
+from iconrpcserver.dispatcher.exception import GenericJsonRpcServerError, JsonError
 from iconrpcserver.dispatcher.v3 import methods
 from iconrpcserver.protos import message_code
 from iconrpcserver.utils import get_protocol_from_uri

@@ -20,15 +20,13 @@ from jsonrpcserver.aio import AsyncMethods
 from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
-
-from iconrpcserver.dispatcher import GenericJsonRpcServerError
-from iconrpcserver.dispatcher import validate_jsonschema_v3
+from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, DISPATCH_V3D_TAG
+from iconrpcserver.dispatcher.exception import GenericJsonRpcServerError
+from iconrpcserver.dispatcher.v3d.schema import validate_jsonschema_v3d
 from iconrpcserver.utils.icon_service import response_to_json_query
 from iconrpcserver.utils.icon_service.converter import make_request
 from iconrpcserver.utils.json_rpc import get_icon_stub_by_channel_name
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
-from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, DISPATCH_V3D_TAG
-
 
 config.log_requests = False
 config.log_responses = False
@@ -58,7 +56,7 @@ class Version3DebugDispatcher:
             Logger.info(f'rest_server_v3d request with {req_json}', DISPATCH_V3D_TAG)
             Logger.info(f"{client_ip} requested {req_json} on {url}")
 
-            validate_jsonschema_v3(request=req_json)
+            validate_jsonschema_v3d(request=req_json)
         except GenericJsonRpcServerError as e:
             response = ExceptionResponse(e, request_id=req_json.get('id', 0))
         except Exception as e:
