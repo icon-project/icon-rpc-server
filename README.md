@@ -1,4 +1,6 @@
+
 [![Build Status](https://travis-ci.org/icon-project/icon-rpc-server.svg?branch=master)](https://travis-ci.org/icon-project/icon-rpc-server)
+[![PyPI](https://img.shields.io/pypi/v/iconrpcserver.svg)](https://pypi.org/project/iconrpcserver)
 
 # ICON RPC Server
 
@@ -27,9 +29,9 @@ ICON RPC Server development and execution requires following environments.
 * OS: MacOS, Linux
     * Windows are not supported yet.
 * Python
-  * Make Virtual Env for Python 3.6.5+ or 3.7.x (recommended version)
+  * Make Virtual Env for Python 3.7.x
 
-    **We will support 3.7.x only in future. Please upgrade python version to 3.7.x.**
+    **Now we support 3.7.x only. Please upgrade python version to 3.7.x.**
 
   * check your python version
     ```bash
