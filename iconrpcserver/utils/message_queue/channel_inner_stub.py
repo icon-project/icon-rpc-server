@@ -22,6 +22,10 @@ if TYPE_CHECKING:
 
 class ChannelInnerTask:
     @message_queue_task
+    async def get_rs_target(self) -> str:
+        pass
+
+    @message_queue_task
     async def get_invoke_result(self, tx_hash) -> Tuple[int, str]:
         pass
 
@@ -34,21 +38,31 @@ class ChannelInnerTask:
         pass
 
     @message_queue_task
-    async def get_block_v2(self, block_height,
-                           block_hash,
-                           block_data_filter,
-                           tx_data_filter) -> Tuple[int, str, str, list]:
+    async def get_block_v2(self, block_height, block_hash) -> Tuple[int, str, str]:
         pass
 
     @message_queue_task
-    async def get_block(self, block_height,
-                        block_hash,
-                        block_data_filter,
-                        tx_data_filter) -> Tuple[int, str, bytes, str, list]:
+    async def get_block(self, block_height, block_hash) -> Tuple[int, str, bytes, str]:
         pass
 
     @message_queue_task
     async def announce_new_block(self, subscriber_block_height: int, subscriber_id: str) -> Tuple[str, bytes]:
+        pass
+
+    @message_queue_task
+    async def get_tx_proof(self, tx_hash: str) -> list:
+        pass
+
+    @message_queue_task
+    async def get_receipt_proof(self, tx_hash: str) -> list:
+        pass
+
+    @message_queue_task
+    async def prove_tx(self, tx_hash: str, proof: list) -> str:
+        pass
+
+    @message_queue_task
+    async def prove_receipt(self, tx_hash: str, proof: list) -> str:
         pass
 
     @message_queue_task
@@ -67,6 +81,14 @@ class ChannelInnerTask:
     async def is_citizen_registered(self, peer_id) -> bool:
         pass
 
+    @message_queue_task
+    async def get_reps_by_hash(self, reps_hash) -> List[Dict[str, str]]:
+        pass
+
+    @message_queue_task
+    async def wait_for_unregister_signal(self, subscriber_id: str):
+        pass
+
 
 class ChannelInnerStub(MessageQueueStub[ChannelInnerTask]):
     TaskType = ChannelInnerTask
@@ -77,7 +99,7 @@ class ChannelInnerStub(MessageQueueStub[ChannelInnerTask]):
 
 class ChannelTxCreatorInnerTask:
     @message_queue_task
-    async def create_icx_tx(self, kwargs) -> Tuple[int, str]:
+    async def create_icx_tx(self, kwargs) -> Tuple[int, str, str]:
         pass
 
 

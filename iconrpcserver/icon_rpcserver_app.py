@@ -1,4 +1,4 @@
-# Copyright 2018 ICON Foundation
+# Copyright 2019 ICON Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,6 +43,11 @@ class StandaloneApplication(gunicorn.app.base.BaseApplication):
         self.options = options or {}
         self.application = app
         super(StandaloneApplication, self).__init__()
+
+        # FIXME : below is temporary patch for snap packaging
+        from gunicorn.workers import base
+        from iconrpcserver.utils import gunicorn_patch
+        base.WorkerTmp.__init__ = gunicorn_patch.__worker_tmp_init__
 
     def load_config(self):
         config = dict([(key, value) for key, value in iteritems(self.options)
@@ -126,9 +131,6 @@ async def _run(conf: 'IconConfig'):
 
     Logger.print_config(conf, ICON_RPCSERVER_CLI)
 
-    # Setup port and host values.
-    host = '0.0.0.0'
-
     # Connect gRPC stub.
     PeerServiceStub().conf = conf
     PeerServiceStub().rest_grpc_timeout = \
@@ -145,28 +147,26 @@ async def _run(conf: 'IconConfig'):
 
     # Configure SSL.
     ssl_context = ServerComponents().ssl_context
-    certfile = ""
-    keyfile = ""
+    certfile = ''
+    keyfile = ''
 
     if ssl_context is not None:
         certfile = ssl_context[0]
         keyfile = ssl_context[1]
 
-    options = {
-        'bind': f"{host}:{conf[ConfigKey.PORT]}",
-        'workers': conf[ConfigKey.GUNICORN_WORKER_COUNT],
-        'worker_class': "sanic.worker.GunicornWorker",
+    options = conf.get(ConfigKey.GUNICORN_CONFIG, {})
+    options.update({
+        'bind': f'{conf[ConfigKey.HOST]}:{conf[ConfigKey.PORT]}',
         'certfile': certfile,
-        'SERVER_SOFTWARE': gunicorn.SERVER_SOFTWARE,
         'keyfile': keyfile,
+        'SERVER_SOFTWARE': gunicorn.SERVER_SOFTWARE,
         'capture_output': False
-    }
+    })
 
     # Launch gunicorn web server.
     ServerComponents.conf = conf
     ServerComponents().ready()
     StandaloneApplication(ServerComponents().app, options).run()
-    Logger.error("Rest App Done!")
 
 
 # Run as gunicorn web server.

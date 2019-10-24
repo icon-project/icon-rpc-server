@@ -23,7 +23,8 @@ from sanic import response as sanic_response
 
 from iconrpcserver.dispatcher import GenericJsonRpcServerError
 from iconrpcserver.dispatcher import validate_jsonschema_v3
-from iconrpcserver.utils.icon_service import make_request, response_to_json_query
+from iconrpcserver.utils.icon_service import response_to_json_query
+from iconrpcserver.utils.icon_service.converter import make_request
 from iconrpcserver.utils.json_rpc import get_icon_stub_by_channel_name
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, DISPATCH_V3D_TAG

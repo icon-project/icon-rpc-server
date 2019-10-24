@@ -13,6 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import os
 from .icon_rpcserver_constant import SSLAuthType, ConfigKey
 
@@ -22,17 +23,21 @@ default_rpcserver_config = \
             "logger": "iconrpcserver"
         },
         ConfigKey.CHANNEL: "loopchain_default",
+        ConfigKey.HOST: "0.0.0.0",
         ConfigKey.PORT: 9000,
         ConfigKey.PORT_DIFF_REST_SERVICE_CONTAINER: 1900,
         ConfigKey.AMQP_KEY: "amqp_key",
         ConfigKey.AMQP_TARGET: "127.0.0.1",
-        ConfigKey.GUNICORN_WORKER_COUNT: os.cpu_count() * 2 + 1,
-        ConfigKey.DISABLE_V1_API: True,
+        ConfigKey.GUNICORN_CONFIG: {
+            "workers": os.cpu_count() * 2 + 1,
+            "worker_class": "sanic.worker.GunicornWorker",
+            "graceful_timeout": 30
+        },
         ConfigKey.REST_SSL_TYPE: SSLAuthType.none.value,
-        ConfigKey.DEFAULT_SSL_CERT_PATH: 'resources/ssl_test_cert/cert.pem',
-        ConfigKey.DEFAULT_SSL_KEY_PATH: 'resources/ssl_test_cert/key.pem',
-        ConfigKey.DEFAULT_SSL_TRUST_CERT_PATH: 'resources/ssl_test_ca/cert.pem',
-        ConfigKey.IP_LOCAL: '127.0.0.1',
+        ConfigKey.DEFAULT_SSL_CERT_PATH: "resources/ssl_test_cert/cert.pem",
+        ConfigKey.DEFAULT_SSL_KEY_PATH: "resources/ssl_test_cert/key.pem",
+        ConfigKey.DEFAULT_SSL_TRUST_CERT_PATH: "resources/ssl_test_ca/cert.pem",
+        ConfigKey.IP_LOCAL: "127.0.0.1",
         ConfigKey.GRPC_TIMEOUT: 30,
         ConfigKey.GRPC_RETRY: 5,
         ConfigKey.REST_ADDITIONAL_TIMEOUT: 30,

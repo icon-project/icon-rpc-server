@@ -16,32 +16,21 @@
 from iconcommons.logger import Logger
 
 from iconrpcserver.dispatcher.v3 import methods
-from iconrpcserver.utils.icon_service import response_to_json_query, make_request
-from iconrpcserver.utils.json_rpc import get_icon_stub_by_channel_name
+from iconrpcserver.utils.icon_service import response_to_json_query, RequestParamType
+from iconrpcserver.utils.icon_service.converter import convert_params
+from iconrpcserver.utils.json_rpc import get_channel_stub_by_channel_name
 
 
 class RepDispatcher:
     @staticmethod
     @methods.add
-    async def rep_getList(**kwargs):
+    async def rep_getListByHash(**kwargs):
         channel = kwargs['context']['channel']
-        score_stub = get_icon_stub_by_channel_name(channel)
-        method = "ise_getPReps"
-        request = make_request(method, kwargs)
+        channel_stub = get_channel_stub_by_channel_name(channel)
+        request = convert_params(kwargs, RequestParamType.get_reps_by_hash)
+        reps_hash = request.get('repsHash')
+        reps = await channel_stub.async_task().get_reps_by_hash(reps_hash=reps_hash)
+        Logger.debug(f"reps_hash: {reps_hash}, reps: {reps}")
+        response = [{'address': rep['id'], 'p2pEndpoint': rep['p2pEndpoint']} for rep in reps]
 
-        response = score_stub.sync_task().call(request)
-        rep_list = [{"id": rep_info["id"], "target": rep_info["target"]}
-                    for rep_info in response["result"]["preps"]]
-        Logger.debug(f'rep list: {rep_list}')
-
-        start_term_height = '0x0'
-        end_term_height = '0x0'
-        rep_hash = ''
-        # term_height, rep_root_hash should be updated after IISS is implemented.
-        response = {
-            'startTermHeight': start_term_height,
-            'endTermHeight': end_term_height,
-            'repHash': rep_hash,
-            'rep': rep_list
-        }
         return response_to_json_query(response)

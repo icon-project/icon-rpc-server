@@ -1,3 +1,7 @@
+
+[![Build Status](https://travis-ci.org/icon-project/icon-rpc-server.svg?branch=master)](https://travis-ci.org/icon-project/icon-rpc-server)
+[![PyPI](https://img.shields.io/pypi/v/iconrpcserver.svg)](https://pypi.org/project/iconrpcserver)
+
 # ICON RPC Server
 
 This is intended to give an introduction ICON RPC Server. ICON RPC Server receives request messages from external clients, and send a response to clients. when receiving the message, ICON RPC Server checks the method of requests and transfer it to appropriate components (loopchain or ICON Service). ICON RPC Server also checks the basic syntax error of messages. 
@@ -7,11 +11,11 @@ This is intended to give an introduction ICON RPC Server. ICON RPC Server receiv
 ## Building source code
  First, clone this project. Then go to the project folder and create a user environment and run build script.
 ```
-$ virtualenv -p python3 venv  # Create a virtual environment.
+$ python3 -m venv venv        # Create a virtual environment.
 $ source venv/bin/activate    # Enter the virtual environment.
-(venv)$ ./build.sh            # run build script
+(venv)$ make build            # run build
 (venv)$ ls dist/              # check result wheel file
-iconrpcserver-1.0.0-py3-none-any.whl
+iconrpcserver-x.x.x-py3-none-any.whl
 ```
 
 ## Installation
@@ -25,9 +29,9 @@ ICON RPC Server development and execution requires following environments.
 * OS: MacOS, Linux
     * Windows are not supported yet.
 * Python
-  * Make Virtual Env for Python 3.6.5+ or 3.7.x (recommended version)
+  * Make Virtual Env for Python 3.7.x
 
-    **We will support 3.7.x only in future. Please upgrade python version to 3.7.x.**
+    **Now we support 3.7.x only. Please upgrade python version to 3.7.x.**
 
   * check your python version
     ```bash
@@ -38,6 +42,7 @@ ICON RPC Server development and execution requires following environments.
 ### Setup on MacOS / Linux
 
 ```bash
+$ python3 -m venv work      # Create a virtual environment.
 # Install the ICON RPC Server
 (work) $ pip install iconrpcserver
 ```

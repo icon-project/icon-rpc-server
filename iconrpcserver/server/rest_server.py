@@ -1,4 +1,4 @@
-# Copyright 2018 ICON Foundation
+# Copyright 2019 ICON Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,22 +18,22 @@ import ssl
 from http import HTTPStatus
 from urllib.parse import urlparse
 
-from sanic import Sanic, response
-from sanic.views import HTTPMethodView
-from sanic.log import LOGGING_CONFIG_DEFAULTS
-
 from iconcommons.icon_config import IconConfig
-from ..default_conf.icon_rpcserver_constant import ConfigKey, NodeType, SSLAuthType
-from ..components import SingletonMetaClass
+from iconcommons.logger import Logger
+from sanic import Sanic, response
+from sanic.log import LOGGING_CONFIG_DEFAULTS
+from sanic.views import HTTPMethodView
+from sanic_cors import CORS
+
 from .peer_service_stub import PeerServiceStub
 from .rest_property import RestProperty
-from iconrpcserver.dispatcher.default import NodeDispatcher, WSDispatcher
-from iconrpcserver.dispatcher.v2 import Version2Dispatcher
-from iconrpcserver.dispatcher.v3 import Version3Dispatcher
-from iconrpcserver.dispatcher.v3d import Version3DebugDispatcher
+from ..components import SingletonMetaClass
+from ..default_conf.icon_rpcserver_constant import ConfigKey, SSLAuthType
+from ..dispatcher.default import NodeDispatcher, WSDispatcher
+from ..dispatcher.v2 import Version2Dispatcher
+from ..dispatcher.v3 import Version3Dispatcher
+from ..dispatcher.v3d import Version3DebugDispatcher
 from ..utils.message_queue.stub_collection import StubCollection
-from sanic_cors import CORS
-from iconcommons.logger import Logger
 
 
 class ServerComponents(metaclass=SingletonMetaClass):
@@ -115,26 +115,21 @@ class ServerComponents(metaclass=SingletonMetaClass):
                 await StubCollection().create_channel_stub(channel_name)
                 await StubCollection().create_channel_tx_creator_stub(channel_name)
                 await StubCollection().create_icon_score_stub(channel_name)
-
-                RestProperty().node_type = NodeType.CommunityNode
-                RestProperty().rs_target = None
             else:
                 await StubCollection().create_peer_stub()
-                channels_info = await StubCollection().peer_stub.async_task().get_channel_infos()
-                channel_name = None
-                for channel_name, channel_info in channels_info.items():
+                channels = await StubCollection().peer_stub.async_task().get_channel_infos()
+                for channel_name in channels:
                     await StubCollection().create_channel_stub(channel_name)
                     await StubCollection().create_channel_tx_creator_stub(channel_name)
                     await StubCollection().create_icon_score_stub(channel_name)
-                results = await StubCollection().peer_stub.async_task().get_channel_info_detail(channel_name)
-                RestProperty().node_type = NodeType(results[6])
-                RestProperty().rs_target = results[3]
-                relay_target = StubCollection().conf.get(ConfigKey.RELAY_TARGET, None)
-                RestProperty().relay_target = urlparse(relay_target).netloc \
-                    if urlparse(relay_target).scheme else relay_target
+
+                    relay_target = StubCollection().conf.get(ConfigKey.RELAY_TARGET, None)
+                    relay_target = \
+                        urlparse(relay_target).netloc if urlparse(relay_target).scheme else relay_target
+                    RestProperty().relay_target[channel_name] = relay_target
 
             Logger.debug(f'rest_server:initialize complete. '
-                         f'node_type({RestProperty().node_type}), rs_target({RestProperty().rs_target})')
+                         f'relay_target({RestProperty().relay_target})')
 
     def serve(self, api_port):
         self.ready()
@@ -144,14 +139,14 @@ class ServerComponents(metaclass=SingletonMetaClass):
 class Status(HTTPMethodView):
     async def get(self, request):
         args = request.raw_args
-        channel_name = ServerComponents.conf[ConfigKey.CHANNEL] if args.get('channel') is None else args.get('channel')
+        channel_name = args.get('channel') or ServerComponents.conf.get(ConfigKey.CHANNEL)
         return response.json(PeerServiceStub().get_status(channel_name))
 
 
 class Avail(HTTPMethodView):
     async def get(self, request):
         args = request.raw_args
-        channel_name = ServerComponents.conf[ConfigKey.CHANNEL] if args.get('channel') is None else args.get('channel')
+        channel_name = args.get('channel') or ServerComponents.conf.get(ConfigKey.CHANNEL)
         status = HTTPStatus.OK
         result = PeerServiceStub().get_status(channel_name)
 

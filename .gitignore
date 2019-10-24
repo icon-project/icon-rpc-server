@@ -175,37 +175,8 @@ share/
 
 
 # ETC
-tmp/
-testcase/db/
-test_chain_helper_block/
-sample_score
-servertool.py
-*_profile.txt
-*_profile_.txt
-test_performance_result.txt
-# *.pem
-nouse_*
-resources/unittest/*
-docs_mine/
-resources/test_score_deploy/
-resources/test_score_repository/loopchain/
-resources/test_score_repository/develop/test_score/deploy/
-resources/test_score_repository/develop/test_query_exception/deploy/
-resources/ssl_grpc_test_cert/ssl.crt
-resources/default_pki/*.der
-score/loopchain/
-score/develop/dev_score/deploy
-score/develop/black_score/deploy
-score/develop/test_score/deploy
-score/develop/test_score/.git
-score/develop/certificate
-loopchain/configure_user.py
-loopchain/configure_user_ori.py
-testcase/unittest/blockchain_db*
-channel_manage_data_test2.json
-channel_manage_data_ori.json
-run_a_test.sh
-todo.md
+loopchain_pb2*.py
+
 
 gen_docs/_build
 gen_docs/docs

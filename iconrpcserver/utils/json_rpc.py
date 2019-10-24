@@ -16,18 +16,18 @@ import json
 import logging
 
 import aiohttp
+from iconcommons.logger import Logger
 from jsonrpcclient import exceptions, config
 from jsonrpcclient.aiohttp_client import AsyncClient, async_timeout
-from past.builtins import basestring
 from jsonrpcserver import status
+from past.builtins import basestring
 
-from iconrpcserver.dispatcher import GenericJsonRpcServerError, JsonError
+from ..dispatcher import GenericJsonRpcServerError, JsonError
 from ..default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion
 from ..protos import message_code
-from ..utils.icon_service.converter_v2 import convert_params, ParamType
+from ..utils.icon_service.converter import convert_params
+from ..utils.icon_service.templates import ResponseParamType
 from ..utils.message_queue.stub_collection import StubCollection
-
-from iconcommons.logger import Logger
 
 
 class CustomAiohttpClient(AsyncClient):
@@ -81,15 +81,18 @@ class CustomAiohttpClient(AsyncClient):
 async def relay_tx_request(protocol, message, relay_target, path, version=ApiVersion.v3.name):
     method_name = "icx_sendTransaction"
 
-    relay_uri = f"{protocol}://{relay_target}/{path}"
+    # TODO required post review [LC-454]
+    # relay_uri = f"{protocol}://{relay_target}/{path}"
+    # I think relay_target is already normalized by loopchain
+    relay_uri = f"{relay_target}/{path}"
     Logger.debug(f'relay_uri: {relay_uri}')
 
     async with aiohttp.ClientSession() as session:
         Logger.info(f"relay_tx_request : "
-                     f"message[{message}], "
-                     f"relay_target[{relay_target}], "
-                     f"version[{version}], "
-                     f"method[{method_name}]")
+                    f"message[{message}], "
+                    f"relay_target[{relay_target}], "
+                    f"version[{version}], "
+                    f"method[{method_name}]")
         result = await CustomAiohttpClient(session, relay_uri).request(method_name, message)
         Logger.debug(f"relay_tx_request result[{result}]")
 
@@ -99,17 +102,15 @@ async def relay_tx_request(protocol, message, relay_target, path, version=ApiVer
 async def get_block_v2_by_params(block_height=None, block_hash="", with_commit_state=False):
     channel_name = StubCollection().conf[ConfigKey.CHANNEL]
     channel_stub = StubCollection().channel_stubs[channel_name]
-    response_code, block_hash, block_data_json, tx_data_json_list = \
+    response_code, block_hash, block_data_json = \
         await channel_stub.async_task().get_block_v2(
             block_height=block_height,
-            block_hash=block_hash,
-            block_data_filter="",
-            tx_data_filter=""
+            block_hash=block_hash
         )
     block = json.loads(block_data_json)  # if fail, block = {}
 
     if block:
-        block = convert_params(block, ParamType.get_block)
+        block = convert_params(block, ResponseParamType.get_block_v0_1a_tx_v2)
 
     result = {
         'response_code': response_code,
@@ -124,9 +125,6 @@ async def get_block_v2_by_params(block_height=None, block_hash="", with_commit_s
 
 async def get_block_by_params(channel_name=None, block_height=None, block_hash="", with_commit_state=False):
     channel_name = StubCollection().conf[ConfigKey.CHANNEL] if channel_name is None else channel_name
-    block_data_filter = "prev_block_hash, height, block_hash, merkle_tree_root_hash," \
-                        " time_stamp, peer_id, signature"
-    tx_data_filter = "icx_origin_data"
 
     try:
         channel_stub = get_channel_stub_by_channel_name(channel_name)
@@ -137,12 +135,10 @@ async def get_block_by_params(channel_name=None, block_height=None, block_hash="
             http_status=status.HTTP_BAD_REQUEST
         )
 
-    response_code, block_hash, confirm_info, block_data_json, tx_data_json_list = \
+    response_code, block_hash, confirm_info, block_data_json = \
         await channel_stub.async_task().get_block(
             block_height=block_height,
-            block_hash=block_hash,
-            block_data_filter=block_data_filter,
-            tx_data_filter=tx_data_filter
+            block_hash=block_hash
         )
 
     try:

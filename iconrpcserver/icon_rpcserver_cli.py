@@ -119,29 +119,29 @@ def stop(conf: 'IconConfig') -> int:
 
 def start_process(conf: 'IconConfig'):
     Logger.debug('start_server() start')
-    python_module_string = 'iconrpcserver.icon_rpcserver_app'
 
-    converted_params = {'-p': conf[ConfigKey.PORT],
-                        '-c': conf.get(ConfigKey.CONFIG),
-                        '-at': conf[ConfigKey.AMQP_TARGET],
-                        '-ak': conf[ConfigKey.AMQP_KEY],
-                        '-ch': conf[ConfigKey.CHANNEL]}
-
-    custom_argv = []
-    for k, v in converted_params.items():
-        if v is None:
-            continue
-        custom_argv.append(k)
-        custom_argv.append(str(v))
-    if conf.get(ConfigKey.TBEARS_MODE, False):
-        custom_argv.append('-tbears')
-
-    is_foreground = conf.get('foreground', False)
-    if is_foreground:
+    if conf.get('foreground', False):
         from iconrpcserver.icon_rpcserver_app import run_in_foreground
         del conf['foreground']
         run_in_foreground(conf)
     else:
+        python_module_string = 'iconrpcserver.icon_rpcserver_app'
+
+        converted_params = {'-p': conf[ConfigKey.PORT],
+                            '-c': conf.get(ConfigKey.CONFIG),
+                            '-at': conf[ConfigKey.AMQP_TARGET],
+                            '-ak': conf[ConfigKey.AMQP_KEY],
+                            '-ch': conf[ConfigKey.CHANNEL]}
+
+        custom_argv = []
+        for k, v in converted_params.items():
+            if v is None:
+                continue
+            custom_argv.append(k)
+            custom_argv.append(str(v))
+        if conf.get(ConfigKey.TBEARS_MODE, False):
+            custom_argv.append('-tbears')
+
         subprocess.Popen([sys.executable, '-m', python_module_string, *custom_argv], close_fds=True)
     Logger.debug('start_process() end')
 
