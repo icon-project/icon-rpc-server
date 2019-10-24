@@ -1,16 +1,18 @@
 language: python
 python:
-  - "3.6"
+  - "3.7"
 
 branches:
   only:
   - master
   - develop
-  - /^release-.*$/
+  - /^release[/-].*$/
+  - /^feature\/.*$/
   - travis-test
 
 install:
   - pip install -r requirements.txt
+  - make generate-proto
 
 script:
   - python setup.py test
