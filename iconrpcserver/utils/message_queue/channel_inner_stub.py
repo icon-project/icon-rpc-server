@@ -22,10 +22,6 @@ if TYPE_CHECKING:
 
 class ChannelInnerTask:
     @message_queue_task
-    async def get_rs_target(self) -> str:
-        pass
-
-    @message_queue_task
     async def get_invoke_result(self, tx_hash) -> Tuple[int, str]:
         pass
 

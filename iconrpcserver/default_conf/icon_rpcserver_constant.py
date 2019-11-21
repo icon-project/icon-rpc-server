@@ -67,7 +67,6 @@ class ConfigKey:
     REDIRECT_PROTOCOL = 'redirectProtocol'
     WS_HEARTBEAT_TIME = 'wsHeartBeatTime'
     REQUEST_MAX_SIZE = 'requestMaxSize'
-    RELAY_TARGET = "relayTarget"
     GUNICORN_CONFIG = 'gunicornConfig'
 
 

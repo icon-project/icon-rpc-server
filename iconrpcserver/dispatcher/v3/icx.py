@@ -23,7 +23,6 @@ from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
 from iconrpcserver.dispatcher import GenericJsonRpcServerError, JsonError
 from iconrpcserver.dispatcher.v3 import methods
 from iconrpcserver.protos import message_code
-from iconrpcserver.server.rest_property import RestProperty
 from iconrpcserver.utils import get_protocol_from_uri
 from iconrpcserver.utils.icon_service import (response_to_json_query,
                                               RequestParamType, ResponseParamType)
@@ -69,7 +68,6 @@ class IcxDispatcher:
 
     @staticmethod
     async def __relay_icx_transaction(url, path, message, channel_name, relay_target):
-        relay_target = RestProperty().relay_target[channel_name] or relay_target
         if not relay_target:
             raise GenericJsonRpcServerError(
                 code=JsonError.INTERNAL_ERROR,

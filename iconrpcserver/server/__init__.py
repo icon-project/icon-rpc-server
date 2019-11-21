@@ -14,4 +14,3 @@
 """A package for restful API server"""
 
 from .peer_service_stub import *
-from .rest_property import *
