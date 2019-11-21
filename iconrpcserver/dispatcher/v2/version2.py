@@ -68,7 +68,7 @@ class Version2Dispatcher:
         return sanic_response.json(response.deserialized(), status=response.http_status, dumps=json.dumps)
 
     @staticmethod
-    async def __relay_icx_transaction(path, message, channel_name, relay_target):
+    async def __relay_icx_transaction(path, message, relay_target):
         if not relay_target:
             response_code = message_code.Response.fail_invalid_peer_target
             return {'response_code': response_code,
@@ -97,7 +97,7 @@ class Version2Dispatcher:
             await channel_tx_creator_stub.async_task().create_icx_tx(kwargs)
 
         if response_code == message_code.Response.fail_no_permission:
-            return await Version2Dispatcher.__relay_icx_transaction(path, kwargs, channel, relay_target)
+            return await Version2Dispatcher.__relay_icx_transaction(path, kwargs, relay_target)
 
         response_data = {'response_code': response_code}
         if response_code != message_code.Response.success:
