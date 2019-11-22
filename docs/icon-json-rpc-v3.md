@@ -1631,17 +1631,19 @@ It is used when depositing ICX in SCORE or withdrawing the deposited ICX, and `d
 }
 ```
 
-## rep_getList
+## rep_getListByHash
 
-* Get all list of Representatives and information about terms & RepRootHash
+* Get all list of Representatives and information by RepsHash
 
 ### Parameters
 
-None
+| KEY       | VALUE type                | Required | Description                     |
+| :-------- | :------------------------ | :------: | :------------------------------ |
+| repsHash   | [T_HASH](#T_HASH)        | required | root hash of representatives
 
 ### Returns
 
-* The list of Representatives of last block
+* The list of Representatives information by repsHash
 
 ### Example
 
@@ -1649,32 +1651,34 @@ None
 // Request
 {
     "jsonrpc" : "2.0",
-    "method": "rep_getList",
-    "id": 1234
+    "method": "rep_getListByHash",
+    "id": 1234,
+    "params": {
+        "repsHash": "0x71303ef8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238"
+    }
 }
 
 // Response - success
 {
     "jsonrpc": "2.0",
-    "result": {
-        "startTermHeight": "0x0",
-        "endTermHeight": "0x0",
-        "repHash": "0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238",
-        "rep": [
-            {
-                "id": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe"
-            },
-            {
-                "id": "hx9f049228bade72bc0a3490061b824f16bbb74589"
-            },
-            {
-                "id": "hx6435405122df9fe5187d659588beccdf7aee8557"
-            },
-            {
-                "id": "hx475bfec4178f3abc88c959faa2e6384e6b409c8f"
-            }
-        ]
-    },
+    "result": [
+        {
+            "address": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe",
+            "p2pEndpoint": "127.0.0.1:7100"
+        },
+        {
+            "address": "hx9f049228bade72bc0a3490061b824f16bbb74589",
+            "p2pEndpoint": "127.0.0.1:7200"
+        },
+        {
+            "address": "hx6435405122df9fe5187d659588beccdf7aee8557",
+            "p2pEndpoint": "127.0.0.1:7300"
+        },
+        {
+            "address": "hx475bfec4178f3abc88c959faa2e6384e6b409c8f",
+            "p2pEndpoint": "127.0.0.1:7400"
+        }
+    ],
     "id": 1234
 }
 ```
