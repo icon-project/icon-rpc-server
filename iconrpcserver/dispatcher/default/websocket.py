@@ -143,8 +143,8 @@ class WSDispatcher:
                 )
                 new_block: dict = json.loads(new_block_dumped)
 
-                if "error" in new_block_dumped:
-                    Logger.error(f"announce_new_block error: {new_block_dumped}, to citizen({peer_id})")
+                if "error" in new_block:
+                    Logger.error(f"announce_new_block error: {new_block}, to citizen({peer_id})")
                     break
 
                 confirm_info = confirm_info_bytes.decode('utf-8')
