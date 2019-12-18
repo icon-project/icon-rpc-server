@@ -16,7 +16,6 @@
 import _ssl
 import ssl
 from http import HTTPStatus
-from urllib.parse import urlparse
 
 from iconcommons.icon_config import IconConfig
 from iconcommons.logger import Logger
@@ -26,7 +25,6 @@ from sanic.views import HTTPMethodView
 from sanic_cors import CORS
 
 from .peer_service_stub import PeerServiceStub
-from .rest_property import RestProperty
 from ..components import SingletonMetaClass
 from ..default_conf.icon_rpcserver_constant import ConfigKey, SSLAuthType
 from ..dispatcher.default import NodeDispatcher, WSDispatcher
@@ -123,13 +121,7 @@ class ServerComponents(metaclass=SingletonMetaClass):
                     await StubCollection().create_channel_tx_creator_stub(channel_name)
                     await StubCollection().create_icon_score_stub(channel_name)
 
-                    relay_target = StubCollection().conf.get(ConfigKey.RELAY_TARGET, None)
-                    relay_target = \
-                        urlparse(relay_target).netloc if urlparse(relay_target).scheme else relay_target
-                    RestProperty().relay_target[channel_name] = relay_target
-
-            Logger.debug(f'rest_server:initialize complete. '
-                         f'relay_target({RestProperty().relay_target})')
+            Logger.debug(f'rest_server:initialize complete.')
 
     def serve(self, api_port):
         self.ready()
