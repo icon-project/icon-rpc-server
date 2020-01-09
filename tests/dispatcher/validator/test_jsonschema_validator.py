@@ -19,7 +19,8 @@ from typing import Union
 
 from iconrpcserver.dispatcher import GenericJsonRpcServerError
 from iconrpcserver.dispatcher import validate_jsonschema_v2, validate_jsonschema_v3
-from tests import create_address, create_tx_hash
+from iconrpcserver.dispatcher.default.schema import validate_jsonschema_node
+from tests.dispatcher.validator import create_address, create_tx_hash
 
 
 class TestJsonschemaValidator(unittest.TestCase):
@@ -707,6 +708,62 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
         for case in case_list:
             if func(case[0]) != case[1]:
                 self.fail(f'error case : [{func.__name__}] {case[2]}')
+
+
+class TestJsonschemValidatorNode(TestJsonschemaValidator):
+    def setUp(self):
+        self.validator = validate_jsonschema_node
+
+        self.node_getChannelInfos = {
+            "jsonrpc": "2.0",
+            "id": 1234,
+            "method": "node_getChannelInfos"
+        }
+        self.node_getBlockByHeight = {
+            "jsonrpc": "2.0",
+            "method": "node_getBlockByHeight",
+            "id": 1234,
+            "params": {
+                "channel": "icon_dex",
+                "height": "50000"
+            }
+        }
+        self.node_getCitizens = {
+            "jsonrpc": "2.0",
+            "id": 1234,
+            "method": "node_getCitizens"
+        }
+
+    def test_node_getChannelInfos(self):
+        full_data = self.node_getChannelInfos
+
+        # check default function
+        self.check_valid(full_data=full_data)
+
+        # check required key validation
+        required_keys = ["jsonrpc", "method", "id"]
+        self.check_more(full_data=full_data, data=full_data, required_keys=required_keys)
+
+    def test_node_getBlockByHeight(self):
+        full_data = self.node_getBlockByHeight
+
+        # check required key validation
+        self.check_valid(full_data=full_data)
+
+        # check full_data['params']
+        params = full_data['params']
+        required_keys = ["height"]
+        self.check_more(full_data=full_data, data=params, required_keys=required_keys)
+
+    def test_node_getCitizens(self):
+        full_data = self.node_getCitizens
+
+        # check default function
+        self.check_valid(full_data=full_data)
+
+        # check required key validation
+        required_keys = ["jsonrpc", "method", "id"]
+        self.check_more(full_data=full_data, data=full_data, required_keys=required_keys)
 
 
 if __name__ == "__main__":
