@@ -46,6 +46,10 @@ class ChannelInnerTask:
         pass
 
     @message_queue_task
+    def try_block_sync(self, subscriber_block_height: int):
+        pass
+
+    @message_queue_task
     async def get_tx_proof(self, tx_hash: str) -> list:
         pass
 
