@@ -18,7 +18,8 @@ import unittest
 from typing import Union
 
 from iconrpcserver.dispatcher import GenericJsonRpcServerError
-from iconrpcserver.dispatcher import validate_jsonschema_v2, validate_jsonschema_v3
+from iconrpcserver.dispatcher.v2.schema import validate_jsonschema_v2
+from iconrpcserver.dispatcher.v3.schema import validate_jsonschema_v3
 from iconrpcserver.dispatcher.default.schema import validate_jsonschema_node
 from tests.dispatcher.validator import create_address, create_tx_hash
 
