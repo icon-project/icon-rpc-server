@@ -487,4 +487,4 @@ SCHEMA_V3: dict = {
     "rep_getListByHash": rep_getListByHash,
 }
 
-validate_jsonschema_v3 = partial(validate_jsonschema, schema=SCHEMA_V3)
+validate_jsonschema_v3 = partial(validate_jsonschema, schemas=SCHEMA_V3)

@@ -74,4 +74,4 @@ SCHEMA_V3_DEBUG: dict = {
     "debug_estimateStep": debug_estimateStep_v3
 }
 
-validate_jsonschema_v3d = partial(validate_jsonschema, schema=SCHEMA_V3_DEBUG)
+validate_jsonschema_v3d = partial(validate_jsonschema, schemas=SCHEMA_V3_DEBUG)

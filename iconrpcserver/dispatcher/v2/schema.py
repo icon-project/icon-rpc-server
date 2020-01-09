@@ -194,4 +194,4 @@ SCHEMA_V2: dict = {
     "icx_getTransactionByAddress": icx_getTransactionByAddress
 }
 
-validate_jsonschema_v2 = partial(validate_jsonschema, schema=SCHEMA_V2)
+validate_jsonschema_v2 = partial(validate_jsonschema, schemas=SCHEMA_V2)

@@ -70,4 +70,4 @@ SCHEMA_NODE: dict = {
     "node_getCitizens": node_getCitizens
 }
 
-validate_jsonschema_node = partial(validate_jsonschema, schema=SCHEMA_NODE)
+validate_jsonschema_node = partial(validate_jsonschema, schemas=SCHEMA_NODE)
