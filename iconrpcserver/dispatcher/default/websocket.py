@@ -77,6 +77,8 @@ class WSDispatcher:
             "ws": ws,
             "remote_target": f"{ip}:{request.port}"
         }
+        Logger.debug(f"Websocket request from: {context['remote_target']}")
+
         await ws_methods.dispatch(ws_request, context=context)
 
     @staticmethod
@@ -106,6 +108,8 @@ class WSDispatcher:
             except Exception as e:
                 pass
 
+        Logger.info(f"Connection closed: {peer_id}, {ws.remote_address}")
+
     @staticmethod
     async def publish_heartbeat(ws):
         call_method = WSDispatcher.PUBLISH_HEARTBEAT
@@ -115,7 +119,7 @@ class WSDispatcher:
                 heartbeat_time = StubCollection().conf[ConfigKey.WS_HEARTBEAT_TIME]
                 await asyncio.sleep(heartbeat_time)
         except exceptions.ConnectionClosed:
-            Logger.debug("Connection Closed by child.")  # TODO: Useful message needed.
+            Logger.debug(f"Connection already closed by child: {ws.remote_address}")
         except Exception as e:
             traceback.print_exc()  # TODO: Keep this tb?
             await WSDispatcher.send_exception(
@@ -135,8 +139,10 @@ class WSDispatcher:
     async def publish_new_block(ws, channel_name, height, peer_id):
         call_method = WSDispatcher.PUBLISH_NEW_BLOCK
         channel_stub = get_channel_stub_by_channel_name(channel_name)
+        Logger.debug(f"Try to publish new block - channel: {channel_name}")
         try:
             while True:
+                Logger.debug(f"Publish new block (height: {height})")
                 new_block_dumped, confirm_info_bytes = await channel_stub.async_task().announce_new_block(
                     subscriber_block_height=height,
                     subscriber_id=peer_id
@@ -149,12 +155,11 @@ class WSDispatcher:
 
                 confirm_info = confirm_info_bytes.decode('utf-8')
                 request = Request(call_method, block=new_block, confirm_info=confirm_info)
-                Logger.debug(f"{call_method}: {request}")
 
                 await ws.send(json.dumps(request))
                 height += 1
         except exceptions.ConnectionClosed:
-            Logger.debug("Connection Closed by child.")  # TODO: Useful message needed.
+            Logger.debug(f"Connection already closed by child: {ws.remote_address}")
         except Exception as e:
             traceback.print_exc()  # TODO: Keep this tb?
             await WSDispatcher.send_exception(
@@ -169,10 +174,12 @@ class WSDispatcher:
         if force:  # unregister due to subscribe limit
             signal = True
             error_code = message_code.Response.fail_subscribe_limit
+            Logger.info("Notify citizen to be unregistered: SUBSCRIBE_LIMIT.")
         else:
             channel_stub = get_channel_stub_by_channel_name(channel_name)
             signal = await channel_stub.async_task().wait_for_unregister_signal(peer_id)
             error_code = message_code.Response.fail_connect_to_leader
+            Logger.info("Notify citizen to be unregistered: CONNECT_TO_LEADER.")
         if signal:
             await WSDispatcher.send_exception(
                 ws, call_method,
@@ -181,5 +188,6 @@ class WSDispatcher:
 
     @staticmethod
     async def send_exception(ws, method, exception, error_code):
+        Logger.info(f"Request child to close connection: {ws.remote_address}")
         request = Request(method, error=str(exception), code=error_code)
         await ws.send(json.dumps(request))
