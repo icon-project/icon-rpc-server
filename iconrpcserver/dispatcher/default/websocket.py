@@ -77,6 +77,8 @@ class WSDispatcher:
             "ws": ws,
             "remote_target": f"{ip}:{request.port}"
         }
+        Logger.debug(f"Websocket request from: {context['remote_target']}")
+
         await ws_methods.dispatch(ws_request, context=context)
 
     @staticmethod
@@ -104,6 +106,7 @@ class WSDispatcher:
             try:
                 await asyncio.wait(futures, return_when=asyncio.FIRST_EXCEPTION)
             except Exception as e:
+                Logger.info("")
                 pass
 
     @staticmethod
@@ -165,6 +168,7 @@ class WSDispatcher:
 
     @staticmethod
     async def publish_unregister(ws, channel_name, peer_id, force: bool = False):
+        Logger.info("Notify citizen to be unregistered.")
         call_method = WSDispatcher.PUBLISH_HEARTBEAT
         if force:  # unregister due to subscribe limit
             signal = True
