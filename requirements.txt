@@ -14,5 +14,4 @@ earlgrey>=0.0.4
 iconcommons>=1.0.5
 pytest
 pytest-asyncio
-asyncmock
-pytest-mock
+mock

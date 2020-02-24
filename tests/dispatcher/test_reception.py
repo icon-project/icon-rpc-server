@@ -1,5 +1,5 @@
 import pytest
-from asyncmock import AsyncMock
+from mock.mock import AsyncMock
 
 from iconrpcserver.dispatcher.default.websocket import Reception
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
