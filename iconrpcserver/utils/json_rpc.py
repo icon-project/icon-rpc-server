@@ -19,7 +19,7 @@ import aiohttp
 import async_timeout
 from iconcommons.logger import Logger
 from jsonrpcclient import exceptions
-from jsonrpcclient.aiohttp_client import AsyncClient
+from jsonrpcclient.async_client import AsyncClient
 from jsonrpcserver import status
 
 from ..dispatcher import GenericJsonRpcServerError, JsonError
