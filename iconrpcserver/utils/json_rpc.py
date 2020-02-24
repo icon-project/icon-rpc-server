@@ -31,9 +31,9 @@ from ..utils.message_queue.stub_collection import StubCollection
 
 
 class CustomAiohttpClient(AsyncClient):
-    def __init__(self, session, endpoint):
+    def __init__(self, session: aiohttp.ClientSession, endpoint):
         super(CustomAiohttpClient, self).__init__(endpoint)
-        self.session = session
+        self.session: aiohttp.ClientSession = session
 
     async def send_message(self, request):
         with async_timeout.timeout(10):
