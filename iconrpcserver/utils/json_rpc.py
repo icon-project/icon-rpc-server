@@ -18,7 +18,7 @@ import logging
 import aiohttp
 import async_timeout
 from iconcommons.logger import Logger
-from jsonrpcclient import exceptions, config
+from jsonrpcclient import exceptions
 from jsonrpcclient.aiohttp_client import AsyncClient
 from jsonrpcserver import status
 
@@ -59,7 +59,7 @@ class CustomAiohttpClient(AsyncClient):
                     raise exceptions.ParseResponseError()
             # Validate the response against the Response schema (raises
             # jsonschema.ValidationError if invalid)
-            if config.validate:
+            if self.validate_against_schema:
                 self.validator.validate(response)
             if isinstance(response, list):
                 # Batch request - just return the whole response
