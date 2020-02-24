@@ -20,7 +20,6 @@ from iconcommons.logger import Logger
 from jsonrpcclient import exceptions, config
 from jsonrpcclient.aiohttp_client import AsyncClient, async_timeout
 from jsonrpcserver import status
-from past.builtins import basestring
 
 from ..dispatcher import GenericJsonRpcServerError, JsonError
 from ..default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion
@@ -52,7 +51,7 @@ class CustomAiohttpClient(AsyncClient):
             # Log the response before processing it
             self.log_response(response, log_extra, log_format)
             # If it's a json string, parse to object
-            if isinstance(response, basestring):
+            if isinstance(response, str) or isinstance(response, bytes):
                 try:
                     response = json.loads(response)
                 except ValueError:
