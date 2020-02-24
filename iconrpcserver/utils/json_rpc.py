@@ -56,7 +56,8 @@ class CustomAiohttpClient(AsyncClient):
                 try:
                     response = json.loads(response)
                 except ValueError:
-                    raise exceptions.ParseResponseError()
+                    # FIXME: Tried to ReceivedErrorResponseError, but needs jsonrpcclient.response.ErrorResponse
+                    raise exceptions.JsonRpcClientError()
             # Validate the response against the Response schema (raises
             # jsonschema.ValidationError if invalid)
             if self.validate_against_schema:
