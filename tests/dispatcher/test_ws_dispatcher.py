@@ -1,7 +1,7 @@
 import json
 
 import pytest
-from mock.mock import AsyncMock
+from mock import AsyncMock
 from jsonrpcclient.requests import Request
 
 from iconrpcserver.dispatcher.default.websocket import WSDispatcher

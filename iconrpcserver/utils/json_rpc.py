@@ -52,7 +52,7 @@ class CustomAiohttpClient(AsyncClient):
             # Log the response before processing it
             self.log_response(response, log_extra, log_format)
             # If it's a json string, parse to object
-            if isinstance(response, str) or isinstance(response, bytes):
+            if isinstance(response, (str, bytes)):
                 try:
                     response = json.loads(response)
                 except ValueError:
