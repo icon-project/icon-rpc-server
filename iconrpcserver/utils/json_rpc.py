@@ -16,11 +16,11 @@ import json
 import logging
 
 import aiohttp
+import async_timeout
 from iconcommons.logger import Logger
-from jsonrpcclient import exceptions, config
-from jsonrpcclient.aiohttp_client import AsyncClient, async_timeout
+from jsonrpcclient import exceptions
+from jsonrpcclient.async_client import AsyncClient
 from jsonrpcserver import status
-from past.builtins import basestring
 
 from ..dispatcher import GenericJsonRpcServerError, JsonError
 from ..default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion
@@ -31,9 +31,9 @@ from ..utils.message_queue.stub_collection import StubCollection
 
 
 class CustomAiohttpClient(AsyncClient):
-    def __init__(self, session, endpoint):
+    def __init__(self, session: aiohttp.ClientSession, endpoint):
         super(CustomAiohttpClient, self).__init__(endpoint)
-        self.session = session
+        self.session: aiohttp.ClientSession = session
 
     async def send_message(self, request):
         with async_timeout.timeout(10):
@@ -52,14 +52,15 @@ class CustomAiohttpClient(AsyncClient):
             # Log the response before processing it
             self.log_response(response, log_extra, log_format)
             # If it's a json string, parse to object
-            if isinstance(response, basestring):
+            if isinstance(response, (str, bytes)):
                 try:
                     response = json.loads(response)
                 except ValueError:
-                    raise exceptions.ParseResponseError()
+                    # FIXME: Tried to ReceivedErrorResponseError, but needs jsonrpcclient.response.ErrorResponse
+                    raise exceptions.JsonRpcClientError()
             # Validate the response against the Response schema (raises
             # jsonschema.ValidationError if invalid)
-            if config.validate:
+            if self.validate_against_schema:
                 self.validator.validate(response)
             if isinstance(response, list):
                 # Batch request - just return the whole response

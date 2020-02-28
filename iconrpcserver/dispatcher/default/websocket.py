@@ -17,7 +17,7 @@ import json
 import traceback
 
 from iconcommons.logger import Logger
-from jsonrpcclient.request import Request
+from jsonrpcclient.requests import Request
 from jsonrpcserver.aio import AsyncMethods
 from websockets import exceptions
 

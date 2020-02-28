@@ -11,11 +11,13 @@ branches:
   - travis-test
 
 install:
+  - virtualenv venv
+  - source venv/bin/activate
   - pip install -r requirements.txt
   - make generate-proto
 
 script:
-  - python setup.py test
+  - python -m pytest -rsxX
 
 deploy:
   provider: pypi
