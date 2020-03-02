@@ -21,9 +21,10 @@ from iconcommons.logger import Logger
 from jsonrpcclient import exceptions
 from jsonrpcclient.async_client import AsyncClient
 from jsonrpcserver import status
+from jsonrpcserver.response import Response
 
-from ..dispatcher import GenericJsonRpcServerError, JsonError
 from ..default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion
+from ..dispatcher import GenericJsonRpcServerError, JsonError
 from ..protos import message_code
 from ..utils.icon_service.converter import convert_params
 from ..utils.icon_service.templates import ResponseParamType
@@ -94,7 +95,8 @@ async def relay_tx_request(protocol, message, relay_target, path, version=ApiVer
                     f"relay_target[{relay_target}], "
                     f"version[{version}], "
                     f"method[{method_name}]")
-        result = await CustomAiohttpClient(session, relay_uri).request(method_name, message)
+        result: Response = await CustomAiohttpClient(session, relay_uri).request(method_name, message)
+        result = result.data.result
         Logger.debug(f"relay_tx_request result[{result}]")
 
     return result
