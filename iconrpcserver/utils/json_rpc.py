@@ -16,14 +16,13 @@ import json
 import logging
 
 import aiohttp
-import async_timeout
 from iconcommons.logger import Logger
 from jsonrpcclient import exceptions
 from jsonrpcclient.clients.aiohttp_client import AiohttpClient
 from jsonrpcserver import status
 
-from ..dispatcher import GenericJsonRpcServerError, JsonError
 from ..default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion
+from ..dispatcher import GenericJsonRpcServerError, JsonError
 from ..protos import message_code
 from ..utils.icon_service.converter import convert_params
 from ..utils.icon_service.templates import ResponseParamType
