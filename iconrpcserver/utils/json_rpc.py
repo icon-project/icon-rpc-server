@@ -20,6 +20,7 @@ import async_timeout
 from iconcommons.logger import Logger
 from jsonrpcclient import exceptions
 from jsonrpcclient.async_client import AsyncClient
+from jsonrpcclient.response import Response
 from jsonrpcserver import status
 
 from ..dispatcher import GenericJsonRpcServerError, JsonError
@@ -94,7 +95,8 @@ async def relay_tx_request(protocol, message, relay_target, path, version=ApiVer
                     f"relay_target[{relay_target}], "
                     f"version[{version}], "
                     f"method[{method_name}]")
-        result = await CustomAiohttpClient(session, relay_uri).request(method_name, message)
+        result: Response = await CustomAiohttpClient(session, relay_uri).request(method_name, message)
+        result = result.data.result
         Logger.debug(f"relay_tx_request result[{result}]")
 
     return result
