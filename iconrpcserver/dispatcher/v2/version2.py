@@ -19,7 +19,8 @@ from urllib.parse import urlparse
 
 from iconcommons.logger import Logger
 from jsonrpcserver import config
-from jsonrpcserver.aio import AsyncMethods
+from jsonrpcserver import async_dispatch
+from jsonrpcserver.methods import Methods
 from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
@@ -36,7 +37,7 @@ from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 config.log_requests = False
 config.log_responses = False
 
-methods = AsyncMethods()
+methods = Methods()
 
 
 class Version2Dispatcher:
@@ -62,7 +63,7 @@ class Version2Dispatcher:
         except GenericJsonRpcServerError as e:
             response = ExceptionResponse(e, request_id=req.get('id', 0))
         else:
-            response = await methods.dispatch(req, context=context)
+            response = await async_dispatch(req, methods, context=context)
         Logger.info(f'rest_server_v2 response with {response}', DISPATCH_V2_TAG)
         return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
 

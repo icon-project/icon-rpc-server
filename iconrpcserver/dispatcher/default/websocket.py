@@ -18,7 +18,8 @@ import traceback
 
 from iconcommons.logger import Logger
 from jsonrpcclient.requests import Request
-from jsonrpcserver.aio import AsyncMethods
+from jsonrpcserver import async_dispatch
+from jsonrpcserver.methods import Methods
 from websockets import exceptions
 
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
@@ -27,7 +28,7 @@ from iconrpcserver.utils import get_now_timestamp
 from iconrpcserver.utils.json_rpc import get_channel_stub_by_channel_name
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
-ws_methods = AsyncMethods()
+ws_methods = Methods()
 
 
 class Reception:
@@ -77,7 +78,7 @@ class WSDispatcher:
             "ws": ws,
             "remote_target": f"{ip}:{request.port}"
         }
-        await ws_methods.dispatch(ws_request, context=context)
+        await async_dispatch(ws_request, ws_methods, context=context)
 
     @staticmethod
     @ws_methods.add

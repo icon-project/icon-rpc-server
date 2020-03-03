@@ -16,7 +16,8 @@ import json
 from typing import Dict, List
 
 from iconcommons.logger import Logger
-from jsonrpcserver.aio import AsyncMethods
+from jsonrpcserver import async_dispatch
+from jsonrpcserver.methods import Methods
 from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
@@ -28,8 +29,7 @@ from iconrpcserver.utils.icon_service.converter import convert_params
 from iconrpcserver.utils.json_rpc import get_block_by_params, get_channel_stub_by_channel_name
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
-methods = AsyncMethods()
-ws_methods = AsyncMethods()
+methods = Methods()
 
 
 class NodeDispatcher:
@@ -59,7 +59,7 @@ class NodeDispatcher:
         except Exception as e:
             response = ExceptionResponse(e, request_id=req_json.get('id', 0))
         else:
-            response = await methods.dispatch(req_json, context=context)
+            response = await async_dispatch(req_json, methods, context=context)
         Logger.info(f'rest_server_node with response {response}', DISPATCH_NODE_TAG)
         return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
 
