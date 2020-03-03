@@ -21,14 +21,10 @@ from iconrpcserver.default_conf.icon_rpcserver_constant import DISPATCH_V3_TAG
 from iconrpcserver.dispatcher import GenericJsonRpcServerError
 from iconrpcserver.dispatcher import validate_jsonschema_v3
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
-from jsonrpcserver import config
 from jsonrpcserver import async_dispatch
 from jsonrpcserver.methods import Methods
 from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
-
-config.log_requests = False
-config.log_responses = False
 
 methods = Methods()
 

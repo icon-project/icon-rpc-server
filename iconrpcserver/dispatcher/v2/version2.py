@@ -18,7 +18,6 @@ import re
 from urllib.parse import urlparse
 
 from iconcommons.logger import Logger
-from jsonrpcserver import config
 from jsonrpcserver import async_dispatch
 from jsonrpcserver.methods import Methods
 from jsonrpcserver.response import ExceptionResponse
@@ -33,9 +32,6 @@ from iconrpcserver.utils.icon_service import response_to_json_query, RequestPara
 from iconrpcserver.utils.icon_service.converter import make_request
 from iconrpcserver.utils.json_rpc import relay_tx_request, get_block_v2_by_params
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
-
-config.log_requests = False
-config.log_responses = False
 
 methods = Methods()
 
