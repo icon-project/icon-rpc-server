@@ -16,10 +16,8 @@ import json
 import logging
 
 import aiohttp
-import async_timeout
 from iconcommons.logger import Logger
-from jsonrpcclient import exceptions
-from jsonrpcclient.async_client import AsyncClient
+from jsonrpcclient.clients.aiohttp_client import AiohttpClient
 from jsonrpcserver import status
 from jsonrpcserver.response import Response
 
@@ -31,56 +29,7 @@ from ..utils.icon_service.templates import ResponseParamType
 from ..utils.message_queue.stub_collection import StubCollection
 
 
-class CustomAiohttpClient(AsyncClient):
-    def __init__(self, session: aiohttp.ClientSession, endpoint):
-        super(CustomAiohttpClient, self).__init__(endpoint)
-        self.session: aiohttp.ClientSession = session
-
-    async def send_message(self, request):
-        with async_timeout.timeout(10):
-            async with self.session.post(self.endpoint, data=request) as response:
-                response = await response.text()
-                return self.process_response(response)
-
-    def process_response(self, response, log_extra=None, log_format=None):
-        """
-        Process the response and return the 'result' portion if present.
-
-        :param response: The JSON-RPC response string to process.
-        :return: The response string, or None
-        """
-        if response:
-            # Log the response before processing it
-            self.log_response(response, log_extra, log_format)
-            # If it's a json string, parse to object
-            if isinstance(response, (str, bytes)):
-                try:
-                    response = json.loads(response)
-                except ValueError:
-                    # FIXME: Tried to ReceivedErrorResponseError, but needs jsonrpcclient.response.ErrorResponse
-                    raise exceptions.JsonRpcClientError()
-            # Validate the response against the Response schema (raises
-            # jsonschema.ValidationError if invalid)
-            if self.validate_against_schema:
-                self.validator.validate(response)
-            if isinstance(response, list):
-                # Batch request - just return the whole response
-                return response
-            else:
-                # If the response was "error", raise to ensure it's handled
-                if 'error' in response and response['error'] is not None:
-                    raise GenericJsonRpcServerError(
-                        code=JsonError.INVALID_REQUEST,
-                        message=response['error'].get('message'),
-                        http_status=status.HTTP_BAD_REQUEST
-                    )
-                # All was successful, return just the result part
-                return response.get('result')
-        # No response was given
-        return None
-
-
-async def relay_tx_request(protocol, message, relay_target, path, version=ApiVersion.v3.name):
+async def relay_tx_request(protocol, message: dict, relay_target, path, version=ApiVersion.v3.name):
     method_name = "icx_sendTransaction"
 
     # TODO required post review [LC-454]
@@ -95,7 +44,8 @@ async def relay_tx_request(protocol, message, relay_target, path, version=ApiVer
                     f"relay_target[{relay_target}], "
                     f"version[{version}], "
                     f"method[{method_name}]")
-        result: Response = await CustomAiohttpClient(session, relay_uri).request(method_name, message)
+        client = AiohttpClient(session, relay_uri, timeout=10)
+        result: Response = await client.request(method_name, **message)
         result = result.data.result
         Logger.debug(f"relay_tx_request result[{result}]")
 
