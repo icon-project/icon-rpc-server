@@ -18,7 +18,7 @@ from typing import Dict, List
 from iconcommons.logger import Logger
 from jsonrpcserver import async_dispatch
 from jsonrpcserver.methods import Methods
-from jsonrpcserver.response import ExceptionResponse
+from jsonrpcserver.response import DictResponse, ExceptionResponse
 from sanic import response as sanic_response
 
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, DISPATCH_NODE_TAG
@@ -59,9 +59,13 @@ class NodeDispatcher:
         except Exception as e:
             response = ExceptionResponse(e, request_id=req_json.get('id', 0))
         else:
-            response = await async_dispatch(req_json, methods, context=context)
+            if "params" in req_json:
+                req_json["params"]["context"] = context
+            else:
+                req_json["params"] = {"context": context}
+            response: DictResponse = await async_dispatch(json.dumps(req_json), methods)
         Logger.info(f'rest_server_node with response {response}', DISPATCH_NODE_TAG)
-        return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
+        return sanic_response.json(response.deserialized(), status=response.http_status, dumps=json.dumps)
 
     @staticmethod
     @methods.add

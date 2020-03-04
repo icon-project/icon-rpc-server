@@ -23,7 +23,7 @@ from iconrpcserver.dispatcher import validate_jsonschema_v3
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 from jsonrpcserver import async_dispatch
 from jsonrpcserver.methods import Methods
-from jsonrpcserver.response import ExceptionResponse
+from jsonrpcserver.response import DictResponse, ExceptionResponse
 from sanic import response as sanic_response
 
 methods = Methods()
@@ -53,6 +53,10 @@ class Version3Dispatcher:
         except Exception as e:
             response = ExceptionResponse(e, request_id=req_json.get('id', 0))
         else:
-            response = await async_dispatch(req_json, methods, context=context)
+            if "params" in req_json:
+                req_json["params"]["context"] = context
+            else:
+                req_json["params"] = {"context": context}
+            response: DictResponse = await async_dispatch(json.dumps(req_json), methods)
         Logger.info(f'rest_server_v3 with response {response}', DISPATCH_V3_TAG)
-        return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
+        return sanic_response.json(response.deserialized(), status=response.http_status, dumps=json.dumps)

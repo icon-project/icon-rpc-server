@@ -67,7 +67,7 @@ class IcxDispatcher:
         return response_to_json_query(response)
 
     @staticmethod
-    async def __relay_icx_transaction(url, path, message, channel_name, relay_target):
+    async def __relay_icx_transaction(url, path, message: dict, channel_name, relay_target):
         if not relay_target:
             raise GenericJsonRpcServerError(
                 code=JsonError.INTERNAL_ERROR,

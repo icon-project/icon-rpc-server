@@ -20,7 +20,7 @@ from urllib.parse import urlparse
 from iconcommons.logger import Logger
 from jsonrpcserver import async_dispatch
 from jsonrpcserver.methods import Methods
-from jsonrpcserver.response import ExceptionResponse
+from jsonrpcserver.response import DictResponse, ExceptionResponse
 from sanic import response as sanic_response
 
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion, DISPATCH_V2_TAG
@@ -59,9 +59,13 @@ class Version2Dispatcher:
         except GenericJsonRpcServerError as e:
             response = ExceptionResponse(e, request_id=req.get('id', 0))
         else:
-            response = await async_dispatch(req, methods, context=context)
+            if "params" in req:
+                req["params"]["context"] = context
+            else:
+                req["params"] = {"context": context}
+            response: DictResponse = await async_dispatch(json.dumps(req), methods)
         Logger.info(f'rest_server_v2 response with {response}', DISPATCH_V2_TAG)
-        return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
+        return sanic_response.json(response.deserialized(), status=response.http_status, dumps=json.dumps)
 
     @staticmethod
     async def __relay_icx_transaction(url, path, message, channel_name, relay_target):

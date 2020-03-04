@@ -71,19 +71,18 @@ class WSDispatcher:
     @staticmethod
     async def dispatch(request, ws, channel_name=None):
         ip = request.remote_addr or request.ip
-        ws_request = json.loads(await ws.recv())
+        ws_request: dict = json.loads(await ws.recv())
         context = {
             "channel": channel_name,
             "peer_id": ws_request.get("peer_id"),
             "ws": ws,
             "remote_target": f"{ip}:{request.port}"
         }
-        await async_dispatch(ws_request, ws_methods, context=context)
+        await async_dispatch(json.dumps(ws_request), ws_methods, context=context)
 
     @staticmethod
     @ws_methods.add
-    async def node_ws_Subscribe(**kwargs):
-        context = kwargs.pop('context')
+    async def node_ws_Subscribe(context, **kwargs):
         channel_name = context["channel"]
         ws = context["ws"]
         remote_target = context['remote_target']
