@@ -57,7 +57,7 @@ class Version2Dispatcher:
 
             validate_jsonschema_v2(request=req)
         except GenericJsonRpcServerError as e:
-            response = ExceptionResponse(e, request_id=req.get('id', 0))
+            response = ExceptionResponse(e, id=req.get('id', 0), debug=False)
         else:
             if "params" in req:
                 req["params"]["context"] = context

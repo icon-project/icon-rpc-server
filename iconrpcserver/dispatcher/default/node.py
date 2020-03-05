@@ -55,9 +55,9 @@ class NodeDispatcher:
 
             validate_jsonschema_node(request=req_json)
         except GenericJsonRpcServerError as e:
-            response = ExceptionResponse(e, request_id=req_json.get('id', 0))
+            response = ExceptionResponse(e, id=req_json.get('id', 0), debug=False)
         except Exception as e:
-            response = ExceptionResponse(e, request_id=req_json.get('id', 0))
+            response = ExceptionResponse(e, id=req_json.get('id', 0), debug=False)
         else:
             if "params" in req_json:
                 req_json["params"]["context"] = context
