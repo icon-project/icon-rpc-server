@@ -19,7 +19,6 @@ import sys
 import gunicorn
 import gunicorn.app.base
 from earlgrey import asyncio, aio_pika
-from gunicorn.six import iteritems
 from iconcommons.icon_config import IconConfig
 from iconcommons.logger import Logger
 
@@ -44,15 +43,10 @@ class StandaloneApplication(gunicorn.app.base.BaseApplication):
         self.application = app
         super(StandaloneApplication, self).__init__()
 
-        # FIXME : below is temporary patch for snap packaging
-        from gunicorn.workers import base
-        from iconrpcserver.utils import gunicorn_patch
-        base.WorkerTmp.__init__ = gunicorn_patch.__worker_tmp_init__
-
     def load_config(self):
-        config = dict([(key, value) for key, value in iteritems(self.options)
-                       if key in self.cfg.settings and value is not None])
-        for key, value in iteritems(config):
+        config = {key: value for key, value in self.options.items()
+                  if key in self.cfg.settings and value is not None}
+        for key, value in config.items():
             self.cfg.set(key.lower(), value)
 
     def load(self):
