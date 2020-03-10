@@ -18,7 +18,8 @@ import traceback
 
 from iconcommons.logger import Logger
 from jsonrpcclient.requests import Request
-from jsonrpcserver.aio import AsyncMethods
+from jsonrpcserver import async_dispatch
+from jsonrpcserver.methods import Methods
 from websockets import exceptions
 
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
@@ -27,7 +28,7 @@ from iconrpcserver.utils import get_now_timestamp
 from iconrpcserver.utils.json_rpc import get_channel_stub_by_channel_name
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
-ws_methods = AsyncMethods()
+ws_methods = Methods()
 
 
 class Reception:
@@ -70,19 +71,18 @@ class WSDispatcher:
     @staticmethod
     async def dispatch(request, ws, channel_name=None):
         ip = request.remote_addr or request.ip
-        ws_request = json.loads(await ws.recv())
+        ws_request: dict = json.loads(await ws.recv())
         context = {
             "channel": channel_name,
             "peer_id": ws_request.get("peer_id"),
             "ws": ws,
             "remote_target": f"{ip}:{request.port}"
         }
-        await ws_methods.dispatch(ws_request, context=context)
+        await async_dispatch(json.dumps(ws_request), ws_methods, context=context)
 
     @staticmethod
     @ws_methods.add
-    async def node_ws_Subscribe(**kwargs):
-        context = kwargs.pop('context')
+    async def node_ws_Subscribe(context, **kwargs):
         channel_name = context["channel"]
         ws = context["ws"]
         remote_target = context['remote_target']

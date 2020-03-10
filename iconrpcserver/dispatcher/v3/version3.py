@@ -21,15 +21,12 @@ from iconrpcserver.default_conf.icon_rpcserver_constant import DISPATCH_V3_TAG
 from iconrpcserver.dispatcher import GenericJsonRpcServerError
 from iconrpcserver.dispatcher import validate_jsonschema_v3
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
-from jsonrpcserver import config
-from jsonrpcserver.aio import AsyncMethods
-from jsonrpcserver.response import ExceptionResponse
+from jsonrpcserver import async_dispatch
+from jsonrpcserver.methods import Methods
+from jsonrpcserver.response import DictResponse, ExceptionResponse
 from sanic import response as sanic_response
 
-config.log_requests = False
-config.log_responses = False
-
-methods = AsyncMethods()
+methods = Methods()
 
 
 class Version3Dispatcher:
@@ -52,10 +49,14 @@ class Version3Dispatcher:
 
             validate_jsonschema_v3(request=req_json)
         except GenericJsonRpcServerError as e:
-            response = ExceptionResponse(e, request_id=req_json.get('id', 0))
+            response = ExceptionResponse(e, id=req_json.get('id', 0), debug=False)
         except Exception as e:
-            response = ExceptionResponse(e, request_id=req_json.get('id', 0))
+            response = ExceptionResponse(e, id=req_json.get('id', 0), debug=False)
         else:
-            response = await methods.dispatch(req_json, context=context)
+            if "params" in req_json:
+                req_json["params"]["context"] = context
+            else:
+                req_json["params"] = {"context": context}
+            response: DictResponse = await async_dispatch(json.dumps(req_json), methods)
         Logger.info(f'rest_server_v3 with response {response}', DISPATCH_V3_TAG)
-        return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
+        return sanic_response.json(response.deserialized(), status=response.http_status, dumps=json.dumps)
