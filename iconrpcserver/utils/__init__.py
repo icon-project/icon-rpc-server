@@ -63,7 +63,3 @@ def convert_upper_camel_method_to_lower_camel(method_name: str) -> str:
 
 def get_now_timestamp():
     return hex(int(time.time() * 1_000_000))
-
-
-def get_protocol_from_uri(uri: str) -> str:
-    return urlsplit(uri).scheme
