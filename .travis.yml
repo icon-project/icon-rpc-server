@@ -14,7 +14,6 @@ install:
   - virtualenv venv
   - source venv/bin/activate
   - pip install -r requirements.txt
-  - make generate-proto
 
 script:
   - python -m pytest -rsxX

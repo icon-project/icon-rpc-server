@@ -82,6 +82,10 @@ class ChannelInnerTask:
         pass
 
     @message_queue_task
+    async def get_status(self) -> dict:
+        pass
+
+    @message_queue_task
     async def wait_for_unregister_signal(self, subscriber_id: str):
         pass
 

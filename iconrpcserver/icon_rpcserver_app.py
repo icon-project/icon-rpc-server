@@ -25,7 +25,6 @@ from iconcommons.logger import Logger
 from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
 from iconrpcserver.icon_rpcserver_cli import ICON_RPCSERVER_CLI, ExitCode
-from iconrpcserver.server.peer_service_stub import PeerServiceStub
 from iconrpcserver.server.rest_server import ServerComponents
 from iconrpcserver.utils import camel_to_upper_snake
 
@@ -121,15 +120,6 @@ async def _check_rabbitmq(amqp_target: str):
 async def _run(conf: 'IconConfig'):
     Logger.print_config(conf, ICON_RPCSERVER_CLI)
 
-    # Connect gRPC stub.
-    PeerServiceStub().conf = conf
-    PeerServiceStub().rest_grpc_timeout = \
-        conf[ConfigKey.GRPC_TIMEOUT] + conf[ConfigKey.REST_ADDITIONAL_TIMEOUT]
-    PeerServiceStub().rest_score_query_timeout = \
-        conf[ConfigKey.SCORE_QUERY_TIMEOUT] + conf[ConfigKey.REST_ADDITIONAL_TIMEOUT]
-    PeerServiceStub().set_stub_port(int(conf[ConfigKey.PORT]) -
-                                    int(conf[ConfigKey.PORT_DIFF_REST_SERVICE_CONTAINER]),
-                                    conf[ConfigKey.IP_LOCAL])
     ServerComponents.conf = conf
     ServerComponents().set_resource()
 
