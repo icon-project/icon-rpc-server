@@ -21,9 +21,9 @@ from jsonrpcclient import exceptions
 from jsonrpcclient.clients.aiohttp_client import AiohttpClient
 from jsonrpcserver import status
 
+from . import message_code
 from ..default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion
 from ..dispatcher import GenericJsonRpcServerError, JsonError
-from ..protos import message_code
 from ..utils.icon_service.converter import convert_params
 from ..utils.icon_service.templates import ResponseParamType
 from ..utils.message_queue.stub_collection import StubCollection

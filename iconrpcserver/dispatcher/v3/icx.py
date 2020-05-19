@@ -19,10 +19,9 @@ from urllib.parse import urlparse
 from iconcommons.logger import Logger
 from jsonrpcserver import status
 
-from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
 from iconrpcserver.dispatcher import GenericJsonRpcServerError, JsonError
 from iconrpcserver.dispatcher.v3 import methods
-from iconrpcserver.protos import message_code
+from iconrpcserver.utils import message_code
 from iconrpcserver.utils.icon_service import (response_to_json_query,
                                               RequestParamType, ResponseParamType)
 from iconrpcserver.utils.icon_service.converter import convert_params, make_request
