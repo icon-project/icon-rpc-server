@@ -4,9 +4,9 @@ help:
 	@awk '/^##/{c=substr($$0,3);next}c&&/^[[:alpha:]][-_[:alnum:]]+:/{print substr($$1,1,index($$1,":")),c}1{c=0}'\
 	 $(MAKEFILE_LIST) | column -s: -t
 
-## Run unittest
+## Run pytest
 test:
-	@python3 -m unittest discover -v tests/ || exit -1
+	@python3 -m pytest -ra tests/ || exit -1
 
 ## Clean all - clean-build
 clean: clean-build
