@@ -23,8 +23,7 @@ from jsonrpcserver.methods import Methods
 from websockets import exceptions
 
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
-from iconrpcserver.protos import message_code
-from iconrpcserver.utils import get_now_timestamp
+from iconrpcserver.utils import get_now_timestamp, message_code
 from iconrpcserver.utils.json_rpc import get_channel_stub_by_channel_name
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 

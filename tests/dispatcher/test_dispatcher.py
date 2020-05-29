@@ -5,7 +5,7 @@ from mock import MagicMock, AsyncMock
 
 from iconrpcserver.dispatcher.v2 import Version2Dispatcher
 from iconrpcserver.dispatcher.v3.icx import IcxDispatcher
-from iconrpcserver.protos import message_code
+from iconrpcserver.utils import message_code
 from iconrpcserver.utils.json_rpc import relay_tx_request
 from iconrpcserver.utils.message_queue.channel_inner_stub import ChannelTxCreatorInnerStub, ChannelTxCreatorInnerTask
 from iconrpcserver.utils.message_queue.icon_score_inner_stub import IconScoreInnerStub, IconScoreInnerTask
