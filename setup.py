@@ -16,6 +16,9 @@ with open('requirements.txt') as requirements:
         req = line.strip()
         install_requires.append(req)
 
+extras_requires = {
+    'tests': ['pytest~=5.4.2', 'pytest-asyncio~=0.12.0', 'mock~=4.0.1']
+}
 
 setup_options = {
     'name': 'iconrpcserver',
@@ -32,6 +35,7 @@ setup_options = {
     'py_modules': ['iconrpcserver', ''],
     'license': "Apache License 2.0",
     'install_requires': install_requires,
+    'extras_require': extras_requires,
     'test_suite': 'tests',
     'entry_points': {
         'console_scripts': [

@@ -7,16 +7,15 @@ branches:
   - master
   - develop
   - /^release[/-].*$/
-  - /^feature\/.*$/
   - travis-test
 
 install:
   - virtualenv venv
   - source venv/bin/activate
-  - pip install -r requirements.txt
+  - pip install -e .[tests]
 
 script:
-  - python -m pytest -rsxX
+  - python -m pytest -ra
 
 deploy:
   provider: pypi
