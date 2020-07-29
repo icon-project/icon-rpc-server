@@ -1,11 +1,11 @@
 import json
 
 import pytest
-from asyncmock import AsyncMock
-from jsonrpcclient.request import Request
+from mock import AsyncMock
+from jsonrpcclient.requests import Request
 
 from iconrpcserver.dispatcher.default.websocket import WSDispatcher
-from iconrpcserver.protos import message_code
+from iconrpcserver.utils import message_code
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 from .conftest import CHANNEL_STUB_NAME
 

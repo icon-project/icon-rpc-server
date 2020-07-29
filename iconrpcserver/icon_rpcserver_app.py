@@ -19,14 +19,12 @@ import sys
 import gunicorn
 import gunicorn.app.base
 from earlgrey import asyncio, aio_pika
-from gunicorn.six import iteritems
 from iconcommons.icon_config import IconConfig
 from iconcommons.logger import Logger
 
 from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_config
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
 from iconrpcserver.icon_rpcserver_cli import ICON_RPCSERVER_CLI, ExitCode
-from iconrpcserver.server.peer_service_stub import PeerServiceStub
 from iconrpcserver.server.rest_server import ServerComponents
 from iconrpcserver.utils import camel_to_upper_snake
 
@@ -44,15 +42,10 @@ class StandaloneApplication(gunicorn.app.base.BaseApplication):
         self.application = app
         super(StandaloneApplication, self).__init__()
 
-        # FIXME : below is temporary patch for snap packaging
-        from gunicorn.workers import base
-        from iconrpcserver.utils import gunicorn_patch
-        base.WorkerTmp.__init__ = gunicorn_patch.__worker_tmp_init__
-
     def load_config(self):
-        config = dict([(key, value) for key, value in iteritems(self.options)
-                       if key in self.cfg.settings and value is not None])
-        for key, value in iteritems(config):
+        config = {key: value for key, value in self.options.items()
+                  if key in self.cfg.settings and value is not None}
+        for key, value in config.items():
             self.cfg.set(key.lower(), value)
 
     def load(self):
@@ -125,21 +118,8 @@ async def _check_rabbitmq(amqp_target: str):
 
 
 async def _run(conf: 'IconConfig'):
-    redirect_protocol_env = os.getenv(camel_to_upper_snake(ConfigKey.REDIRECT_PROTOCOL))
-    if redirect_protocol_env:
-        conf.update_conf({ConfigKey.REDIRECT_PROTOCOL: redirect_protocol_env})
-
     Logger.print_config(conf, ICON_RPCSERVER_CLI)
 
-    # Connect gRPC stub.
-    PeerServiceStub().conf = conf
-    PeerServiceStub().rest_grpc_timeout = \
-        conf[ConfigKey.GRPC_TIMEOUT] + conf[ConfigKey.REST_ADDITIONAL_TIMEOUT]
-    PeerServiceStub().rest_score_query_timeout = \
-        conf[ConfigKey.SCORE_QUERY_TIMEOUT] + conf[ConfigKey.REST_ADDITIONAL_TIMEOUT]
-    PeerServiceStub().set_stub_port(int(conf[ConfigKey.PORT]) -
-                                    int(conf[ConfigKey.PORT_DIFF_REST_SERVICE_CONTAINER]),
-                                    conf[ConfigKey.IP_LOCAL])
     ServerComponents.conf = conf
     ServerComponents().set_resource()
 

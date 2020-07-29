@@ -24,7 +24,6 @@ from sanic.log import LOGGING_CONFIG_DEFAULTS
 from sanic.views import HTTPMethodView
 from sanic_cors import CORS
 
-from .peer_service_stub import PeerServiceStub
 from ..components import SingletonMetaClass
 from ..default_conf.icon_rpcserver_constant import ConfigKey, SSLAuthType
 from ..dispatcher.default import NodeDispatcher, WSDispatcher
@@ -128,11 +127,20 @@ class ServerComponents(metaclass=SingletonMetaClass):
         self.__app.run(host='0.0.0.0', port=api_port, debug=False, ssl=self.ssl_context)
 
 
+async def get_channel_status(channel_name) -> dict:
+    channel_stub = StubCollection().channel_stubs[channel_name]
+    status_data: dict = await channel_stub.async_task().get_status()
+
+    return status_data
+
+
 class Status(HTTPMethodView):
     async def get(self, request):
         args = request.raw_args
         channel_name = args.get('channel') or ServerComponents.conf.get(ConfigKey.CHANNEL)
-        return response.json(PeerServiceStub().get_status(channel_name))
+        status_data: dict = await get_channel_status(channel_name)
+
+        return response.json(status_data)
 
 
 class Avail(HTTPMethodView):
@@ -140,7 +148,7 @@ class Avail(HTTPMethodView):
         args = request.raw_args
         channel_name = args.get('channel') or ServerComponents.conf.get(ConfigKey.CHANNEL)
         status = HTTPStatus.OK
-        result = PeerServiceStub().get_status(channel_name)
+        result: dict = await get_channel_status(channel_name)
 
         if not result['service_available']:
             status = HTTPStatus.SERVICE_UNAVAILABLE

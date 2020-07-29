@@ -154,7 +154,7 @@ API path : `<scheme>://<host>/api/debug/v3`
 API path : `<scheme>://<host>/api/v3`
 
 * [ise_getStatus](#ise_getstatus)
-* [rep_getList](#rep_getlist)
+* [rep_getListByHash](#rep_getlistbyhash)
 
 # JSON-RPC Methods
 

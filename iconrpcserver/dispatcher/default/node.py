@@ -16,8 +16,9 @@ import json
 from typing import Dict, List
 
 from iconcommons.logger import Logger
-from jsonrpcserver.aio import AsyncMethods
-from jsonrpcserver.response import ExceptionResponse
+from jsonrpcserver import async_dispatch
+from jsonrpcserver.methods import Methods
+from jsonrpcserver.response import DictResponse, ExceptionResponse
 from sanic import response as sanic_response
 
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, DISPATCH_NODE_TAG
@@ -28,8 +29,7 @@ from iconrpcserver.utils.icon_service.converter import convert_params
 from iconrpcserver.utils.json_rpc import get_block_by_params, get_channel_stub_by_channel_name
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
-methods = AsyncMethods()
-ws_methods = AsyncMethods()
+methods = Methods()
 
 
 class NodeDispatcher:
@@ -55,13 +55,17 @@ class NodeDispatcher:
 
             validate_jsonschema_node(request=req_json)
         except GenericJsonRpcServerError as e:
-            response = ExceptionResponse(e, request_id=req_json.get('id', 0))
+            response = ExceptionResponse(e, id=req_json.get('id', 0), debug=False)
         except Exception as e:
-            response = ExceptionResponse(e, request_id=req_json.get('id', 0))
+            response = ExceptionResponse(e, id=req_json.get('id', 0), debug=False)
         else:
-            response = await methods.dispatch(req_json, context=context)
+            if "params" in req_json:
+                req_json["params"]["context"] = context
+            else:
+                req_json["params"] = {"context": context}
+            response: DictResponse = await async_dispatch(json.dumps(req_json), methods)
         Logger.info(f'rest_server_node with response {response}', DISPATCH_NODE_TAG)
-        return sanic_response.json(response, status=response.http_status, dumps=json.dumps)
+        return sanic_response.json(response.deserialized(), status=response.http_status, dumps=json.dumps)
 
     @staticmethod
     @methods.add

@@ -19,11 +19,9 @@ from urllib.parse import urlparse
 from iconcommons.logger import Logger
 from jsonrpcserver import status
 
-from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
 from iconrpcserver.dispatcher import GenericJsonRpcServerError, JsonError
 from iconrpcserver.dispatcher.v3 import methods
-from iconrpcserver.protos import message_code
-from iconrpcserver.utils import get_protocol_from_uri
+from iconrpcserver.utils import message_code
 from iconrpcserver.utils.icon_service import (response_to_json_query,
                                               RequestParamType, ResponseParamType)
 from iconrpcserver.utils.icon_service.converter import convert_params, make_request
@@ -67,7 +65,7 @@ class IcxDispatcher:
         return response_to_json_query(response)
 
     @staticmethod
-    async def __relay_icx_transaction(url, path, message, channel_name, relay_target):
+    async def __relay_icx_transaction(path, message: dict, relay_target):
         if not relay_target:
             raise GenericJsonRpcServerError(
                 code=JsonError.INTERNAL_ERROR,
@@ -75,15 +73,7 @@ class IcxDispatcher:
                 http_status=status.HTTP_INTERNAL_ERROR
             )
 
-        dispatch_protocol = get_protocol_from_uri(url)
-        Logger.debug(f'Dispatch Protocol: {dispatch_protocol}')
-        redirect_protocol = StubCollection().conf.get(ConfigKey.REDIRECT_PROTOCOL)
-        Logger.debug(f'Redirect Protocol: {redirect_protocol}')
-        if redirect_protocol:
-            dispatch_protocol = redirect_protocol
-        Logger.debug(f'Protocol: {dispatch_protocol}')
-
-        return await relay_tx_request(dispatch_protocol, message, relay_target, path=path[1:])
+        return await relay_tx_request(relay_target, message, path=path[1:])
 
     @staticmethod
     @methods.add
@@ -106,7 +96,7 @@ class IcxDispatcher:
             await channel_tx_creator_stub.async_task().create_icx_tx(kwargs)
 
         if response_code == message_code.Response.fail_no_permission:
-            return await IcxDispatcher.__relay_icx_transaction(url, path, kwargs, channel, relay_target)
+            return await IcxDispatcher.__relay_icx_transaction(path, kwargs, relay_target)
 
         if response_code != message_code.Response.success:
             raise GenericJsonRpcServerError(
