@@ -40,6 +40,15 @@ deploy:
       tags: true
       all_branches: true
       condition: $TRAVIS_TAG =~ ^([0-9]+)(\.[0-9]+){1,2}((a|b|rc)+[0-9]*)+(\.?(post|dev)[0-9]*)?
+  - provider: pypi
+    edge: true
+    server: https://test.pypi.org/legacy/
+    distributions: sdist bdist_wheel
+    user: $PYPI_USER
+    password: $PYPI_PW
+    skip_existing: true
+    on:
+      branch: deploy-test
 
 notifications:
   slack:
