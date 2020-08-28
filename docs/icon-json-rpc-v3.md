@@ -178,14 +178,14 @@ Block data (including v0.3)
 ```javascript
 // Request 1 - get last block
 {
-    "jsonrpc" : "2.0",
+    "jsonrpc": "2.0",
     "method": "icx_getBlock",
     "id": 1234
 }
 
 // Request 2 - get block by hash
 {
-    "jsonrpc" : "2.0",
+    "jsonrpc": "2.0",
     "method": "icx_getBlock",
     "id": 1234,
     "params": {
@@ -195,7 +195,7 @@ Block data (including v0.3)
 
 // Request 3 - get block by height
 {
-    "jsonrpc" : "2.0",
+    "jsonrpc": "2.0",
     "method": "icx_getBlock",
     "id": 1234,
     "params": {
@@ -261,7 +261,7 @@ Block data (including v0.3)
 
 // Request (fail if both parameters are in request message.)
 {
-    "jsonrpc" : "2.0",
+    "jsonrpc": "2.0",
     "method": "icx_getBlock",
     "id": 1234,
     "params": {
@@ -965,7 +965,7 @@ Total number of ICX coins issued.
 ```javascript
 // Request
 {
-    "jsonrpc" : "2.0",
+    "jsonrpc": "2.0",
     "method": "icx_getTransactionProof",
     "id": 1234,
     "params": {
@@ -1033,7 +1033,7 @@ Total number of ICX coins issued.
 ```javascript
 // Request
 {
-    "jsonrpc" : "2.0",
+    "jsonrpc": "2.0",
     "method": "icx_getReceiptProof",
     "id": 1234,
     "params": {
@@ -1102,7 +1102,7 @@ Total number of ICX coins issued.
 ```javascript
 // Request
 {
-    "jsonrpc" : "2.0",
+    "jsonrpc": "2.0",
     "method": "icx_proveTransaction",
     "id": 1234,
     "params": {
@@ -1179,7 +1179,7 @@ Total number of ICX coins issued.
 ```javascript
 // Request
 {
-    "jsonrpc" : "2.0",
+    "jsonrpc": "2.0",
     "method": "icx_proveReceipt",
     "id": 1234,
     "params": {
@@ -1650,7 +1650,7 @@ It is used when depositing ICX in SCORE or withdrawing the deposited ICX, and `d
 ```javascript
 // Request
 {
-    "jsonrpc" : "2.0",
+    "jsonrpc": "2.0",
     "method": "rep_getListByHash",
     "id": 1234,
     "params": {

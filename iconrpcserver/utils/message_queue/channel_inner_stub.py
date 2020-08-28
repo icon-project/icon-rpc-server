@@ -23,70 +23,161 @@ if TYPE_CHECKING:
 class ChannelInnerTask:
     @message_queue_task
     async def get_invoke_result(self, tx_hash) -> Tuple[int, str]:
+        """Get invoke result
+
+        :param tx_hash:
+        :return: (response_code, invoke_result)
+        """
         pass
 
     @message_queue_task
     async def get_tx_info(self, tx_hash) -> Tuple[int, dict]:
+        """
+
+        :param tx_hash:
+        :return:
+        """
         pass
 
     @message_queue_task
     async def get_tx_by_address(self, address, index) -> Tuple[list, int]:
+        """
+
+        :param address:
+        :param index:
+        :return:
+        """
         pass
 
     @message_queue_task
     async def get_block_v2(self, block_height, block_hash) -> Tuple[int, str, str]:
+        """
+
+        :param block_height:
+        :param block_hash:
+        :return:
+        """
         pass
 
     @message_queue_task
     async def get_block(self, block_height, block_hash) -> Tuple[int, str, bytes, str]:
+        """
+
+        :param block_height:
+        :param block_hash:
+        :return:
+        """
         pass
 
     @message_queue_task
     async def announce_new_block(self, subscriber_block_height: int, subscriber_id: str) -> Tuple[str, bytes]:
+        """
+
+        :param subscriber_block_height:
+        :param subscriber_id:
+        :return:
+        """
         pass
 
     @message_queue_task
     async def get_tx_proof(self, tx_hash: str) -> list:
+        """
+
+        :param tx_hash:
+        :return:
+        """
         pass
 
     @message_queue_task
     async def get_receipt_proof(self, tx_hash: str) -> list:
+        """
+
+        :param tx_hash:
+        :return:
+        """
         pass
 
     @message_queue_task
     async def prove_tx(self, tx_hash: str, proof: list) -> str:
+        """
+
+        :param tx_hash:
+        :param proof:
+        :return:
+        """
         pass
 
     @message_queue_task
     async def prove_receipt(self, tx_hash: str, proof: list) -> str:
+        """
+
+        :param tx_hash:
+        :param proof:
+        :return:
+        """
         pass
 
     @message_queue_task
     async def get_citizens(self) -> List[Dict[str, str]]:
+        """
+
+        :return:
+        """
         pass
 
     @message_queue_task
     async def register_citizen(self, peer_id, target, connected_time) -> bool:
+        """
+
+        :param peer_id:
+        :param target:
+        :param connected_time:
+        :return:
+        """
         pass
 
     @message_queue_task
     async def unregister_citizen(self, peer_id):
+        """
+
+        :param peer_id:
+        :return:
+        """
         pass
 
     @message_queue_task
     async def is_citizen_registered(self, peer_id) -> bool:
+        """
+
+        :param peer_id:
+        :return:
+        """
         pass
 
     @message_queue_task
     async def get_reps_by_hash(self, reps_hash) -> List[Dict[str, str]]:
+        """
+
+        :param reps_hash:
+        :return:
+        """
         pass
 
     @message_queue_task
     async def get_status(self) -> dict:
+        """
+
+        :return:
+        """
         pass
 
     @message_queue_task
     async def wait_for_unregister_signal(self, subscriber_id: str):
+        """
+
+        :param subscriber_id:
+        :return:
+        """
         pass
 
 

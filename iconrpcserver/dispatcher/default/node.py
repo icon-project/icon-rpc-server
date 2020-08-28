@@ -1,17 +1,3 @@
-# Copyright 2018 ICON Foundation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.'
-
 import json
 from typing import Dict, List
 
@@ -59,24 +45,21 @@ class NodeDispatcher:
         except Exception as e:
             response = ExceptionResponse(e, id=req_json.get('id', 0), debug=False)
         else:
-            if "params" in req_json:
-                req_json["params"]["context"] = context
-            else:
-                req_json["params"] = {"context": context}
-            response: DictResponse = await async_dispatch(json.dumps(req_json), methods)
+            response: DictResponse = await async_dispatch(json.dumps(req_json), methods, context=context)
+
         Logger.info(f'rest_server_node with response {response}', DISPATCH_NODE_TAG)
         return sanic_response.json(response.deserialized(), status=response.http_status, dumps=json.dumps)
 
     @staticmethod
     @methods.add
-    async def node_getChannelInfos(**kwargs):
+    async def node_getChannelInfos(context: Dict[str, str], **kwargs):
         channel_infos = await StubCollection().peer_stub.async_task().get_channel_infos()
         return {"channel_infos": channel_infos}
 
     @staticmethod
     @methods.add
-    async def node_getBlockByHeight(**kwargs):
-        channel = kwargs['context']['channel']
+    async def node_getBlockByHeight(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
         request = convert_params(kwargs, RequestParamType.get_block_by_height)
         block_hash, response = await get_block_by_params(channel_name=channel, block_height=request['height'],
                                                          with_commit_state=True)
@@ -84,8 +67,8 @@ class NodeDispatcher:
 
     @staticmethod
     @methods.add
-    async def node_getCitizens(**kwargs):
-        channel = kwargs['context']['channel']
+    async def node_getCitizens(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
         channel_stub = get_channel_stub_by_channel_name(channel)
         citizens: List[Dict[str, str]] = await channel_stub.async_task().get_citizens()
         return {
