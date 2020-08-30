@@ -386,3 +386,69 @@ class TestVersion3Dispatcher(TestDispatcher):
         # Then response is not error
         for json_data in result_json:
             assert 'error' not in json_data, f"request = {json_request_batch}"
+    async def test_icx_proveReceipt(self, mock_channel, test_cli):
+        # Given I receives icx_proveReceipt request
+        json_request = copy.deepcopy(self.REQUESTS["icx_proveReceipt"])
+        # And the node is a validator
+        mock_channel(response_code=message_code.Response.success)
+
+        # When I call dispatch method
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = await response.json()
+
+        # Then response is not error
+        assert 'error' not in result_json, f"request = {json_request}"
+
+    async def test_icx_proveReceipt_batch(self, mock_channel, test_cli):
+        # Given I receives icx_proveReceipt batch request
+        json_request_batch = copy.deepcopy(self.REQUESTS["icx_proveReceipt_batch"])
+        # And the node is a validator
+        mock_channel(response_code=message_code.Response.success)
+
+        # When I call dispatch method
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = await response.json()
+
+        # Then response is not error
+        for json_data in result_json:
+            assert 'error' not in json_data, f"request = {json_request_batch}"
+
+    async def test_ise_getStatus(self, mock_channel, test_cli):
+        # Given I receives ise_getStatus request
+        json_request = copy.deepcopy(self.REQUESTS["ise_getStatus"])
+        # And the node is a validator
+        mock_channel(response_code=message_code.Response.success)
+
+        # When I call dispatch method
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = await response.json()
+
+        # Then response is not error
+        assert 'error' not in result_json, f"request = {json_request}"
+
+    async def test_rep_getListByHash(self, mock_channel, test_cli):
+        # Given I receives rep_getListByHash request
+        json_request = copy.deepcopy(self.REQUESTS["rep_getListByHash"])
+        # And the node is a validator
+        mock_channel(response_code=message_code.Response.success)
+
+        # When I call dispatch method
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = await response.json()
+
+        # Then response is not error
+        assert 'error' not in result_json, f"request = {json_request}"
+
+    async def test_rep_getListByHash_batch(self, mock_channel, test_cli):
+        # Given I receives rep_getListByHash batch request
+        json_request_batch = copy.deepcopy(self.REQUESTS["rep_getListByHash"])
+        # And the node is a validator
+        mock_channel(response_code=message_code.Response.success)
+
+        # When I call dispatch method
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = await response.json()
+
+        # Then response is not error
+        for json_data in result_json:
+            assert 'error' not in json_data, f"request = {json_request_batch}"

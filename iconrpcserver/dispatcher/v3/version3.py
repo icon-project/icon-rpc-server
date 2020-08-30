@@ -41,7 +41,7 @@ class Version3Dispatcher:
 
             validate_jsonschema_v3(request=req_json)
         except GenericJsonRpcServerError as e:
-            response = ExceptionResponse(e, id=req_json.get('id', 0), debug=False)
+            response = ExceptionResponse(e, id=req_json.get('id', 0), debug=True)
         except Exception as e:
             response = ExceptionResponse(e, id=req_json.get('id', 0), debug=False)
         else:

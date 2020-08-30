@@ -564,6 +564,40 @@ REQUESTS_V3 = {
                 ]
             }
         }
+    ],
+    "ise_getStatus": {
+        "jsonrpc": "2.0",
+        "method": "ise_getStatus",
+        "id": 1234,
+        "params": {
+            "filter": ["lastBlock"]
+        }
+    },
+    "rep_getListByHash": {
+        "jsonrpc": "2.0",
+        "method": "rep_getListByHash",
+        "id": 1234,
+        "params": {
+            "repsHash": "0x71303ef8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238a"
+        }
+    },
+    "rep_getListByHash_batch": [
+        {
+            "jsonrpc": "2.0",
+            "method": "rep_getListByHash",
+            "id": 1234,
+            "params": {
+                "repsHash": "0x71303ef8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238a"
+            }
+        },
+        {
+            "jsonrpc": "2.0",
+            "method": "rep_getListByHash",
+            "id": 1234,
+            "params": {
+                "repsHash": "0xe08f93fac84433f8220c18e415e15c6e837539de2aa7d9d6cb953acd8cdd609e"
+            }
+        }
     ]
 }
 
@@ -769,6 +803,26 @@ def create_channel_stub(**kwargs) -> ChannelInnerStub:
 
     # response
     task.prove_receipt.return_value = '0x1'
+
+    # reps
+    task.get_reps_by_hash.return_value = [
+        {
+            "id": "hx86aba2210918a9b116973f3c4b27c41a54d5dafe",
+            "p2pEndpoint": "127.0.0.1:7100"
+        },
+        {
+            "id": "hx9f049228bade72bc0a3490061b824f16bbb74589",
+            "p2pEndpoint": "127.0.0.1:7200"
+        },
+        {
+            "id": "hx6435405122df9fe5187d659588beccdf7aee8557",
+            "p2pEndpoint": "127.0.0.1:7300"
+        },
+        {
+            "id": "hx475bfec4178f3abc88c959faa2e6384e6b409c8f",
+            "p2pEndpoint": "127.0.0.1:7400"
+        }
+    ]
 
     stub: ChannelInnerStub = MagicMock(ChannelInnerStub)
     stub.async_task.return_value = task

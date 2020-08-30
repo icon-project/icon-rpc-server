@@ -59,18 +59,14 @@ class Version3DebugDispatcher:
         except Exception as e:
             response = ExceptionResponse(e, id=req_json.get('id', 0), debug=False)
         else:
-            if "params" in req_json:
-                req_json["params"]["context"] = context
-            else:
-                req_json["params"] = {"context": context}
-            response: DictResponse = await async_dispatch(json.dumps(req_json), methods)
+            response: DictResponse = await async_dispatch(json.dumps(req_json), methods, context=context)
         Logger.info(f'rest_server_v3d with response {response}', DISPATCH_V3D_TAG)
         return sanic_response.json(response.deserialized(), status=response.http_status, dumps=json.dumps)
 
     @staticmethod
     @methods.add
-    async def debug_estimateStep(**kwargs):
-        channel = kwargs['context']['channel']
+    async def debug_estimateStep(context, **kwargs):
+        channel = context.get('channel')
         method = 'debug_estimateStep'
         request = make_request(method, kwargs)
         score_stub = get_icon_stub_by_channel_name(channel)
