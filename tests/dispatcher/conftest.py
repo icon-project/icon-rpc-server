@@ -1,5 +1,4 @@
 import json
-from typing import Tuple
 
 import pytest
 from mock import AsyncMock, MagicMock
@@ -34,6 +33,115 @@ REQUESTS_V2 = {
             "tx_hash": "4bf74e6aeeb43bde5dc8d5b62537a33ac8eb7605ebbdb51b015c1881b45b3aed",
             "signature": "VAia7YZ2Ji6igKWzjR2YsGa2m53nKPrfK7uXYW78QLE+ATehAVZPC40szvAiA6NEU5gCYB4c4qaQzqDh2ugcHgA="
         }
+    },
+    "icx_getTransactionResult": {
+        "jsonrpc": "2.0",
+        "method": "icx_getTransactionResult",
+        "id": 1234,
+        "params": {
+            "tx_hash": "9c60c91c5821ba70dee43d7ddc2a5b03b2958d8dffac6d35488b43b8a62ee372"
+        }
+    },
+    "icx_getTransactionResult_batch": [
+        {
+            "jsonrpc": "2.0",
+            "method": "icx_getTransactionResult",
+            "id": 1234,
+            "params": {
+                "tx_hash": "9c60c91c5821ba70dee43d7ddc2a5b03b2958d8dffac6d35488b43b8a62ee372"
+            }
+        },
+        {
+            "jsonrpc": "2.0",
+            "method": "icx_getTransactionResult",
+            "id": 1234,
+            "params": {
+                "tx_hash": "375540830d475a73b704cf8dee9fa9eba2798f9d2af1fa55a85482e48daefd3b"
+            }
+        }
+    ],
+    "icx_getBalance": {
+        "jsonrpc": "2.0",
+        "method": "icx_getBalance",
+        "id": 1234,
+        "params": {
+            "address": "hxb0776ee37f5b45bfaea8cff1d8232fbb6122ec32"
+        }
+    },
+    "icx_getBalance_batch": [
+        {
+            "jsonrpc": "2.0",
+            "method": "icx_getBalance",
+            "id": 1234,
+            "params": {
+                "address": "hxb0776ee37f5b45bfaea8cff1d8232fbb6122ec32"
+            }
+        },
+        {
+            "jsonrpc": "2.0",
+            "method": "icx_getBalance",
+            "id": 1234,
+            "params": {
+                "address": "hx5bfdb090f43a808005ffc27c25b213145e80b7cd"
+            }
+        }
+    ],
+    "icx_getBlockByHeight": {
+        "jsonrpc": "2.0",
+        "method": "icx_getBlockByHeight",
+        "id": 1234,
+        "params": {
+            "height": "0"
+        }
+    },
+    "icx_getBlockByHeight_batch": [
+        {
+            "jsonrpc": "2.0",
+            "method": "icx_getBlockByHeight",
+            "id": 1234,
+            "params": {
+                "height": "1",
+            }
+        },
+        {
+            "jsonrpc": "2.0",
+            "method": "icx_getBlockByHeight",
+            "id": 1234,
+            "params": {
+                "height": "2",
+            }
+        }
+    ],
+    "icx_getBlockByHash": {
+        "jsonrpc": "2.0",
+        "method": "icx_getBlockByHash",
+        "id": 1234,
+        "params": {
+            "hash": "cf43b3fd45981431a0e64f79d07bfcf703e064b73b802c5f32834eec72142190",
+        }
+    },
+    "icx_getBlockByHash_batch": [
+        {
+            "jsonrpc": "2.0",
+            "method": "icx_getBlockByHash",
+            "id": 1234,
+            "params": {
+                "hash": "3add53134014e940f6f6010173781c4d8bd677d9931a697f962483e04a685e5c",
+            }
+        },
+        {
+            "jsonrpc": "2.0",
+            "method": "icx_getBlockByHash",
+            "id": 1234,
+            "params": {
+                "hash": "2cd6b2a6edd6dbce861bd9b79e91b5bc8351e7c87430e93251dfcb309a8ecff8",
+            }
+        }
+    ],
+    "icx_getLastBlock": {
+        "jsonrpc": "2.0",
+        "id": 1234,
+        "method": "icx_getLastBlock"
     }
 }
 
@@ -473,9 +581,6 @@ class MockChannelInnerStub:
     async def wait_for_unregister_signal(self, peer_id):
         pass
 
-    async def get_block(self, block_height, block_hash) -> Tuple[int, str, bytes, str]:
-        pass
-
 
 @pytest.fixture(autouse=True)
 def patch_stubcollection():
@@ -485,13 +590,13 @@ def patch_stubcollection():
 
 @pytest.yield_fixture
 def app():
-    app = Sanic("test_sanic_app")
+    sanic_app = Sanic("test_sanic_app")
 
-    app.add_route(NodeDispatcher.dispatch, '/api/node/', methods=['POST'])
-    app.add_route(Version2Dispatcher.dispatch, '/api/v2/', methods=['POST'])
-    app.add_route(Version3Dispatcher.dispatch, '/api/v3/', methods=['POST'])
+    sanic_app.add_route(NodeDispatcher.dispatch, '/api/node/', methods=['POST'])
+    sanic_app.add_route(Version2Dispatcher.dispatch, '/api/v2/', methods=['POST'])
+    sanic_app.add_route(Version3Dispatcher.dispatch, '/api/v3/', methods=['POST'])
 
-    yield app
+    yield sanic_app
 
 
 @pytest.fixture
@@ -543,7 +648,7 @@ def create_channel_stub(**kwargs) -> ChannelInnerStub:
 
     task: ChannelInnerTask = AsyncMock(ChannelInnerTask)
 
-    block_sample_data = {
+    block_sample_response = {
         "version": "0.3",
         "height": 10324749,
         "signature": "d1PQ4ohfWlcn/rog105s23EcGheynGGXiclfejoBqXAD3Rcr3fdDk2knQSBym1p0tlF2XS0AByP5I1ixkQTNwAA=",
@@ -582,10 +687,17 @@ def create_channel_stub(**kwargs) -> ChannelInnerStub:
         kwargs.get("response_code"),
         "0xd071ae4d4663bdbe4b5f635399323504edfcb7352b3ca7aabd2486873b6708ba",
         b"confirm_info",
-        json.dumps(block_sample_data)
+        json.dumps(block_sample_response)
     )
 
-    invoke_sample_data = {
+    # FIXME : for dipatcher v2
+    task.get_block_v2.return_value = (
+        kwargs.get("response_code"),
+        "0xd071ae4d4663bdbe4b5f635399323504edfcb7352b3ca7aabd2486873b6708ba",
+        json.dumps(block_sample_response)
+    )
+
+    invoke_sample_response = {
         "version": "0x3",
         "from": "hxbe258ceb872e08851f1f59694dac2558708ece11",
         "to": "hx5bfdb090f43a808005ffc27c25b213145e80b7cd",
@@ -604,10 +716,10 @@ def create_channel_stub(**kwargs) -> ChannelInnerStub:
     # response_code, invoke_result
     task.get_invoke_result.return_value = (
         kwargs.get("response_code"),
-        json.dumps(invoke_sample_data)
+        json.dumps(invoke_sample_response)
     )
 
-    tx_info_sample_data = {
+    tx_info_sample_response = {
         "transaction": {
             "version": "0x3",
             "timestamp": "0x5add84a7e9dbc",
@@ -634,11 +746,10 @@ def create_channel_stub(**kwargs) -> ChannelInnerStub:
     # response_code, tx_info
     task.get_tx_info.return_value = (
         kwargs.get("response_code"),
-        tx_info_sample_data
+        tx_info_sample_response
     )
 
-    # response
-    task.get_tx_proof.return_value = [
+    proof_sample_response = [
         {
             "left": "0xac1695c9d3ec0dedd7320d49e8b28bb76cb3f4332f99b396154d35cdb521efbc"
         },
@@ -648,14 +759,10 @@ def create_channel_stub(**kwargs) -> ChannelInnerStub:
     ]
 
     # response
-    task.get_receipt_proof.return_value = [
-        {
-            "left": "0xac1695c9d3ec0dedd7320d49e8b28bb76cb3f4332f99b396154d35cdb521efbc"
-        },
-        {
-            "right": "0xbb65b23173914f5618c4101b93a8a9e221814b3733dbd4cab6ae06f47982808e"
-        }
-    ]
+    task.get_tx_proof.return_value = proof_sample_response
+
+    # response
+    task.get_receipt_proof.return_value = proof_sample_response
 
     # response
     task.prove_tx.return_value = '0x1'

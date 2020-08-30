@@ -4,60 +4,19 @@ from typing import TYPE_CHECKING
 import pytest
 from mock import AsyncMock
 
-from iconrpcserver.dispatcher.v2 import Version2Dispatcher
 from iconrpcserver.dispatcher.v3.icx import IcxDispatcher
 from iconrpcserver.utils import message_code
 from iconrpcserver.utils.json_rpc import relay_tx_request
-from tests.dispatcher.conftest import TestDispatcher, TX_RESULT_HASH, REQUESTS_V2, REQUESTS_V3
+from tests.dispatcher.conftest import TestDispatcher, REQUESTS_V3
 
 if TYPE_CHECKING:
     from aiohttp import ClientResponse
 
 
-
-@pytest.mark.asyncio
-class TestVersion2Dispatcher(TestDispatcher):
-    REQUESTS = REQUESTS_V2
-
-    async def test_icx_sendTransaction(self, mock_channel_tx_creator, test_cli):
-        # Given I receives icx_sendTransaction request
-        json_request = copy.deepcopy(self.REQUESTS["icx_sendTransaction"])
-        # And the node is a validator
-        mock_channel_tx_creator(response_code=message_code.Response.success)
-
-        # When I call dispatch method
-        # json_response: dict = await Version2Dispatcher.icx_sendTransaction(**json_request)
-        response: 'ClientResponse' = await test_cli.post('/api/v2', json=json_request)
-        result_json: dict = await response.json()
-        result = result_json.get('result')
-
-        # Then I should receive response code and tx hash as dict type
-        assert result.get("response_code") == message_code.Response.success
-        assert result.get("tx_hash") == TX_RESULT_HASH
-
-    async def test_icx_sendTransaction_must_relay_if_no_permission(
-            self, mock_channel_tx_creator, monkeypatch, test_cli
-    ):
-        # Mocking to check tx is relayed or not!
-        mock_relay_tx_request = AsyncMock()
-        monkeypatch.setattr(f"{Version2Dispatcher.__module__}.{relay_tx_request.__name__}", mock_relay_tx_request)
-        mock_relay_tx_request.return_value = 'relay mock result'
-
-        # Given I receives icx_sendTransaction request
-        json_request = copy.deepcopy(self.REQUESTS["icx_sendTransaction"])
-        # And the node is not a validator
-        mock_channel_tx_creator(response_code=message_code.Response.fail_no_permission)
-
-        # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v2', json=json_request)
-
-        # Then the server should relay tx to another node
-        mock_relay_tx_request.assert_called()
-
-
 @pytest.mark.asyncio
 class TestVersion3Dispatcher(TestDispatcher):
     REQUESTS = REQUESTS_V3
+    URI = "/api/v3"
 
     async def test_icx_sendTransaction(self, mock_channel_tx_creator, test_cli):
         # Given I receives icx_sendTransaction request
@@ -66,7 +25,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel_tx_creator(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
         result_json: dict = await response.json()
         tx_hash = result_json.get("result")
 
@@ -87,7 +46,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel_tx_creator(response_code=message_code.Response.fail_no_permission)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
 
         # Then the server should relay tx to another node
         mock_relay_tx_request.assert_called()
@@ -99,7 +58,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
         result_json: dict = await response.json()
 
         # Then response is not error
@@ -112,7 +71,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request_batch)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
         result_json: list = await response.json()
 
         # Then response is not error
@@ -126,7 +85,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
         result_json: dict = await response.json()
 
         # Then response is not error
@@ -139,7 +98,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
         result_json: dict = await response.json()
 
         # Then response is not error
@@ -152,7 +111,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request_batch)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
         result_json: list = await response.json()
 
         # Then response is not error
@@ -166,7 +125,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
         result_json: dict = await response.json()
 
         # Then response is not error
@@ -179,7 +138,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request_batch)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
         result_json: list = await response.json()
 
         # Then response is not error
@@ -191,7 +150,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         json_request = copy.deepcopy(self.REQUESTS["icx_call"])
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
         result_json: dict = await response.json()
 
         # Then response is not error
@@ -202,7 +161,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         json_request_batch = copy.deepcopy(self.REQUESTS["icx_call_batch"])
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request_batch)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
         result_json: list = await response.json()
 
         # Then response is not error
@@ -214,7 +173,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         json_request = copy.deepcopy(self.REQUESTS["icx_getBalance"])
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
         result_json: dict = await response.json()
 
         # Then response is not error
@@ -225,7 +184,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         json_request_batch = copy.deepcopy(self.REQUESTS["icx_getBalance_batch"])
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request_batch)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
         result_json: list = await response.json()
 
         # Then response is not error
@@ -237,7 +196,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         json_request = copy.deepcopy(self.REQUESTS["icx_getScoreApi"])
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
         result_json: dict = await response.json()
 
         # Then response is not error
@@ -248,7 +207,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         json_request_batch = copy.deepcopy(self.REQUESTS["icx_getScoreApi_batch"])
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request_batch)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
         result_json: list = await response.json()
 
         # Then response is not error
@@ -260,7 +219,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         json_request = copy.deepcopy(self.REQUESTS["icx_getTotalSupply"])
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
         result_json: dict = await response.json()
 
         # Then response is not error
@@ -273,7 +232,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
         result_json: dict = await response.json()
 
         # Then response is not error
@@ -286,7 +245,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request_batch)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
         result_json: list = await response.json()
 
         # Then response is not error
@@ -300,7 +259,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
         result_json: dict = await response.json()
 
         # Then response is not error
@@ -313,7 +272,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request_batch)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
         result_json: list = await response.json()
 
         # Then response is not error
@@ -327,7 +286,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
         result_json: dict = await response.json()
 
         # Then response is not error
@@ -340,7 +299,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request_batch)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
         result_json: list = await response.json()
 
         # Then response is not error
@@ -354,7 +313,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
         result_json: dict = await response.json()
 
         # Then response is not error
@@ -367,7 +326,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request_batch)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
         result_json: list = await response.json()
 
         # Then response is not error
@@ -381,7 +340,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
         result_json: dict = await response.json()
 
         # Then response is not error
@@ -394,7 +353,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request_batch)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
         result_json: list = await response.json()
 
         # Then response is not error
@@ -408,7 +367,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
         result_json: dict = await response.json()
 
         # Then response is not error
@@ -421,7 +380,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: 'ClientResponse' = await test_cli.post('/api/v3', json=json_request_batch)
+        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
         result_json: list = await response.json()
 
         # Then response is not error

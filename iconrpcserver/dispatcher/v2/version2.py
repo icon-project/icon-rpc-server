@@ -37,9 +37,6 @@ class Version2Dispatcher:
             "url": url
         }
 
-        if "node_" in req["method"]:
-            return sanic_response.text("no support method!")
-
         try:
             client_ip = request.remote_addr if request.remote_addr else request.ip
             Logger.info(f'rest_server_v2 request with {req}', DISPATCH_V2_TAG)
@@ -47,6 +44,7 @@ class Version2Dispatcher:
 
             validate_jsonschema_v2(request=req)
         except GenericJsonRpcServerError as e:
+            Logger.debug(f'dispatch() validate exception = {e}')
             response = ExceptionResponse(e, id=req.get('id', 0), debug=False)
         else:
             response: DictResponse = await async_dispatch(json.dumps(req), methods, context=context)
@@ -95,7 +93,7 @@ class Version2Dispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getTransactionResult(**kwargs):
+    async def icx_getTransactionResult(context: Dict[str, str], **kwargs):
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
         channel_stub = StubCollection().channel_stubs[channel_name]
         verify_result = {}
@@ -144,7 +142,7 @@ class Version2Dispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getBalance(**kwargs):
+    async def icx_getBalance(context: Dict[str, str], **kwargs):
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
         method = 'icx_getBalance'
@@ -156,7 +154,7 @@ class Version2Dispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getTotalSupply(**kwargs):
+    async def icx_getTotalSupply(context: Dict[str, str], **kwargs):
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
         method = 'icx_getTotalSupply'
@@ -168,19 +166,19 @@ class Version2Dispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getLastBlock(**kwargs):
+    async def icx_getLastBlock(context: Dict[str, str], **kwargs):
         block_hash, response = await get_block_v2_by_params(block_height=-1)
         return response
 
     @staticmethod
     @methods.add
-    async def icx_getBlockByHash(**kwargs):
+    async def icx_getBlockByHash(context: Dict[str, str], **kwargs):
         block_hash, response = await get_block_v2_by_params(block_hash=kwargs["hash"])
         return response
 
     @staticmethod
     @methods.add
-    async def icx_getBlockByHeight(**kwargs):
+    async def icx_getBlockByHeight(context: Dict[str, str], **kwargs):
         try:
             block_height = int(kwargs["height"])
         except Exception as e:
@@ -195,14 +193,13 @@ class Version2Dispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getLastTransaction(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
+    async def icx_getTransactionByAddress(context: Dict[str, str], **kwargs):
+        """
+        FIXME : deprecated?
 
-        return ""
-
-    @staticmethod
-    @methods.add
-    async def icx_getTransactionByAddress(**kwargs):
+        :param kwargs:
+        :return:
+        """
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
         address = kwargs.get("address", None)
