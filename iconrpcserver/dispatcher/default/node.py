@@ -21,6 +21,12 @@ methods = Methods()
 class NodeDispatcher:
     @staticmethod
     async def dispatch(request, channel_name=None):
+        """Node dispatch
+
+        FIXME : this dispatch is not considered to support batch request.
+            If you want to support batch request, need to update code that using req_json.
+        """
+
         req_json = request.json
         url = request.url
         channel = channel_name if channel_name else StubCollection().conf[ConfigKey.CHANNEL]
