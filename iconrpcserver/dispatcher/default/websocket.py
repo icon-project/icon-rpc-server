@@ -15,6 +15,7 @@
 import asyncio
 import json
 import traceback
+from typing import TYPE_CHECKING
 
 from iconcommons.logger import Logger
 from jsonrpcclient.requests import Request
@@ -27,11 +28,15 @@ from iconrpcserver.utils import get_now_timestamp, message_code
 from iconrpcserver.utils.json_rpc import get_channel_stub_by_channel_name
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
+if TYPE_CHECKING:
+    from sanic.request import Request as SanicRequest
+    from websockets import WebSocketCommonProtocol, Data
+
 ws_methods = Methods()
 
 
 class Reception:
-    """ register and unregister citizen by asynccontextmanager in websocket node_ws_Subscribe
+    """Register and unregister citizen by asynccontextmanager in websocket node_ws_Subscribe
     """
 
     def __init__(self, channel_name: str, peer_id: str, remote_target: str):
@@ -68,23 +73,23 @@ class WSDispatcher:
     PUBLISH_NEW_BLOCK = "node_ws_PublishNewBlock"
 
     @staticmethod
-    async def dispatch(request, ws, channel_name=None):
+    async def dispatch(request: 'SanicRequest', ws: 'WebSocketCommonProtocol', channel_name: str = None):
         ip = request.remote_addr or request.ip
-        ws_request: dict = json.loads(await ws.recv())
+        ws_request: Data = await ws.recv()
         context = {
             "channel": channel_name,
-            "peer_id": ws_request.get("peer_id"),
             "ws": ws,
             "remote_target": f"{ip}:{request.port}"
         }
-        await async_dispatch(json.dumps(ws_request), ws_methods, context=context)
+        Logger.info(f'rest_server_ws request with {ws_request}')
+        await async_dispatch(ws_request, ws_methods, context=context)
 
     @staticmethod
     @ws_methods.add
     async def node_ws_Subscribe(context, **kwargs):
-        channel_name = context["channel"]
-        ws = context["ws"]
-        remote_target = context['remote_target']
+        channel_name = context.get("channel")
+        ws = context.get("ws")
+        remote_target = context.get('remote_target')
 
         height = kwargs['height']
         peer_id = kwargs['peer_id']

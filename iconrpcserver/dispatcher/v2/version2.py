@@ -2,13 +2,13 @@
 
 import json
 import re
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING, Dict, Union
 from urllib.parse import urlparse
 
 from iconcommons.logger import Logger
 from jsonrpcserver import async_dispatch
 from jsonrpcserver.methods import Methods
-from jsonrpcserver.response import DictResponse, ExceptionResponse
+from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion, DISPATCH_V2_TAG
@@ -21,7 +21,8 @@ from iconrpcserver.utils.json_rpc import relay_tx_request, get_block_v2_by_param
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
 if TYPE_CHECKING:
-    from sanic.request import Request
+    from sanic.request import Request as SanicRequest
+    from jsonrpcserver.response import Response, DictResponse, BatchResponse
 
 methods = Methods()
 
@@ -29,7 +30,7 @@ methods = Methods()
 class Version2Dispatcher:
 
     @staticmethod
-    async def dispatch(request: 'Request'):
+    async def dispatch(request: 'SanicRequest'):
         req = request.json
         url = request.url
 
@@ -37,6 +38,7 @@ class Version2Dispatcher:
             "url": url
         }
 
+        response: Union[Response, DictResponse, BatchResponse]
         try:
             client_ip = request.remote_addr if request.remote_addr else request.ip
             Logger.info(f'rest_server_v2 request with {req}', DISPATCH_V2_TAG)
@@ -47,7 +49,7 @@ class Version2Dispatcher:
             Logger.debug(f'dispatch() validate exception = {e}')
             response = ExceptionResponse(e, id=req.get('id', 0), debug=False)
         else:
-            response: DictResponse = await async_dispatch(json.dumps(req), methods, context=context)
+            response = await async_dispatch(request.body, methods, context=context)
 
         Logger.info(f'rest_server_v2 response with {response}', DISPATCH_V2_TAG)
         return sanic_response.json(response.deserialized(), status=response.http_status, dumps=json.dumps)

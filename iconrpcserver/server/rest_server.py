@@ -42,6 +42,10 @@ class ServerComponents(metaclass=SingletonMetaClass):
         self.__app.config.REQUEST_MAX_SIZE = ServerComponents.conf[ConfigKey.REQUEST_MAX_SIZE]
         CORS(self.__app)
 
+        # jsonrpcserver 'dispatch()' to get bytes type for first parameter
+        from iconrpcserver.utils import json_rpc
+        json_rpc.monkey_patch()
+
         # Decide whether to create context or not according to whether SSL is applied
 
         rest_ssl_type = ServerComponents.conf[ConfigKey.REST_SSL_TYPE]
@@ -83,7 +87,6 @@ class ServerComponents(metaclass=SingletonMetaClass):
     def set_resource(self):
         self.__app.add_route(NodeDispatcher.dispatch, '/api/node/<channel_name>', methods=['POST'])
         self.__app.add_route(NodeDispatcher.dispatch, '/api/node/', methods=['POST'])
-        self.__app.add_websocket_route(WSDispatcher.dispatch, '/api/node/<channel_name>')
 
         self.__app.add_route(Version2Dispatcher.dispatch, '/api/v2', methods=['POST'])
         self.__app.add_route(Version3Dispatcher.dispatch, '/api/v3/<channel_name>', methods=['POST'])

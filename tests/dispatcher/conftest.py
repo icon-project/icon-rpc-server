@@ -602,6 +602,12 @@ REQUESTS_V3 = {
 }
 
 
+@pytest.fixture(autouse=True, scope="session")
+def jsonrpc_monkey_patch():
+    from iconrpcserver.utils import json_rpc
+    json_rpc.monkey_patch()
+
+
 class MockChannelInnerStub:
     def async_task(self):
         return self

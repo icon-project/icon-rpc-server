@@ -26,7 +26,6 @@ from iconrpcserver.default_conf.icon_rpcserver_config import default_rpcserver_c
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
 from iconrpcserver.icon_rpcserver_cli import ICON_RPCSERVER_CLI, ExitCode
 from iconrpcserver.server.rest_server import ServerComponents
-from iconrpcserver.utils import camel_to_upper_snake
 
 
 class StandaloneApplication(gunicorn.app.base.BaseApplication):

@@ -1,10 +1,10 @@
 import json
-from typing import Dict, List
+from typing import TYPE_CHECKING, Dict, List, Union
 
 from iconcommons.logger import Logger
 from jsonrpcserver import async_dispatch
 from jsonrpcserver.methods import Methods
-from jsonrpcserver.response import DictResponse, ExceptionResponse
+from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, DISPATCH_NODE_TAG
@@ -15,12 +15,16 @@ from iconrpcserver.utils.icon_service.converter import convert_params
 from iconrpcserver.utils.json_rpc import get_block_by_params, get_channel_stub_by_channel_name
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
+if TYPE_CHECKING:
+    from sanic.request import Request as SanicRequest
+    from jsonrpcserver.response import Response, DictResponse, BatchResponse
+
 methods = Methods()
 
 
 class NodeDispatcher:
     @staticmethod
-    async def dispatch(request, channel_name=None):
+    async def dispatch(request: 'SanicRequest', channel_name=None):
         """Node dispatch
 
         FIXME : this dispatch is not considered to support batch request.
@@ -40,6 +44,7 @@ class NodeDispatcher:
             'channel': channel
         }
 
+        response: Union[Response, DictResponse, BatchResponse]
         try:
             client_ip = request.remote_addr if request.remote_addr else request.ip
             Logger.info(f'rest_server_node request with {req_json}', DISPATCH_NODE_TAG)
@@ -51,7 +56,7 @@ class NodeDispatcher:
         except Exception as e:
             response = ExceptionResponse(e, id=req_json.get('id', 0), debug=False)
         else:
-            response: DictResponse = await async_dispatch(json.dumps(req_json), methods, context=context)
+            response = await async_dispatch(request.body, methods, context=context)
 
         Logger.info(f'rest_server_node with response {response}', DISPATCH_NODE_TAG)
         return sanic_response.json(response.deserialized(), status=response.http_status, dumps=json.dumps)

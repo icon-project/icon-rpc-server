@@ -69,7 +69,7 @@ class ConfigKey:
     GUNICORN_CONFIG = 'gunicornConfig'
 
 
-ICON_RPC_SERVER_LOG_TAG = 'IconService'
+ICON_RPC_SERVER_LOG_TAG = 'IconRpcServer'
 DISPATCH_NODE_TAG = f'{ICON_RPC_SERVER_LOG_TAG}_dispatch_node'
 DISPATCH_V2_TAG = f'{ICON_RPC_SERVER_LOG_TAG}_dispatch_v2'
 DISPATCH_V3_TAG = f'{ICON_RPC_SERVER_LOG_TAG}_dispatch_v3'
