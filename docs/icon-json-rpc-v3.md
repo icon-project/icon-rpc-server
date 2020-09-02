@@ -148,6 +148,7 @@ API path : `<scheme>://<host>/api/v3`
 API path : `<scheme>://<host>/api/debug/v3`
 
 * [debug_estimateStep](#debug_estimatestep)
+* [debug_getAccount](#debug_getAccount)
 
 ## Other API
 
@@ -1627,6 +1628,80 @@ It is used when depositing ICX in SCORE or withdrawing the deposited ICX, and `d
     "error": {
         "code": -32602,
         "message": "JSON schema validation error: 'version' is a required property"
+    }
+}
+```
+
+## debug_getAccount
+
+* Returns the Account information including stake, delegation of the given EOA or SCORE.
+
+### Parameters
+
+| KEY | VALUE type | Description |
+|:----|:-----------|:-----|
+| address | [T_ADDR_EOA](#T_ADDR_EOA) or [T_ADDR_SCORE](#T_ADDR_SCORE) | Address of EOA or SCORE |
+| filter | [T_INT](#T_INT) | flag value to what information will be included(coin : 1, stake: 2, delegation: 4) |
+
+### Returns
+
+Information of Account
+
+### Example
+
+```javascript
+// Request
+{
+    "jsonrpc": "2.0",
+    "id": 1234,
+    "method": "debug_getAccount",
+    "params": {
+        "address": "hxe7af5fcfd8dfc67530a01a0e403882687528dfcb",
+        "filter": "0x7"
+    }
+}
+
+// Response - success
+{
+  "coin": {
+    "type": "0x1",
+    "typeStr": "CoinPartType.GENERAL",
+    "flag": "0x0",
+    "flagStr": "CoinPartFlag.None"
+  },
+  "stake": {
+    "stake": "0x100",
+    "unstake": "0x100",
+    "unstakeBlockHeight": "0x200",
+    "unstakesInfo": [
+      [
+        "0x100",
+        "0x200"
+      ]
+    ]
+  },
+  "delegation": {
+    "totalDelegated": "0xa688906bd8b0000",
+    "delegations": [
+      {
+        "address": "hx1d6463e4628ee52a7f751e9d500a79222a7f3935",
+        "value": "0x3782dace9d90000"
+      },
+      {
+        "address": "hxb6bc0bf95d90cb3cd5b3abafd9682a62f36cc826",
+        "value": "0x6f05b59d3b20000"
+      }
+    ]
+  }
+}
+
+// Response - error
+{
+    "jsonrpc": "2.0",
+    "id": 1234,
+    "error": {
+        "code": -32602,
+        "message": "Invalid address"
     }
 }
 ```

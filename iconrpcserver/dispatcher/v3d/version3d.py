@@ -78,3 +78,13 @@ class Version3DebugDispatcher:
         score_stub = get_icon_stub_by_channel_name(channel)
         response = await score_stub.async_task().query(request)
         return response_to_json_query(response)
+
+    @staticmethod
+    @methods.add
+    async def debug_getAccount(context, **kwargs):
+        channel = context.get('channel')
+        method = "debug_getAccount"
+        request = make_request(method, kwargs)
+        score_stub = get_icon_stub_by_channel_name(channel)
+        response = await score_stub.async_task().query(request)
+        return response_to_json_query(response)
