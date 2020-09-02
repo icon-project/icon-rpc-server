@@ -16,7 +16,6 @@
 
 import re
 
-from iconcommons import Logger
 from jsonrpcserver import status
 from jsonschema import Draft4Validator, FormatChecker
 from jsonschema.exceptions import ValidationError
