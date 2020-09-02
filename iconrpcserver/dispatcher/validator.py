@@ -16,6 +16,7 @@
 
 import re
 
+from iconcommons import Logger
 from jsonrpcserver import status
 from jsonschema import Draft4Validator, FormatChecker
 from jsonschema.exceptions import ValidationError
@@ -735,6 +736,28 @@ rep_getListByHash_v3: dict = {
     }
 }
 
+debug_getAccount_v3: dict = {
+    "title": "debug_getAccount",
+    "id": "https://github.com/icon-project/icon-rpc-server/blob/master/docs/icon-json-rpc-v3.md#debug_getAccount",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": ["number", "string"]},
+        "params": {
+            "type": "object",
+            "properties": {
+                "address": {"type": "string", "format": "address"},
+                "filter": {"type": "string", "format": "int_16"},
+            },
+            "additionalProperties": False,
+            "required": ["address", "filter"]
+        }
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id", "params"]
+}
+
 SCHEMA_V3: dict = {
     "icx_getBlock": icx_getBlock,
     "icx_getLastBlock": icx_getLastBlock,
@@ -754,6 +777,7 @@ SCHEMA_V3: dict = {
     "debug_estimateStep": debug_estimateStep_v3,
     "ise_getStatus": ise_getStatus_v3,
     "rep_getListByHash": rep_getListByHash_v3,
+    "debug_getAccount": debug_getAccount_v3,
 }
 
 
