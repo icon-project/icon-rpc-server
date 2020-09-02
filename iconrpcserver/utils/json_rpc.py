@@ -143,3 +143,41 @@ def get_channel_stub_by_channel_name(channel_name):
         )
     else:
         return channel_stub
+
+
+def monkey_patch():
+    from typing import Optional, Union, Dict
+    from jsonrpcserver import dispatcher, log
+
+    def _patched_log_(
+            message: Union[str, bytes, bytearray],
+            logger: logging.Logger,
+            level: int = logging.INFO,
+            extra: Optional[Dict] = None,
+            trim: bool = False,
+    ) -> None:
+        """
+        Log a request or response
+
+        Args:
+            message: JSON-RPC request or response string.
+            logger:
+            level: Log level.
+            extra: More details to include in the log entry.
+            trim: Abbreviate log messages.
+        """
+        if extra is None:
+            extra = {}
+        # Clean up the message for logging
+        if message:
+            if isinstance(message, (bytes, bytearray)):
+                message = message.replace(b"\n", b"").replace(b"  ", b" ").replace(b"{ ", b"{")
+            else:
+                message = message.replace("\n", "").replace("  ", " ").replace("{ ", "{")
+        if trim:
+            message = log._trim_message(message)
+
+        # Log.
+        logger.log(level, message, extra=extra)
+
+    dispatcher.log_ = _patched_log_

@@ -1,26 +1,14 @@
-# Copyright 2018 ICON Foundation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 """json rpc dispatcher"""
 
 import json
 import re
+from typing import TYPE_CHECKING, Dict, Union
 from urllib.parse import urlparse
 
 from iconcommons.logger import Logger
 from jsonrpcserver import async_dispatch
 from jsonrpcserver.methods import Methods
-from jsonrpcserver.response import DictResponse, ExceptionResponse
+from jsonrpcserver.response import ExceptionResponse
 from sanic import response as sanic_response
 
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey, ApiVersion, DISPATCH_V2_TAG
@@ -32,13 +20,17 @@ from iconrpcserver.utils.icon_service.converter import make_request
 from iconrpcserver.utils.json_rpc import relay_tx_request, get_block_v2_by_params
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
+if TYPE_CHECKING:
+    from sanic.request import Request as SanicRequest
+    from jsonrpcserver.response import Response, DictResponse, BatchResponse
+
 methods = Methods()
 
 
 class Version2Dispatcher:
 
     @staticmethod
-    async def dispatch(request):
+    async def dispatch(request: 'SanicRequest'):
         req = request.json
         url = request.url
 
@@ -46,9 +38,7 @@ class Version2Dispatcher:
             "url": url
         }
 
-        if "node_" in req["method"]:
-            return sanic_response.text("no support method!")
-
+        response: Union[Response, DictResponse, BatchResponse]
         try:
             client_ip = request.remote_addr if request.remote_addr else request.ip
             Logger.info(f'rest_server_v2 request with {req}', DISPATCH_V2_TAG)
@@ -56,13 +46,11 @@ class Version2Dispatcher:
 
             validate_jsonschema_v2(request=req)
         except GenericJsonRpcServerError as e:
+            Logger.debug(f'dispatch() validate exception = {e}')
             response = ExceptionResponse(e, id=req.get('id', 0), debug=False)
         else:
-            if "params" in req:
-                req["params"]["context"] = context
-            else:
-                req["params"] = {"context": context}
-            response: DictResponse = await async_dispatch(json.dumps(req), methods)
+            response = await async_dispatch(request.body, methods, context=context)
+
         Logger.info(f'rest_server_v2 response with {response}', DISPATCH_V2_TAG)
         return sanic_response.json(response.deserialized(), status=response.http_status, dumps=json.dumps)
 
@@ -78,10 +66,9 @@ class Version2Dispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_sendTransaction(**kwargs):
-        url = kwargs['context']['url']
+    async def icx_sendTransaction(context: Dict[str, str], **kwargs):
+        url = context.get('url')
         path = urlparse(url).path
-        del kwargs['context']
 
         request = make_request("icx_sendTransaction", kwargs, RequestParamType.send_tx)
         channel = StubCollection().conf[ConfigKey.CHANNEL]
@@ -108,7 +95,7 @@ class Version2Dispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getTransactionResult(**kwargs):
+    async def icx_getTransactionResult(context: Dict[str, str], **kwargs):
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
         channel_stub = StubCollection().channel_stubs[channel_name]
         verify_result = {}
@@ -157,7 +144,7 @@ class Version2Dispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getBalance(**kwargs):
+    async def icx_getBalance(context: Dict[str, str], **kwargs):
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
         method = 'icx_getBalance'
@@ -169,7 +156,7 @@ class Version2Dispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getTotalSupply(**kwargs):
+    async def icx_getTotalSupply(context: Dict[str, str], **kwargs):
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
         method = 'icx_getTotalSupply'
@@ -181,19 +168,19 @@ class Version2Dispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getLastBlock(**kwargs):
+    async def icx_getLastBlock(context: Dict[str, str], **kwargs):
         block_hash, response = await get_block_v2_by_params(block_height=-1)
         return response
 
     @staticmethod
     @methods.add
-    async def icx_getBlockByHash(**kwargs):
+    async def icx_getBlockByHash(context: Dict[str, str], **kwargs):
         block_hash, response = await get_block_v2_by_params(block_hash=kwargs["hash"])
         return response
 
     @staticmethod
     @methods.add
-    async def icx_getBlockByHeight(**kwargs):
+    async def icx_getBlockByHeight(context: Dict[str, str], **kwargs):
         try:
             block_height = int(kwargs["height"])
         except Exception as e:
@@ -208,14 +195,13 @@ class Version2Dispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getLastTransaction(**kwargs):
-        channel_name = StubCollection().conf[ConfigKey.CHANNEL]
+    async def icx_getTransactionByAddress(context: Dict[str, str], **kwargs):
+        """
+        FIXME : deprecated?
 
-        return ""
-
-    @staticmethod
-    @methods.add
-    async def icx_getTransactionByAddress(**kwargs):
+        :param kwargs:
+        :return:
+        """
         channel_name = StubCollection().conf[ConfigKey.CHANNEL]
 
         address = kwargs.get("address", None)

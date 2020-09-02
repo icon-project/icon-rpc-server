@@ -24,8 +24,8 @@ from iconrpcserver.utils.json_rpc import get_channel_stub_by_channel_name
 class RepDispatcher:
     @staticmethod
     @methods.add
-    async def rep_getListByHash(**kwargs):
-        channel = kwargs['context']['channel']
+    async def rep_getListByHash(context, **kwargs):
+        channel = context.get('channel')
         channel_stub = get_channel_stub_by_channel_name(channel)
         request = convert_params(kwargs, RequestParamType.get_reps_by_hash)
         reps_hash = request.get('repsHash')

@@ -1,19 +1,7 @@
-# Copyright 2018 ICON Foundation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 """json rpc dispatcher version 3"""
 
 import json
+from typing import Dict
 from urllib.parse import urlparse
 
 from iconcommons.logger import Logger
@@ -45,8 +33,8 @@ def check_response_code(response_code: message_code.Response):
 class IcxDispatcher:
     @staticmethod
     @methods.add
-    async def icx_call(**kwargs):
-        channel = kwargs['context']['channel']
+    async def icx_call(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
         method = 'icx_call'
         request = make_request(method, kwargs)
         score_stub = get_icon_stub_by_channel_name(channel)
@@ -55,8 +43,8 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getScoreApi(**kwargs):
-        channel = kwargs['context']['channel']
+    async def icx_getScoreApi(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
         method = 'icx_getScoreApi'
         request = make_request(method, kwargs)
         score_stub = get_icon_stub_by_channel_name(channel)
@@ -77,11 +65,10 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_sendTransaction(**kwargs):
-        channel = kwargs['context']['channel']
-        url = kwargs['context']['url']
+    async def icx_sendTransaction(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
+        url = context.get('url')
         path = urlparse(url).path
-        del kwargs['context']
 
         method = 'icx_sendTransaction'
         request = make_request(method, kwargs)
@@ -116,8 +103,8 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getTransactionResult(**kwargs):
-        channel = kwargs['context']['channel']
+    async def icx_getTransactionResult(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
         request = convert_params(kwargs, RequestParamType.get_tx_result)
         channel_stub = StubCollection().channel_stubs[channel]
         verify_result = dict()
@@ -151,8 +138,8 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getTransactionByHash(**kwargs):
-        channel = kwargs['context']['channel']
+    async def icx_getTransactionByHash(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
         request = convert_params(kwargs, RequestParamType.get_tx_result)
         channel_stub = StubCollection().channel_stubs[channel]
 
@@ -175,8 +162,8 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getBalance(**kwargs):
-        channel = kwargs['context']['channel']
+    async def icx_getBalance(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
         method = 'icx_getBalance'
         request = make_request(method, kwargs)
         score_stub = get_icon_stub_by_channel_name(channel)
@@ -186,8 +173,8 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getTotalSupply(**kwargs):
-        channel = kwargs['context']['channel']
+    async def icx_getTotalSupply(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
 
         method = 'icx_getTotalSupply'
         request = make_request(method, kwargs)
@@ -198,8 +185,8 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getBlock(**kwargs):
-        channel = kwargs['context']['channel']
+    async def icx_getBlock(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
         request = convert_params(kwargs, RequestParamType.get_block)
         if all(param in request for param in ["hash", "height"]):
             raise GenericJsonRpcServerError(
@@ -231,8 +218,8 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getLastBlock(**kwargs):
-        channel = kwargs['context']['channel']
+    async def icx_getLastBlock(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
 
         block_hash, result = await get_block_by_params(block_height=-1,
                                                        channel_name=channel)
@@ -242,8 +229,8 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getBlockByHash(**kwargs):
-        channel = kwargs['context']['channel']
+    async def icx_getBlockByHash(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
         request = convert_params(kwargs, RequestParamType.get_block_by_hash)
         block_hash, result = await get_block_by_params(block_hash=request['hash'],
                                                        channel_name=channel)
@@ -256,9 +243,10 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getBlockByHeight(**kwargs):
-        channel = kwargs['context']['channel']
+    async def icx_getBlockByHeight(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
         request = convert_params(kwargs, RequestParamType.get_block_by_height)
+
         block_hash, result = await get_block_by_params(block_height=request['height'],
                                                        channel_name=channel)
         response_code = result['response_code']
@@ -269,8 +257,8 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getTransactionProof(**kwargs):
-        channel = kwargs['context']['channel']
+    async def icx_getTransactionProof(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
         channel_stub = get_channel_stub_by_channel_name(channel)
 
         tx_hash = kwargs['txHash']
@@ -279,8 +267,8 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_getReceiptProof(**kwargs):
-        channel = kwargs['context']['channel']
+    async def icx_getReceiptProof(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
         channel_stub = get_channel_stub_by_channel_name(channel)
 
         tx_hash = kwargs['txHash']
@@ -289,8 +277,8 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_proveTransaction(**kwargs):
-        channel = kwargs['context']['channel']
+    async def icx_proveTransaction(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
         channel_stub = get_channel_stub_by_channel_name(channel)
 
         tx_hash = kwargs['txHash']
@@ -300,8 +288,8 @@ class IcxDispatcher:
 
     @staticmethod
     @methods.add
-    async def icx_proveReceipt(**kwargs):
-        channel = kwargs['context']['channel']
+    async def icx_proveReceipt(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
         channel_stub = get_channel_stub_by_channel_name(channel)
 
         tx_hash = kwargs['txHash']
