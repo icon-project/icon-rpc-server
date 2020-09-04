@@ -26,8 +26,8 @@ class IseDispatcher:
 
     @staticmethod
     @methods.add
-    async def ise_getStatus(**kwargs):
-        channel = kwargs['context']['channel']
+    async def ise_getStatus(context, **kwargs):
+        channel = context.get('channel')
         method = 'ise_getStatus'
         request = make_request(method, kwargs)
         score_stub = get_icon_stub_by_channel_name(channel)

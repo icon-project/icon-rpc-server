@@ -437,6 +437,16 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
             }
         }
 
+        self.getAccount = {
+            "jsonrpc": "2.0",
+            "method": "debug_getAccount",
+            "id": 1234,
+            "params": {
+                "address": "hxe7af5fcfd8dfc67530a01a0e403882687528dfcb",
+                "filter": "0x7"
+            }
+        }
+
     def test_getLastBlock(self):
         full_data = self.getLastBlock
 
@@ -582,6 +592,10 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
             validate_jsonschema_v3(batch_request)
         except:
             self.fail('raise exception!')
+
+    def test_getAccount(self):
+        full_data = self.getAccount
+        self.check_valid(full_data)
 
     def test_format_checker(self):
         from iconrpcserver.dispatcher import validator
