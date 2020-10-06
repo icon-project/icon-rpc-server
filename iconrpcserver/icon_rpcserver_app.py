@@ -16,9 +16,10 @@ import argparse
 import os
 import sys
 
+import aio_pika
+import asyncio
 import gunicorn
 import gunicorn.app.base
-from earlgrey import asyncio, aio_pika
 from iconcommons.icon_config import IconConfig
 from iconcommons.logger import Logger
 

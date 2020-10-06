@@ -4,5 +4,5 @@ jsonrpcclient[aiohttp]~=3.3.5
 sanic~=19.12.2
 gunicorn~=20.0.0
 sanic-cors~=0.10.0
-earlgrey~=0.1.0
+earlgrey~=0.1.3
 iconcommons~=1.1.3

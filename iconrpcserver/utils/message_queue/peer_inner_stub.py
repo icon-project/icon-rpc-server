@@ -13,11 +13,8 @@
 # limitations under the License.
 
 from earlgrey import MessageQueueStub, message_queue_task
-from typing import TYPE_CHECKING
-from . import exit_process
 
-if TYPE_CHECKING:
-    from earlgrey import RobustConnection
+from . import earlgrey_close
 
 
 class PeerInnerTask:
@@ -34,5 +31,5 @@ class PeerInnerTask:
 class PeerInnerStub(MessageQueueStub[PeerInnerTask]):
     TaskType = PeerInnerTask
 
-    def _callback_connection_lost_callback(self, connection: 'RobustConnection'):
-        exit_process()
+    def _callback_connection_close(self, exc: Exception):
+        earlgrey_close(func="IconScoreInnerStub", exc=exc)
