@@ -176,7 +176,7 @@ class ChannelInnerTask:
 class ChannelInnerStub(MessageQueueStub[ChannelInnerTask]):
     TaskType = ChannelInnerTask
 
-    def _callback_connection_lost_callback(self, connection: 'RobustConnection'):
+    def _callback_connection_close(self, exc: Exception):
         exit_process()
 
 
@@ -194,5 +194,5 @@ class ChannelTxCreatorInnerTask:
 class ChannelTxCreatorInnerStub(MessageQueueStub[ChannelTxCreatorInnerTask]):
     TaskType = ChannelTxCreatorInnerTask
 
-    def _callback_connection_lost_callback(self, connection: 'RobustConnection'):
+    def _callback_connection_close(self, exc: Exception):
         exit_process()
