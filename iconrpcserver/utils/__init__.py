@@ -14,7 +14,6 @@
 
 import re
 import time
-from urllib.parse import urlsplit
 
 
 def camel_to_upper_snake(camel: str) -> str:

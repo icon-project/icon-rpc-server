@@ -11,9 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import os
 import signal
+from typing import Optional
+
+from iconcommons import Logger
 
 
-def exit_process():
+def earlgrey_close(func: str, exc: Optional[BaseException]):
+    Logger.error(tag="MQ", msg=f"[{func}] connection closed. {exc}")
     os.killpg(0, signal.SIGKILL)
