@@ -175,7 +175,7 @@ class ChannelInnerTask:
 class ChannelInnerStub(MessageQueueStub[ChannelInnerTask]):
     TaskType = ChannelInnerTask
 
-    def _callback_connection_close(self, exc: Optional[BaseException]):
+    def _callback_connection_close(self, sender, exc: Optional[BaseException], *args, **kwargs):
         earlgrey_close(func="ChannelInnerStub", exc=exc)
 
 
@@ -193,5 +193,5 @@ class ChannelTxCreatorInnerTask:
 class ChannelTxCreatorInnerStub(MessageQueueStub[ChannelTxCreatorInnerTask]):
     TaskType = ChannelTxCreatorInnerTask
 
-    def _callback_connection_close(self, exc: Optional[BaseException]):
+    def _callback_connection_close(self, sender, exc: Optional[BaseException], *args, **kwargs):
         earlgrey_close(func="ChannelTxCreatorInnerStub", exc=exc)
