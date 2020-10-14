@@ -60,5 +60,5 @@ class IconScoreInnerTask:
 class IconScoreInnerStub(MessageQueueStub[IconScoreInnerTask]):
     TaskType = IconScoreInnerTask
 
-    def _callback_connection_close(self, exc: Optional[BaseException]):
+    def _callback_connection_close(self, sender, exc: Optional[BaseException], *args, **kwargs):
         earlgrey_close(func="IconScoreInnerStub", exc=exc)

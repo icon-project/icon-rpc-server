@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Optional
 
 from earlgrey import MessageQueueStub, message_queue_task
 
@@ -31,5 +32,5 @@ class PeerInnerTask:
 class PeerInnerStub(MessageQueueStub[PeerInnerTask]):
     TaskType = PeerInnerTask
 
-    def _callback_connection_close(self, exc: Exception):
+    def _callback_connection_close(self, sender, exc: Optional[BaseException], *args, **kwargs):
         earlgrey_close(func="IconScoreInnerStub", exc=exc)
