@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Union
 from iconcommons.logger import Logger
 from jsonrpcserver import async_dispatch
 from jsonrpcserver.methods import Methods
-from jsonrpcserver.response import ExceptionResponse
+from jsonrpcserver.response import ExceptionResponse, ApiErrorResponse
 from sanic import response as sanic_response
 
 from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
@@ -43,7 +43,11 @@ class Version3Dispatcher:
 
             validate_jsonschema_v3(request=req_json)
         except GenericJsonRpcServerError as e:
-            response = ExceptionResponse(e, id=req_json.get('id', 0), debug=False)
+            response = ApiErrorResponse(id=req_json.get('id', 0),
+                                        code=e.code,
+                                        message=str(e),
+                                        http_status=e.http_status,
+                                        debug=False)
         except Exception as e:
             response = ExceptionResponse(e, id=req_json.get('id', 0), debug=False)
         else:
