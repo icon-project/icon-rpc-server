@@ -42,3 +42,4 @@ class GenericJsonRpcServerError(ApiError):
         """
         # FIXME: Replace GenericJsonRpcServerError as ApiError itself
         super().__init__(message=message, code=code, data=data)
+        self.http_status = http_status
