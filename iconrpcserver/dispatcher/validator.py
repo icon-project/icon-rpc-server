@@ -678,6 +678,7 @@ debug_estimateStep_v3: dict = {
                 "to": {"type": "string", "format": "address"},
                 "value": {"type": "string", "format": "int_16"},
                 "message": {"type": "string"},
+                "stepLimit": {"type": "string", "format": "int_16"},
                 "timestamp": {"type": "string", "format": "int_16"},
                 "nid": {"type": "string", "format": "int_16"},
                 "nonce": {"type": "string", "format": "int_16"},
