@@ -171,6 +171,16 @@ class ChannelInnerTask:
         """
         pass
 
+    @message_queue_task
+    async def get_block_receipts(self, block_height, block_hash) -> Tuple[int, str]:
+        """Get block receipts via v3
+
+        :param block_height:
+        :param block_hash:
+        :return: (response_code, block_receipts_json)
+        """
+        pass
+
 
 class ChannelInnerStub(MessageQueueStub[ChannelInnerTask]):
     TaskType = ChannelInnerTask

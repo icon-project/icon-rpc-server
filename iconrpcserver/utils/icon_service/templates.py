@@ -117,6 +117,8 @@ templates[RequestParamType.get_reps_by_hash] = {
     "repsHash": ValueType.hex_0x_hash_number
 }
 
+templates[RequestParamType.get_block_receipts] = templates[RequestParamType.get_block]
+
 # ======== templates for Response =========
 
 BLOCK_0_1a = {
@@ -201,3 +203,11 @@ templates[ResponseParamType.get_tx_by_hash] = {
 
 templates[ResponseParamType.send_tx] = ValueType.hex_0x_hash_number
 
+templates[ResponseParamType.get_block_receipts] = {
+    "tx_results": [
+        {
+            "txHash": ValueType.hex_0x_hash_number,
+            "blockHash": ValueType.hex_0x_hash_number,
+        }
+    ]
+}
