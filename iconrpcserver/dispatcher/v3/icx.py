@@ -150,6 +150,12 @@ class IcxDispatcher:
                 message='Invalid params txHash',
                 http_status=status.HTTP_BAD_REQUEST
             )
+        elif response_code == message_code.Response.pruned_hash_data:
+            raise GenericJsonRpcServerError(
+                code=JsonError.INVALID_PARAMS,
+                message='Pruned Hash Data',
+                http_status=status.HTTP_BAD_REQUEST
+            )
 
         result = tx_info["transaction"]
         result['txHash'] = request['txHash']
