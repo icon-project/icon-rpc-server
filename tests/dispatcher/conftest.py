@@ -598,7 +598,35 @@ REQUESTS_V3 = {
                 "repsHash": "0xe08f93fac84433f8220c18e415e15c6e837539de2aa7d9d6cb953acd8cdd609e"
             }
         }
-    ]
+    ],
+    "icx_getBlockReceipts": {
+        "jsonrpc": "2.0",
+        "method": "icx_getBlockReceipts",
+        "id": 1234
+    },
+    "icx_getBlockReceipts_batch": [
+        {
+            "jsonrpc": "2.0",
+            "method": "icx_getBlockReceipts",
+            "id": 1234
+        },
+        {
+            "jsonrpc": "2.0",
+            "method": "icx_getBlockReceipts",
+            "id": 1234,
+            "params": {
+                "height": "0x1"
+            }
+        },
+        {
+            "jsonrpc": "2.0",
+            "method": "icx_getBlockReceipts",
+            "id": 1234,
+            "params": {
+                "hash": "0xcf43b3fd45981431a0e64f79d07bfcf703e064b73b802c5f32834eec72142190",
+            }
+        },
+    ],
 }
 
 
