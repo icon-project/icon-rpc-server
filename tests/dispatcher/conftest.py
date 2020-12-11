@@ -598,7 +598,35 @@ REQUESTS_V3 = {
                 "repsHash": "0xe08f93fac84433f8220c18e415e15c6e837539de2aa7d9d6cb953acd8cdd609e"
             }
         }
-    ]
+    ],
+    "icx_getBlockReceipts": {
+        "jsonrpc": "2.0",
+        "method": "icx_getBlockReceipts",
+        "id": 1234
+    },
+    "icx_getBlockReceipts_batch": [
+        {
+            "jsonrpc": "2.0",
+            "method": "icx_getBlockReceipts",
+            "id": 1234
+        },
+        {
+            "jsonrpc": "2.0",
+            "method": "icx_getBlockReceipts",
+            "id": 1234,
+            "params": {
+                "height": "0x1"
+            }
+        },
+        {
+            "jsonrpc": "2.0",
+            "method": "icx_getBlockReceipts",
+            "id": 1234,
+            "params": {
+                "hash": "0xcf43b3fd45981431a0e64f79d07bfcf703e064b73b802c5f32834eec72142190",
+            }
+        },
+    ],
 }
 
 
@@ -829,6 +857,52 @@ def create_channel_stub(**kwargs) -> ChannelInnerStub:
             "p2pEndpoint": "127.0.0.1:7400"
         }
     ]
+
+    # Block Receipts
+    block_receipts_sample_response = [
+        {
+            "txHash": "4b9afccf0ce595fc67fd84959d8ff3107aad2e78ea418d8e115d39dbb5ddf683",
+            "blockHeight": "0x696",
+            "blockHash": "59415879e59977ac29bfa5dcfff3dfff2604beb0f1ba97d1944caf90b39d4c49",
+            "txIndex": "0x0",
+            "to": "hxe3d6d5d8e433fbd13b9c481d11cf46cebd84b23c",
+            "stepUsed": "0x0",
+            "stepPrice": "0x0",
+            "cumulativeStepUsed": "0x0",
+            "eventLogs": [
+                {
+                    "scoreAddress": "cx0000000000000000000000000000000000000000",
+                    "indexed": [
+                        "PRepIssued(int,int,int,int)"
+                    ],
+                    "data": [
+                        "0xa968163f0a57b400000",
+                        "0x477",
+                        "0xd3e02419de2130fd07fe4",
+                        "0x20bd5ed6b99b1fcb"
+                    ]
+                },
+                {
+                    "scoreAddress": "cx0000000000000000000000000000000000000000",
+                    "indexed": [
+                        "ICXIssued(int,int,int,int)"
+                    ],
+                    "data": [
+                        "0x0",
+                        "0x20bd5ed6b99b1fcb",
+                        "0x0",
+                        "0x53a06a5e791a89dbe"
+                    ]
+                }
+            ],
+            "status": "0x1"
+        }]
+
+    # response_code, block_hash, confirm_info, block_data_json
+    task.get_block_receipts.return_value = (
+        kwargs.get("response_code"),
+        json.dumps(block_receipts_sample_response)
+    )
 
     stub: ChannelInnerStub = MagicMock(ChannelInnerStub)
     stub.async_task.return_value = task

@@ -14,6 +14,7 @@
 
 import json
 import logging
+from typing import Tuple
 
 import aiohttp
 from iconcommons.logger import Logger
@@ -83,7 +84,12 @@ async def get_block_v2_by_params(block_height=None, block_hash="", with_commit_s
     return block_hash, result
 
 
-async def get_block_by_params(channel_name=None, block_height=None, block_hash="", with_commit_state=False):
+async def get_block_by_params(
+        channel_name=None,
+        block_height=None,
+        block_hash="",
+        with_commit_state=False
+):
     channel_name = StubCollection().conf[ConfigKey.CHANNEL] if channel_name is None else channel_name
 
     try:
@@ -117,6 +123,37 @@ async def get_block_by_params(channel_name=None, block_height=None, block_hash="
         del result['block']['commit_state']
 
     return block_hash, result
+
+
+async def get_block_recipts_by_params(
+        channel_name: str = None,
+        block_height: int = None,
+        block_hash: str = ""
+) -> Tuple[int, list]:
+    channel_name = StubCollection().conf[ConfigKey.CHANNEL] if channel_name is None else channel_name
+
+    try:
+        channel_stub = get_channel_stub_by_channel_name(channel_name)
+    except KeyError:
+        raise GenericJsonRpcServerError(
+            code=JsonError.INVALID_REQUEST,
+            message="Invalid channel name",
+            http_status=status.HTTP_BAD_REQUEST
+        )
+
+    response_code, block_receipts = \
+        await channel_stub.async_task().get_block_receipts(
+            block_height=block_height,
+            block_hash=block_hash
+        )
+
+    try:
+        block_receipts: list = json.loads(block_receipts)
+    except Exception as e:
+        logging.error(f"get_block_receipts_by_params error caused by : {e}")
+        block_receipts: list = []
+
+    return response_code, block_receipts
 
 
 def get_icon_stub_by_channel_name(channel_name):
