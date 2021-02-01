@@ -14,7 +14,7 @@ from iconrpcserver.utils.icon_service import (response_to_json_query,
                                               RequestParamType, ResponseParamType)
 from iconrpcserver.utils.icon_service.converter import convert_params, make_request
 from iconrpcserver.utils.json_rpc import (get_icon_stub_by_channel_name, get_channel_stub_by_channel_name,
-                                          relay_tx_request, get_block_by_params)
+                                          relay_tx_request, get_block_by_params, get_block_recipts_by_params)
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
 BLOCK_v0_1a = '0.1a'
@@ -295,4 +295,35 @@ class IcxDispatcher:
         tx_hash = kwargs['txHash']
         proof = kwargs['proof']
         response = await channel_stub.async_task().prove_receipt(tx_hash, proof)
+        return response_to_json_query(response)
+
+    @staticmethod
+    @methods.add
+    async def icx_getBlockReceipts(context: Dict[str, str], **kwargs):
+        channel = context.get('channel')
+        request = convert_params(kwargs, RequestParamType.get_block_receipts)
+        if all(param in request for param in ["hash", "height"]):
+            raise GenericJsonRpcServerError(
+                code=JsonError.INVALID_PARAMS,
+                message='Invalid params (only one parameter is allowed)',
+                http_status=status.HTTP_BAD_REQUEST
+            )
+        if 'hash' in request:
+            code, block_receipts = await get_block_recipts_by_params(
+                block_hash=request['hash'],
+                channel_name=channel
+            )
+        elif 'height' in request:
+            code, block_receipts = await get_block_recipts_by_params(
+                block_height=request['height'],
+                channel_name=channel
+            )
+        else:
+            code, block_receipts = await get_block_recipts_by_params(
+                block_height=-1,
+                channel_name=channel
+            )
+
+        check_response_code(code)
+        response = convert_params(block_receipts, ResponseParamType.get_block_receipts)
         return response_to_json_query(response)

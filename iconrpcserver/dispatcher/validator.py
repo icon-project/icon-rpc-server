@@ -678,6 +678,7 @@ debug_estimateStep_v3: dict = {
                 "to": {"type": "string", "format": "address"},
                 "value": {"type": "string", "format": "int_16"},
                 "message": {"type": "string"},
+                "stepLimit": {"type": "string", "format": "int_16"},
                 "timestamp": {"type": "string", "format": "int_16"},
                 "nid": {"type": "string", "format": "int_16"},
                 "nonce": {"type": "string", "format": "int_16"},
@@ -757,6 +758,27 @@ debug_getAccount_v3: dict = {
     "required": ["jsonrpc", "method", "id", "params"]
 }
 
+icx_getBlockReceipts: dict = {
+    "title": "icx_getBlockReceipts",
+    "id": "https://github.com/icon-project/icon-rpc-server/blob/master/docs/icon-json-rpc-v3.md",
+    "type": "object",
+    "properties": {
+        "jsonrpc": {"type": "string", "enum": ["2.0"]},
+        "method": {"type": "string"},
+        "id": {"type": ["number", "string"]},
+        "params": {
+            "type": "object",
+            "properties": {
+                "hash": {"type": "string", "format": "hash"},
+                "height": {"type": "string", "format": "int_16"},
+            },
+            "additionalProperties": False
+        }
+    },
+    "additionalProperties": False,
+    "required": ["jsonrpc", "method", "id"]
+}
+
 SCHEMA_V3: dict = {
     "icx_getBlock": icx_getBlock,
     "icx_getLastBlock": icx_getLastBlock,
@@ -777,6 +799,7 @@ SCHEMA_V3: dict = {
     "ise_getStatus": ise_getStatus_v3,
     "rep_getListByHash": rep_getListByHash_v3,
     "debug_getAccount": debug_getAccount_v3,
+    "icx_getBlockReceipts": icx_getBlockReceipts
 }
 
 

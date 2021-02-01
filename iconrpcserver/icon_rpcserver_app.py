@@ -16,9 +16,10 @@ import argparse
 import os
 import sys
 
+import aio_pika
+import asyncio
 import gunicorn
 import gunicorn.app.base
-from earlgrey import asyncio, aio_pika
 from iconcommons.icon_config import IconConfig
 from iconcommons.logger import Logger
 
@@ -107,7 +108,6 @@ async def _check_rabbitmq(amqp_target: str):
         amqp_user_name = os.getenv("AMQP_USERNAME", "guest")
         amqp_password = os.getenv("AMQP_PASSWORD", "guest")
         connection = await aio_pika.connect(host=amqp_target, login=amqp_user_name, password=amqp_password)
-        connection.connect()
     except ConnectionRefusedError:
         Logger.error("rabbitmq-service disable", ICON_RPCSERVER_CLI)
         exit(0)

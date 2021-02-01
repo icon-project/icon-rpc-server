@@ -118,6 +118,7 @@ Below table shows the default error messages for the error code. Actual message 
     * v2: "data_type"
     * v3: "dataType"
 * Removed tx_hash from the icx_sendTransaction message.
+* Append icx_getBlockReceipts API
 
 # JSON-RPC APIs
 
@@ -142,6 +143,7 @@ API path : `<scheme>://<host>/api/v3`
 * [icx_proveTransaction](#icx_provetransaction)
 * [icx_proveReceipt](#icx_provereceipt)
 * [icx_sendTransaction](#icx_sendtransaction)
+* [icx_getBlockReceipts](#icx_getblockreceipts)
 
 ## Debug API
 
@@ -1757,6 +1759,124 @@ Information of Account
     "id": 1234
 }
 ```
+
+
+
+## icx_getBlockReceipts
+
+* Returns the block receipts by given parameter.
+
+### Parameters
+
+| KEY    | VALUE type        | Description               |
+| :----- | :---------------- | :------------------------ |
+| hash   | [T_HASH](#T_HASH) | Hash of a block           |
+| height | [T_INT](#T_INT)   | Integer of a block height |
+| None   | -                 | Last block                |
+
+### Returns
+
+Block Receipts data (including v0.3)
+
+### Example
+
+```javascript
+// Request 1 - get last block receipts
+{
+    "jsonrpc": "2.0",
+    "method": "icx_getBlockReceipts",
+    "id": 1234
+}
+
+// Request 2 - get block receipts by hash
+{
+    "jsonrpc": "2.0",
+    "method": "icx_getBlockReceipts",
+    "id": 1234,
+    "params": {
+        "hash": "0x6d4a4dbb950152050684eef5d0e228b8a31cae7afd37d9760b79312305008977"
+    }
+}
+
+// Request 3 - get block receipts by height
+{
+    "jsonrpc": "2.0",
+    "method": "icx_getBlockReceipts",
+    "id": 1234,
+    "params": {
+        "height": "0x4"
+    }
+}
+
+// Response - success
+{
+    "jsonrpc": "2.0",
+    "result": [
+		{
+			"txHash": "4b9afccf0ce595fc67fd84959d8ff3107aad2e78ea418d8e115d39dbb5ddf683",
+			"blockHeight": "0x696",
+			"blockHash": "59415879e59977ac29bfa5dcfff3dfff2604beb0f1ba97d1944caf90b39d4c49",
+			"txIndex": "0x0",
+			"to": "hxe3d6d5d8e433fbd13b9c481d11cf46cebd84b23c",
+			"stepUsed": "0x0",
+			"stepPrice": "0x0",
+			"cumulativeStepUsed": "0x0",
+			"eventLogs": [
+				{
+					"scoreAddress": "cx0000000000000000000000000000000000000000",
+					"indexed": [
+						"PRepIssued(int,int,int,int)"
+					],
+					"data": [
+						"0xa968163f0a57b400000",
+						"0x477",
+						"0xd3e02419de2130fd07fe4",
+						"0x20bd5ed6b99b1fcb"
+					]
+				},
+				{
+					"scoreAddress": "cx0000000000000000000000000000000000000000",
+					"indexed": [
+						"ICXIssued(int,int,int,int)"
+					],
+					"data": [
+						"0x0",
+						"0x20bd5ed6b99b1fcb",
+						"0x0",
+						"0x53a06a5e791a89dbe"
+					]
+				}
+			],
+			"status": "0x1"
+		}
+	],
+  "id": 1234
+}
+
+// Request (fail if both parameters are in request message.)
+{
+    "jsonrpc": "2.0",
+    "method": "icx_getBlockReceipts",
+    "id": 1234,
+    "params": {
+        "hash": "0x6d4a4dbb950152050684eef5d0e228b8a31cae7afd37d9760b79312305008977",
+        "height": "0x4"
+    }
+}
+ 
+ 
+// Response - fail
+{
+    "jsonrpc": "2.0",
+    "id": 1234,
+    "error": {
+        "code": -32602,
+        "message": "Invalid params (only one parameter is allowed)"
+    }
+}
+```
+
+## 
 
 ## References
 

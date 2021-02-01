@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from earlgrey import MessageQueueStub, message_queue_task
-from typing import TYPE_CHECKING, Tuple, List, Dict, Union, NoReturn
-from . import exit_process
+from typing import Tuple, List, Dict, Union, NoReturn, Optional
 
-if TYPE_CHECKING:
-    from earlgrey import RobustConnection
+from earlgrey import MessageQueueStub, message_queue_task
+
+from ...utils.message_queue import earlgrey_close
 
 
 class ChannelInnerTask:
@@ -172,12 +171,22 @@ class ChannelInnerTask:
         """
         pass
 
+    @message_queue_task
+    async def get_block_receipts(self, block_height, block_hash) -> Tuple[int, str]:
+        """Get block receipts via v3
+
+        :param block_height:
+        :param block_hash:
+        :return: (response_code, block_receipts_json)
+        """
+        pass
+
 
 class ChannelInnerStub(MessageQueueStub[ChannelInnerTask]):
     TaskType = ChannelInnerTask
 
-    def _callback_connection_lost_callback(self, connection: 'RobustConnection'):
-        exit_process()
+    def _callback_connection_close(self, sender, exc: Optional[BaseException], *args, **kwargs):
+        earlgrey_close(func="ChannelInnerStub", exc=exc)
 
 
 class ChannelTxCreatorInnerTask:
@@ -194,5 +203,5 @@ class ChannelTxCreatorInnerTask:
 class ChannelTxCreatorInnerStub(MessageQueueStub[ChannelTxCreatorInnerTask]):
     TaskType = ChannelTxCreatorInnerTask
 
-    def _callback_connection_lost_callback(self, connection: 'RobustConnection'):
-        exit_process()
+    def _callback_connection_close(self, sender, exc: Optional[BaseException], *args, **kwargs):
+        earlgrey_close(func="ChannelTxCreatorInnerStub", exc=exc)

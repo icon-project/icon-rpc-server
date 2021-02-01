@@ -11,13 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Optional
 
 from earlgrey import MessageQueueStub, message_queue_task
-from typing import TYPE_CHECKING
-from . import exit_process
 
-if TYPE_CHECKING:
-    from earlgrey import RobustConnection
+from ...utils.message_queue import earlgrey_close
 
 
 class IconScoreInnerTask:
@@ -62,5 +60,5 @@ class IconScoreInnerTask:
 class IconScoreInnerStub(MessageQueueStub[IconScoreInnerTask]):
     TaskType = IconScoreInnerTask
 
-    def _callback_connection_lost_callback(self, connection: 'RobustConnection'):
-        exit_process()
+    def _callback_connection_close(self, sender, exc: Optional[BaseException], *args, **kwargs):
+        earlgrey_close(func="IconScoreInnerStub", exc=exc)
