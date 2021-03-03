@@ -18,7 +18,7 @@ from typing import Tuple
 
 import aiohttp
 from iconcommons.logger import Logger
-from jsonrpcclient import exceptions
+from jsonrpcclient import exceptions, Response
 from jsonrpcclient.clients.aiohttp_client import AiohttpClient
 from jsonrpcserver import status
 
@@ -28,6 +28,24 @@ from ..dispatcher import GenericJsonRpcServerError, JsonError
 from ..utils.icon_service.converter import convert_params
 from ..utils.icon_service.templates import ResponseParamType
 from ..utils.message_queue.stub_collection import StubCollection
+
+
+class NewAiohttpClient(AiohttpClient):
+    def validate_response(self, response: Response):
+        if response.raw is not None and not 200 <= response.raw.status <= 299:
+            try:
+                data: dict = json.loads(response.text)
+                error = data["error"]
+                code = int(error["code"])
+                message = error["message"]
+            except Exception as e:
+                code = JsonError.INTERNAL_ERROR
+                message = f"ServerError: {response.text}"
+            raise GenericJsonRpcServerError(
+                code=code,
+                message=message,
+                http_status=status.HTTP_BAD_REQUEST
+            )
 
 
 async def relay_tx_request(relay_target, message, path, version=ApiVersion.v3.name):
@@ -43,7 +61,7 @@ async def relay_tx_request(relay_target, message, path, version=ApiVersion.v3.na
                     f"version[{version}], "
                     f"method[{method_name}]")
         try:
-            response = await AiohttpClient(session, relay_uri, timeout=10).request(method_name, **message)
+            response = await NewAiohttpClient(session, relay_uri, timeout=10).request(method_name, **message)
         except exceptions.ReceivedNon2xxResponseError as e:
             raise GenericJsonRpcServerError(
                 code=JsonError.INTERNAL_ERROR,
