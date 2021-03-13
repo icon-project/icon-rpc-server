@@ -13,6 +13,7 @@ from iconrpcserver.default_conf.icon_rpcserver_constant import ConfigKey
 from iconrpcserver.default_conf.icon_rpcserver_constant import DISPATCH_V3_TAG
 from iconrpcserver.dispatcher import GenericJsonRpcServerError
 from iconrpcserver.dispatcher import validate_jsonschema_v3
+from iconrpcserver.dispatcher.v3.statics import statics_call
 from iconrpcserver.utils.message_queue.stub_collection import StubCollection
 
 if TYPE_CHECKING:
@@ -42,6 +43,8 @@ class Version3Dispatcher:
             Logger.info(f"{client_ip} requested {req_json} on {url}")
 
             validate_jsonschema_v3(request=req_json)
+
+            await statics_call(context, client_ip, req_json)
         except GenericJsonRpcServerError as e:
             response = ApiErrorResponse(id=req_json.get('id', 0),
                                         code=e.code,
@@ -49,6 +52,7 @@ class Version3Dispatcher:
                                         http_status=e.http_status,
                                         debug=False)
         except Exception as e:
+            Logger.exception(e)
             response = ExceptionResponse(e, id=req_json.get('id', 0), debug=False)
         else:
             response = await async_dispatch(request.body, methods, context=context)
