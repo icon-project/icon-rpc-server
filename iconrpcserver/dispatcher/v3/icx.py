@@ -8,7 +8,7 @@ from iconcommons.logger import Logger
 from jsonrpcserver import status
 
 from iconrpcserver.dispatcher import GenericJsonRpcServerError, JsonError
-from iconrpcserver.dispatcher.v3 import methods
+from iconrpcserver.dispatcher.v3 import methods, ConfigKey
 from iconrpcserver.utils import message_code
 from iconrpcserver.utils.icon_service import (response_to_json_query,
                                               RequestParamType, ResponseParamType)
@@ -68,6 +68,7 @@ class IcxDispatcher:
     async def icx_sendTransaction(context: Dict[str, str], **kwargs):
         channel = context.get('channel')
         url = context.get('url')
+
         path = urlparse(url).path
 
         method = 'icx_sendTransaction'
@@ -77,6 +78,12 @@ class IcxDispatcher:
         response = await icon_stub.async_task().validate_transaction(request)
         # Error Check
         response_to_json_query(response)
+
+        # DosGuard
+        if StubCollection().conf[ConfigKey.DOS_GUARD_ENABLE]:
+            response = await icon_stub.async_task().dos_guard(kwargs)
+            # Error Check
+            response_to_json_query(response)
 
         channel_tx_creator_stub = StubCollection().channel_tx_creator_stubs[channel]
         response_code, tx_hash, relay_target = \

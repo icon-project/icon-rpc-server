@@ -56,6 +56,10 @@ class IconScoreInnerTask:
     async def change_block_hash(self, params) -> dict:
         pass
 
+    @message_queue_task
+    async def dos_guard(self, params: dict) -> dict:
+        pass
+
 
 class IconScoreInnerStub(MessageQueueStub[IconScoreInnerTask]):
     TaskType = IconScoreInnerTask
