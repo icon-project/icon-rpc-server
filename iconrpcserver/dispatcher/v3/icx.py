@@ -80,7 +80,7 @@ class IcxDispatcher:
         response_to_json_query(response)
 
         # DosGuard
-        if StubCollection().conf[ConfigKey.DOS_GUARD_ENABLE]:
+        if StubCollection().conf.get(ConfigKey.DOS_GUARD_ENABLE, False):
             response = await icon_stub.async_task().dos_guard(kwargs)
             # Error Check
             response_to_json_query(response)
