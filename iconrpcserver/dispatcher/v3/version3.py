@@ -49,6 +49,7 @@ class Version3Dispatcher:
                                         http_status=e.http_status,
                                         debug=False)
         except Exception as e:
+            Logger.exception(e)
             response = ExceptionResponse(e, id=req_json.get('id', 0), debug=False)
         else:
             response = await async_dispatch(request.body, methods, context=context)
