@@ -44,5 +44,4 @@ default_rpcserver_config = \
         ConfigKey.SCORE_QUERY_TIMEOUT: 120,
         ConfigKey.WS_HEARTBEAT_TIME: 30,
         ConfigKey.REQUEST_MAX_SIZE: 2 * 1024 * 1024,
-        ConfigKey.DOS_GUARD_ENABLE: False,
     }

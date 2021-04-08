@@ -79,12 +79,6 @@ class IcxDispatcher:
         # Error Check
         response_to_json_query(response)
 
-        # DosGuard
-        if StubCollection().conf.get(ConfigKey.DOS_GUARD_ENABLE, False):
-            response = await icon_stub.async_task().dos_guard(kwargs)
-            # Error Check
-            response_to_json_query(response)
-
         channel_tx_creator_stub = StubCollection().channel_tx_creator_stubs[channel]
         response_code, tx_hash, relay_target = \
             await channel_tx_creator_stub.async_task().create_icx_tx(kwargs)
