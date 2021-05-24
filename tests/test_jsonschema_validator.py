@@ -570,6 +570,20 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
         for data in send_txs:
             self.check_sendTransaction(data)
 
+    def test_debug_estimateStep(self):
+        send_txs = [
+            self.sendTransaction,
+            self.sendTransaction_call,
+            self.sendTransaction_deploy,
+            self.sendTransaction_message,
+            self.sendTransaction_deposit
+        ]
+
+        for data in send_txs:
+            debug_estimate_step = data
+            debug_estimate_step["method"] = "debug_estimateStep"
+            self.check_sendTransaction(debug_estimate_step)
+
     def check_sendTransaction(self, full_data):
         # check default function
         self.check_valid(full_data=full_data)
