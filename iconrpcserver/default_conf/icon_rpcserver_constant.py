@@ -67,6 +67,7 @@ class ConfigKey:
     WS_HEARTBEAT_TIME = 'wsHeartBeatTime'
     REQUEST_MAX_SIZE = 'requestMaxSize'
     GUNICORN_CONFIG = 'gunicornConfig'
+    DOS_GUARD_ENABLE = "dosGuardEnable"
 
 
 ICON_RPC_SERVER_LOG_TAG = 'IconRpcServer'
