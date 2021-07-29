@@ -658,7 +658,7 @@ def patch_stubcollection():
 
 @pytest.yield_fixture
 def app():
-    sanic_app = Sanic("test_sanic_app")
+    sanic_app = Sanic("test_sanic_app", register=False)
 
     sanic_app.add_route(NodeDispatcher.dispatch, '/api/node/', methods=['POST'])
     sanic_app.add_route(Version2Dispatcher.dispatch, '/api/v2/', methods=['POST'])
