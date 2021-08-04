@@ -10,7 +10,7 @@ from iconrpcserver.utils.json_rpc import relay_tx_request
 from tests.dispatcher.conftest import TestDispatcher, REQUESTS_V3
 
 if TYPE_CHECKING:
-    from aiohttp import ClientResponse
+    from httpx import Response
 
 
 @pytest.mark.asyncio
@@ -25,8 +25,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel_tx_creator(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
         tx_hash = result_json.get("result")
 
         # Then I should receive valid tx_hash
@@ -46,7 +46,7 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel_tx_creator(response_code=message_code.Response.fail_no_permission)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
+        response: Response = await test_cli.post(self.URI, json=json_request)
 
         # Then the server should relay tx to another node
         mock_relay_tx_request.assert_called()
@@ -58,8 +58,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -71,8 +71,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
-        result_json: list = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = response.json()
 
         # Then response is not error
         for json_data in result_json:
@@ -85,8 +85,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -98,8 +98,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -111,8 +111,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
-        result_json: list = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = response.json()
 
         # Then response is not error
         for json_data in result_json:
@@ -125,8 +125,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -138,8 +138,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
-        result_json: list = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = response.json()
 
         # Then response is not error
         for json_data in result_json:
@@ -150,8 +150,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         json_request = copy.deepcopy(self.REQUESTS["icx_call"])
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -161,8 +161,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         json_request_batch = copy.deepcopy(self.REQUESTS["icx_call_batch"])
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
-        result_json: list = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = response.json()
 
         # Then response is not error
         for json_data in result_json:
@@ -173,8 +173,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         json_request = copy.deepcopy(self.REQUESTS["icx_getBalance"])
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -184,8 +184,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         json_request_batch = copy.deepcopy(self.REQUESTS["icx_getBalance_batch"])
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
-        result_json: list = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = response.json()
 
         # Then response is not error
         for json_data in result_json:
@@ -196,8 +196,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         json_request = copy.deepcopy(self.REQUESTS["icx_getScoreApi"])
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -207,8 +207,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         json_request_batch = copy.deepcopy(self.REQUESTS["icx_getScoreApi_batch"])
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
-        result_json: list = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = response.json()
 
         # Then response is not error
         for json_data in result_json:
@@ -219,8 +219,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         json_request = copy.deepcopy(self.REQUESTS["icx_getTotalSupply"])
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -232,8 +232,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -245,8 +245,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
-        result_json: list = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = response.json()
 
         # Then response is not error
         for json_data in result_json:
@@ -259,8 +259,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -272,8 +272,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
-        result_json: list = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = response.json()
 
         # Then response is not error
         for json_data in result_json:
@@ -286,8 +286,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -299,8 +299,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
-        result_json: list = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = response.json()
 
         # Then response is not error
         for json_data in result_json:
@@ -313,8 +313,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -326,8 +326,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
-        result_json: list = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = response.json()
 
         # Then response is not error
         for json_data in result_json:
@@ -340,8 +340,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -353,8 +353,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
-        result_json: list = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = response.json()
 
         # Then response is not error
         for json_data in result_json:
@@ -367,8 +367,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -380,8 +380,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
-        result_json: list = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = response.json()
 
         # Then response is not error
         for json_data in result_json:
@@ -394,8 +394,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -407,8 +407,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
-        result_json: list = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = response.json()
 
         # Then response is not error
         for json_data in result_json:
@@ -421,8 +421,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -434,8 +434,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -447,8 +447,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
-        result_json: list = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = response.json()
 
         # Then response is not error
         for json_data in result_json:
@@ -461,8 +461,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request)
-        result_json: dict = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request)
+        result_json: dict = response.json()
 
         # Then response is not error
         assert 'error' not in result_json, f"request = {json_request}"
@@ -474,8 +474,8 @@ class TestVersion3Dispatcher(TestDispatcher):
         mock_channel(response_code=message_code.Response.success)
 
         # When I call dispatch method
-        response: ClientResponse = await test_cli.post(self.URI, json=json_request_batch)
-        result_json: list = await response.json()
+        response: Response = await test_cli.post(self.URI, json=json_request_batch)
+        result_json: list = response.json()
 
         # Then response is not error
         for json_data in result_json:

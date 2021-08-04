@@ -138,18 +138,16 @@ async def get_channel_status(channel_name) -> dict:
 
 
 class Status(HTTPMethodView):
-    async def get(self, request):
-        args = request.raw_args
-        channel_name = args.get('channel') or ServerComponents.conf.get(ConfigKey.CHANNEL)
+    async def get(self, request, *args, **kwargs):
+        channel_name = request.args.get('channel') or ServerComponents.conf.get(ConfigKey.CHANNEL)
         status_data: dict = await get_channel_status(channel_name)
 
         return response.json(status_data)
 
 
 class Avail(HTTPMethodView):
-    async def get(self, request):
-        args = request.raw_args
-        channel_name = args.get('channel') or ServerComponents.conf.get(ConfigKey.CHANNEL)
+    async def get(self, request, *args, **kwargs):
+        channel_name = request.args.get('channel') or ServerComponents.conf.get(ConfigKey.CHANNEL)
         status = HTTPStatus.OK
         result: dict = await get_channel_status(channel_name)
 
@@ -160,8 +158,8 @@ class Avail(HTTPMethodView):
 
 
 class Disable(HTTPMethodView):
-    async def get(self, request):
+    async def get(self, request, *args, **kwargs):
         return response.text("This api version not support any more!")
 
-    async def post(self, request):
+    async def post(self, request, *args, **kwargs):
         return response.text("This api version not support any more!")
