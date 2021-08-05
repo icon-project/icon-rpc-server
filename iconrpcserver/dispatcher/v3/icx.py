@@ -193,20 +193,17 @@ class IcxDispatcher:
     @staticmethod
     @methods.add
     async def icx_getBlock(context: Dict[str, str], **kwargs):
-        channel = context.get('channel')
+        channel = context.get("channel")
         request = convert_params(kwargs, RequestParamType.get_block)
-        if all(param in request for param in ["hash", "height"]):
-            raise GenericJsonRpcServerError(
-                code=JsonError.INVALID_PARAMS,
-                message='Invalid params (only one parameter is allowed)',
-                http_status=status.HTTP_BAD_REQUEST
-            )
-        if 'hash' in request:
-            block_hash, result = await get_block_by_params(block_hash=request['hash'],
+
+        if "hash" in request:
+            block_hash, result = await get_block_by_params(block_hash=request.get("hash"),
                                                            channel_name=channel)
-        elif 'height' in request:
-            block_hash, result = await get_block_by_params(block_height=request['height'],
-                                                           channel_name=channel)
+        elif "height" in request:
+            block_hash, result = await get_block_by_params(block_height=request.get("height"),
+                                                           channel_name=channel,
+                                                           unconfirmed=request.get("unconfirmed", False))
+
         else:
             block_hash, result = await get_block_by_params(block_height=-1,
                                                            channel_name=channel)
@@ -254,8 +251,9 @@ class IcxDispatcher:
         channel = context.get('channel')
         request = convert_params(kwargs, RequestParamType.get_block_by_height)
 
-        block_hash, result = await get_block_by_params(block_height=request['height'],
-                                                       channel_name=channel)
+        block_hash, result = await get_block_by_params(block_height=request.get("height"),
+                                                       channel_name=channel,
+                                                       unconfirmed=request.get("unconfirmed", False))
         response_code = result['response_code']
         check_response_code(response_code)
 
