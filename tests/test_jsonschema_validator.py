@@ -266,8 +266,7 @@ class TestJsonschemaValidatorV3(TestJsonschemaValidator):
             "id": 1234,
             "method": "icx_getBlockByHeight",
             "params": {
-                "height": "0x4d2",
-                "unconfirmed": True
+                "height": "0x4d2"
             }
         }
         self.getBlockByHash = {

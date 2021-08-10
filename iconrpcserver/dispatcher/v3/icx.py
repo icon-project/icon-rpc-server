@@ -252,8 +252,7 @@ class IcxDispatcher:
         request = convert_params(kwargs, RequestParamType.get_block_by_height)
 
         block_hash, result = await get_block_by_params(block_height=request.get("height"),
-                                                       channel_name=channel,
-                                                       unconfirmed=request.get("unconfirmed", False))
+                                                       channel_name=channel)
         response_code = result['response_code']
         check_response_code(response_code)
 

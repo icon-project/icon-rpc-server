@@ -310,7 +310,6 @@ icx_getBlockByHeight_v3: dict = {
             "type": "object",
             "properties": {
                 "height": {"type": "string", "format": "int_16"},
-                "unconfirmed": {"type": "boolean"},
             },
             "additionalProperties": False,
             "required": ["height"]
