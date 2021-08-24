@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import re
+from typing import Union, List, Dict, Optional
 
 from jsonrpcserver import status
 from jsonschema import Draft4Validator, FormatChecker
@@ -270,12 +271,27 @@ icx_getBlock: dict = {
         "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
-            "properties": {
-                "hash": {"type": "string", "format": "hash"},
-                "height": {"type": "string", "format": "int_16"},
-            },
-            "additionalProperties": False
-        }
+            "oneOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "hash": {"type": "string", "format": "hash"},
+                    },
+                    "additionalProperties": False,
+                    "required": ["hash"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "height": {"type": "string", "format": "int_16"},
+                        "unconfirmed": {"type": "boolean"},
+                    },
+                    "additionalProperties": False,
+                    "required": ["height"]
+                }
+            ]
+        },
+        "additionalProperties": False
     },
     "additionalProperties": False,
     "required": ["jsonrpc", "method", "id"]
@@ -756,11 +772,11 @@ SCHEMA_V3: dict = {
 }
 
 
-def validate_jsonschema_v3(request: object):
+def validate_jsonschema_v3(request: Union[List, Dict]):
     validate_jsonschema(request, SCHEMA_V3)
 
 
-def validate_jsonschema(request: object, schemas: dict = SCHEMA_V3):
+def validate_jsonschema(request: Union[List, Dict], schemas: dict = SCHEMA_V3):
     """ Validate JSON-RPC v3 schema.
 
     refer to
@@ -778,7 +794,7 @@ def validate_jsonschema(request: object, schemas: dict = SCHEMA_V3):
         return
 
     # get schema for 'method'
-    schema: dict = None
+    schema: Optional[Dict] = None
     method = request.get('method', None)
 
     if method and isinstance(method, str):

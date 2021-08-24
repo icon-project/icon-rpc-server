@@ -64,7 +64,7 @@ class TestJsonschemaValidator(unittest.TestCase):
         data.pop('invalid_key')
 
 
-class TestJsonschemValidatorV2(TestJsonschemaValidator):
+class TestJsonschemaValidatorV2(TestJsonschemaValidator):
     def setUp(self):
         self.validator = validate_jsonschema_v2
 
@@ -243,7 +243,7 @@ class TestJsonschemValidatorV2(TestJsonschemaValidator):
             self.fail('raise exception!')
 
 
-class TestJsonschemValidatorV3(TestJsonschemaValidator):
+class TestJsonschemaValidatorV3(TestJsonschemaValidator):
     def setUp(self):
         self.validator = validate_jsonschema_v3
 
@@ -251,6 +251,15 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
             "jsonrpc": "2.0",
             "id": 1234,
             "method": "icx_getLastBlock"
+        }
+        self.getBlock = {
+            "jsonrpc": "2.0",
+            "id": 1234,
+            "method": "icx_getBlock",
+            "params": {
+                "height": "0x4d2",
+                "unconfirmed": True
+            }
         }
         self.getBlockByHeight = {
             "jsonrpc": "2.0",
@@ -456,6 +465,17 @@ class TestJsonschemValidatorV3(TestJsonschemaValidator):
         # check required key validation
         required_keys = ['jsonrpc', 'id']
         self.check_more(full_data=full_data, data=full_data, required_keys=required_keys)
+
+    def test_getBlock(self):
+        full_data = self.getBlock
+
+        # check default function
+        self.check_valid(full_data=full_data)
+
+        # check required key validation
+        params = full_data['params']
+        required_keys = []
+        self.check_more(full_data=full_data, data=params, required_keys=required_keys)
 
     def test_getBlockByHeight(self):
         full_data = self.getBlockByHeight

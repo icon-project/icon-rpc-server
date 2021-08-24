@@ -43,6 +43,8 @@ class Response:
     fail_no_permission = -18
     fail_out_of_tps_limit = -19
     fail_connection_closed = -20
+    fail_no_confirm_info = -21
+    fail_zero_limit_qos = -22
     fail_tx_invalid_unknown = -100
     fail_tx_invalid_hash_format = -101
     fail_tx_invalid_hash_generation = -102
@@ -125,6 +127,9 @@ responseCodeMap = {
 
     Response.fail_out_of_tps_limit:
         (Response.fail_out_of_tps_limit, "Server is processing too many requests"),
+
+    Response.fail_zero_limit_qos:
+        (Response.fail_zero_limit_qos, "Server is shutting down"),
 
     Response.fail_tx_invalid_unknown:
         (Response.fail_tx_invalid_unknown, "fail tx invalid unknown"),
