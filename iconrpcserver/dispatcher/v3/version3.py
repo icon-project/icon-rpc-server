@@ -24,11 +24,10 @@ methods = Methods()
 
 class Version3Dispatcher:
     @staticmethod
-    async def dispatch(request: 'SanicRequest', channel_name: str = None):
+    async def dispatch(request: 'SanicRequest', channel_name: str = ""):
         req_json = request.json
         url = request.url
-        channel = (channel_name if channel_name is not None
-                   else StubCollection().conf[ConfigKey.CHANNEL])
+        channel = channel_name if channel_name else StubCollection().conf[ConfigKey.CHANNEL]
 
         context = {
             "url": url,
