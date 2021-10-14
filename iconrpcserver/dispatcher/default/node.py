@@ -24,7 +24,7 @@ methods = Methods()
 
 class NodeDispatcher:
     @staticmethod
-    async def dispatch(request: 'SanicRequest', channel_name=None):
+    async def dispatch(request: 'SanicRequest', channel_name: str = ""):
         """Node dispatch
 
         FIXME : this dispatch is not considered to support batch request.

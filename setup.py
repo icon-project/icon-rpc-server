@@ -17,7 +17,7 @@ with open('requirements.txt') as requirements:
         install_requires.append(req)
 
 extras_requires = {
-    'tests': ['pytest~=5.4.2', 'pytest-asyncio~=0.12.0', 'mock~=4.0.1', 'pytest-sanic~=1.6.1']
+    'tests': ['pytest~=5.4.2', 'pytest-asyncio~=0.12.0', 'mock~=4.0.1', 'pytest-sanic~=1.8.1']
 }
 
 setup_options = {

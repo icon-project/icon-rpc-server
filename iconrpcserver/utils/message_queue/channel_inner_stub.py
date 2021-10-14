@@ -59,11 +59,12 @@ class ChannelInnerTask:
         pass
 
     @message_queue_task
-    async def get_block(self, block_height, block_hash) -> Tuple[int, str, bytes, str]:
+    async def get_block(self, block_height, block_hash, unconfirmed: bool) -> Tuple[int, str, bytes, str]:
         """Get block via v3
 
         :param block_height:
         :param block_hash:
+        :param unconfirmed: return unconfirmed block if True else fail response
         :return: (response_code, block_hash, confirm_info, block_data_json)
         """
         pass

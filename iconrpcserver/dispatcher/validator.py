@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import re
+from typing import Union, List, Dict, Optional
 
 from jsonrpcserver import status
 from jsonschema import Draft4Validator, FormatChecker
@@ -270,12 +271,27 @@ icx_getBlock: dict = {
         "id": {"type": ["number", "string"]},
         "params": {
             "type": "object",
-            "properties": {
-                "hash": {"type": "string", "format": "hash"},
-                "height": {"type": "string", "format": "int_16"},
-            },
-            "additionalProperties": False
-        }
+            "oneOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "hash": {"type": "string", "format": "hash"},
+                    },
+                    "additionalProperties": False,
+                    "required": ["hash"]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "height": {"type": "string", "format": "int_16"},
+                        "unconfirmed": {"type": "boolean"},
+                    },
+                    "additionalProperties": False,
+                    "required": ["height"]
+                }
+            ]
+        },
+        "additionalProperties": False
     },
     "additionalProperties": False,
     "required": ["jsonrpc", "method", "id"]
@@ -659,62 +675,15 @@ icx_sendTransaction_v3: dict = {
     },
     "additionalProperties": False,
     "required": ["jsonrpc", "method", "id", "params"]
-
 }
 
 debug_estimateStep_v3: dict = {
     "title": "debug_estimateStep",
     "id": "https://github.com/icon-project/icon-rpc-server/blob/master/docs/icon-json-rpc-v3.md#debug_estimateStep",
     "type": "object",
-    "properties": {
-        "jsonrpc": {"type": "string", "enum": ["2.0"]},
-        "method": {"type": "string"},
-        "id": {"type": "number"},
-        "params": {
-            "type": "object",
-            "properties": {
-                "version": {"type": "string", "format": "int_16"},
-                "from": {"type": "string", "format": "address_eoa"},
-                "to": {"type": "string", "format": "address"},
-                "value": {"type": "string", "format": "int_16"},
-                "message": {"type": "string"},
-                "stepLimit": {"type": "string", "format": "int_16"},
-                "timestamp": {"type": "string", "format": "int_16"},
-                "nid": {"type": "string", "format": "int_16"},
-                "nonce": {"type": "string", "format": "int_16"},
-                "dataType": {"type": "string", "enum": ["call", "deploy", "message"]},
-                "data": {
-                    "oneOf": [
-                        {
-                            "type": "object",
-                            "properties": {
-                                "method": {"type": "string"},
-                                "params": {"type": "object"}
-                            },
-                            "additionalProperties": False,
-                            "required": ["method"]
-                        },
-                        {
-                            "type": "object",
-                            "properties": {
-                                "contentType": {"type": "string", "enum": ["application/zip", "application/tbears"]},
-                                "content": {"type": "string"},  # tbears get string content
-                                "params": {"type": "object"}
-                            },
-                            "additionalProperties": False,
-                            "required": ["contentType", "content"]
-                        },
-                        {"type": "string"}
-                    ],
-                }
-            },
-            "additionalProperties": False,
-            "required": ["version", "from", "to", "timestamp"]
-        }
-    },
+    "properties": icx_sendTransaction_v3["properties"],
     "additionalProperties": False,
     "required": ["jsonrpc", "method", "id", "params"]
-
 }
 
 rep_getListByHash_v3: dict = {
@@ -803,11 +772,11 @@ SCHEMA_V3: dict = {
 }
 
 
-def validate_jsonschema_v3(request: object):
+def validate_jsonschema_v3(request: Union[List, Dict]):
     validate_jsonschema(request, SCHEMA_V3)
 
 
-def validate_jsonschema(request: object, schemas: dict = SCHEMA_V3):
+def validate_jsonschema(request: Union[List, Dict], schemas: dict = SCHEMA_V3):
     """ Validate JSON-RPC v3 schema.
 
     refer to
@@ -825,7 +794,7 @@ def validate_jsonschema(request: object, schemas: dict = SCHEMA_V3):
         return
 
     # get schema for 'method'
-    schema: dict = None
+    schema: Optional[Dict] = None
     method = request.get('method', None)
 
     if method and isinstance(method, str):

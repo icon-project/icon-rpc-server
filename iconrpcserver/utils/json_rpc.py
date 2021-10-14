@@ -106,7 +106,8 @@ async def get_block_by_params(
         channel_name=None,
         block_height=None,
         block_hash="",
-        with_commit_state=False
+        with_commit_state=False,
+        unconfirmed=False
 ):
     channel_name = StubCollection().conf[ConfigKey.CHANNEL] if channel_name is None else channel_name
 
@@ -122,7 +123,8 @@ async def get_block_by_params(
     response_code, block_hash, confirm_info, block_data_json = \
         await channel_stub.async_task().get_block(
             block_height=block_height,
-            block_hash=block_hash
+            block_hash=block_hash,
+            unconfirmed=unconfirmed
         )
 
     try:

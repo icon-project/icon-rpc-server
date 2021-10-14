@@ -73,7 +73,7 @@ class WSDispatcher:
     PUBLISH_NEW_BLOCK = "node_ws_PublishNewBlock"
 
     @staticmethod
-    async def dispatch(request: 'SanicRequest', ws: 'WebSocketCommonProtocol', channel_name: str = None):
+    async def dispatch(request: 'SanicRequest', ws: 'WebSocketCommonProtocol', channel_name: str = ""):
         ip = request.remote_addr or request.ip
         ws_request: Data = await ws.recv()
         context = {

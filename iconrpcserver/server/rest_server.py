@@ -85,21 +85,21 @@ class ServerComponents(metaclass=SingletonMetaClass):
         return self.__ssl_context
 
     def set_resource(self):
-        self.__app.add_route(NodeDispatcher.dispatch, '/api/node/<channel_name>', methods=['POST'])
+        self.__app.add_route(NodeDispatcher.dispatch, '/api/node/<channel_name:str>', methods=['POST'])
         self.__app.add_route(NodeDispatcher.dispatch, '/api/node/', methods=['POST'])
 
         self.__app.add_route(Version2Dispatcher.dispatch, '/api/v2', methods=['POST'])
-        self.__app.add_route(Version3Dispatcher.dispatch, '/api/v3/<channel_name>', methods=['POST'])
+        self.__app.add_route(Version3Dispatcher.dispatch, '/api/v3/<channel_name:str>', methods=['POST'])
         self.__app.add_route(Version3Dispatcher.dispatch, '/api/v3/', methods=['POST'])
 
-        self.__app.add_route(Version3DebugDispatcher.dispatch, '/api/debug/v3/<channel_name>', methods=['POST'])
+        self.__app.add_route(Version3DebugDispatcher.dispatch, '/api/debug/v3/<channel_name:str>', methods=['POST'])
         self.__app.add_route(Version3DebugDispatcher.dispatch, '/api/debug/v3/', methods=['POST'])
 
         self.__app.add_route(Disable.as_view(), '/api/v1', methods=['POST', 'GET'])
         self.__app.add_route(Status.as_view(), '/api/v1/status/peer')
         self.__app.add_route(Avail.as_view(), '/api/v1/avail/peer')
 
-        self.__app.add_websocket_route(WSDispatcher.dispatch, '/api/ws/<channel_name>')
+        self.__app.add_websocket_route(WSDispatcher.dispatch, '/api/ws/<channel_name:str>')
 
     def ready(self):
         StubCollection().amqp_target = ServerComponents.conf[ConfigKey.AMQP_TARGET]
@@ -138,18 +138,16 @@ async def get_channel_status(channel_name) -> dict:
 
 
 class Status(HTTPMethodView):
-    async def get(self, request):
-        args = request.raw_args
-        channel_name = args.get('channel') or ServerComponents.conf.get(ConfigKey.CHANNEL)
+    async def get(self, request, *args, **kwargs):
+        channel_name = request.args.get('channel') or ServerComponents.conf.get(ConfigKey.CHANNEL)
         status_data: dict = await get_channel_status(channel_name)
 
         return response.json(status_data)
 
 
 class Avail(HTTPMethodView):
-    async def get(self, request):
-        args = request.raw_args
-        channel_name = args.get('channel') or ServerComponents.conf.get(ConfigKey.CHANNEL)
+    async def get(self, request, *args, **kwargs):
+        channel_name = request.args.get('channel') or ServerComponents.conf.get(ConfigKey.CHANNEL)
         status = HTTPStatus.OK
         result: dict = await get_channel_status(channel_name)
 
@@ -160,8 +158,8 @@ class Avail(HTTPMethodView):
 
 
 class Disable(HTTPMethodView):
-    async def get(self, request):
+    async def get(self, request, *args, **kwargs):
         return response.text("This api version not support any more!")
 
-    async def post(self, request):
+    async def post(self, request, *args, **kwargs):
         return response.text("This api version not support any more!")
