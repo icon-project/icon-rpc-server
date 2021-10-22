@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import re
+import copy
 from typing import Union, List, Dict, Optional
 
 from jsonrpcserver import status
@@ -677,11 +678,13 @@ icx_sendTransaction_v3: dict = {
     "required": ["jsonrpc", "method", "id", "params"]
 }
 
+debug_estimateStep_properties = copy.deepcopy(icx_sendTransaction_v3["properties"])
+debug_estimateStep_properties["params"]["required"] = ["version", "from", "to", "timestamp"]
 debug_estimateStep_v3: dict = {
     "title": "debug_estimateStep",
     "id": "https://github.com/icon-project/icon-rpc-server/blob/master/docs/icon-json-rpc-v3.md#debug_estimateStep",
     "type": "object",
-    "properties": icx_sendTransaction_v3["properties"],
+    "properties": debug_estimateStep_properties,
     "additionalProperties": False,
     "required": ["jsonrpc", "method", "id", "params"]
 }
