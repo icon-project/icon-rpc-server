@@ -613,7 +613,7 @@ class TestJsonschemaValidatorV3(TestJsonschemaValidator):
         self.check_valid(full_data=full_data)
 
         # check full_data['params']
-        required_keys = ['version', 'from', 'stepLimit', 'timestamp', 'nid', 'signature']
+        required_keys = ['version', 'from', 'to', 'timestamp']
         self.check_more(full_data=full_data, data=params, required_keys=required_keys)
 
         # check full_data['params']['data']
