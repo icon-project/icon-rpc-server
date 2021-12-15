@@ -1,3 +1,6 @@
+# This repository archived. Refer to ICON 2.0 aka [goloop](https://github.com/icon-project/goloop).
+
+----
 
 [![Build Status](https://travis-ci.org/icon-project/icon-rpc-server.svg?branch=master)](https://travis-ci.org/icon-project/icon-rpc-server)
 [![PyPI](https://img.shields.io/pypi/v/iconrpcserver.svg)](https://pypi.org/project/iconrpcserver)
